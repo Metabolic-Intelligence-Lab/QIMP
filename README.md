@@ -1,2 +1,0 @@
-# QIMP
-Quantum Image Processing
