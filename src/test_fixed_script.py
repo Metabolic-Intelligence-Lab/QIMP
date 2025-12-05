@@ -69,7 +69,7 @@ def test_import():
     
     try:
         # Read the script but don't execute main
-        with open('Quantize and analyze Quantum GP 2.py', 'r') as f:
+        with open('quantize_analyze_quantum_gp_v2.py', 'r') as f:
             script_content = f.read()
         
         # Remove the main execution part
@@ -95,7 +95,7 @@ def test_import():
         return False
 
 if __name__ == "__main__":
-    print("🔧 Testing Fixed Quantize and Analyze Script")
+    print("Testing Fixed Quantize and Analyze Script")
     print("=" * 50)
     
     test1_passed = test_path_resolution()
@@ -103,12 +103,12 @@ if __name__ == "__main__":
     
     print("\n" + "=" * 50)
     if test1_passed and test2_passed:
-        print("✅ Tutti i test passati! Lo script dovrebbe funzionare ora.")
-        print("\n📝 Per eseguire lo script:")
-        print("   python 'Quantize and analyze Quantum GP 2.py'")
+        print("Tutti i test passati! Lo script dovrebbe funzionare ora.")
+        print("\nEsempio di esecuzione:")
+        print("   python quantize_analyze_quantum_gp_v2.py")
     else:
-        print("❌ Alcuni test falliti. Verificare i problemi sopra.")
+        print("Alcuni test falliti. Verificare i problemi sopra.")
     
-    print(f"\n📊 Risultati:")
-    print(f"  Path resolution: {'✅' if test1_passed else '❌'}")
-    print(f"  Script compilation: {'✅' if test2_passed else '❌'}")
+    print("\nRisultati:")
+    print("  Path resolution: " + ("OK" if test1_passed else "KO"))
+    print("  Script compilation: " + ("OK" if test2_passed else "KO"))
