@@ -103,6 +103,21 @@ reconstructed = encoder.decode(counts, n=2)
 print("PSNR:", psnr(image, reconstructed))
 ```
 
+## Interactive UI
+
+A Streamlit-based explorer ships with the package. Install the optional extra
+and launch:
+
+```bash
+pip install -e ".[ui]"
+qimp ui    # or: streamlit run apps/qimp_explorer/app.py
+```
+
+Four pages — Encoder Explorer, Processing Playground, Benchmark, GP-ratio —
+let you exercise every encoder + processing operation interactively, save
+outputs to `data/output/run_<timestamp>/`, and compare metrics side by side.
+See [`docs/ui.md`](docs/ui.md) for screenshots and tips.
+
 ## Citation
 
 If you use this library in academic work, please cite the underlying thesis:

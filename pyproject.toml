@@ -59,6 +59,10 @@ notebooks = [
     "jupyterlab>=4.0",
     "ipywidgets>=8.1",
 ]
+ui = [
+    "streamlit>=1.30",
+    "pandas>=2.0",
+]
 docs = [
     "mkdocs-material>=9.5",
     "mkdocstrings[python]>=0.24",
@@ -106,7 +110,7 @@ exclude = [
 [tool.ruff]
 line-length = 100
 target-version = "py310"
-src = ["src", "tests"]
+src = ["src", "tests", "apps"]
 extend-exclude = ["legacy", "data", "notebooks"]
 
 [tool.ruff.lint]
@@ -137,10 +141,24 @@ quote-style = "double"
 python_version = "3.10"
 strict = true
 files = ["src/qimp"]
-exclude = ["legacy", "data", "tests/fixtures"]
+# `apps/qimp_explorer/pages/*.py` use numeric prefixes (Streamlit's
+# multi-page convention) which mypy can't import. The helpers in `_io.py`
+# and `_viz.py` are covered by their unit tests; the pages are smoke-tested
+# in `tests/unit/test_app_imports.py`.
+exclude = ["legacy", "data", "tests/fixtures", "apps"]
 
 [[tool.mypy.overrides]]
-module = ["qiskit.*", "qiskit_aer.*", "qiskit_ibm_runtime.*", "matplotlib.*", "imageio.*", "PIL.*", "scipy.*"]
+module = [
+    "qiskit.*",
+    "qiskit_aer.*",
+    "qiskit_ibm_runtime.*",
+    "matplotlib.*",
+    "imageio.*",
+    "PIL.*",
+    "scipy.*",
+    "streamlit.*",
+    "pandas.*",
+]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
