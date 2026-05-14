@@ -125,7 +125,8 @@ ignore = [
     "E501",   # line too long (formatter handles it)
     "N803",   # argument lowercase (we keep n, m, q for qubit counts)
     "N806",   # variable lowercase (same reason)
-    "RUF002", # ambiguous unicode in docstrings (× – θ are physics notation)
+    "RUF001", # ambiguous unicode in strings (× – θ are physics notation)
+    "RUF002", # same, in docstrings
     "RUF003", # same, in comments
 ]
 
