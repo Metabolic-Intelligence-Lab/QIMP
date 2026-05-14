@@ -20,17 +20,16 @@ di Torino, 2022, Chapter 3).
 
 ## Install
 
-```bash
-pip install qimp-mi
-```
-
-For development:
+The repository is currently **private**. Use a GitHub Personal Access Token
+(`repo: Contents: Read`) when cloning:
 
 ```bash
-git clone https://github.com/Metabolic-Intelligence-Lab/QIMP
+git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP
 cd QIMP
 pip install -e ".[dev]"
 ```
+
+A future public release will simplify this to `pip install qimp-mi`.
 
 Optional extras: `[ibm]`, `[gpu]`, `[qml]`, `[notebooks]`, `[docs]`.
 

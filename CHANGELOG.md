@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.1.0] — 2026-05-14
+
+First tagged release. Repository remains **private** while we iterate;
+publication on PyPI is deferred. See README for the private-install workflow.
+
+### Security
+- Redacted an IBM Quantum API token that was hard-coded in eight legacy
+  exploratory scripts under `legacy/Old/`. The token is replaced by
+  `<REDACTED-IBM-Q-TOKEN>`; the original was committed to the repository in
+  earlier history (during the legacy migration in Fase 2) so it has been
+  **revoked** on the IBM Quantum side. If you cloned the repo prior to v0.1.0,
+  treat that token as compromised.
 
 ### Added — Fase 5
 - `examples/` directory with four self-contained runnable scripts:

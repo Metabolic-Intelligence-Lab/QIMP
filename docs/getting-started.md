@@ -2,19 +2,22 @@
 
 ## Install
 
-QIMP targets **Python ≥ 3.10** and **Qiskit ≥ 1.0**. The recommended installation:
+QIMP targets **Python ≥ 3.10** and **Qiskit ≥ 1.0**.
+
+The repository is currently **private**. Installation requires a GitHub PAT with
+*Contents: Read* permission. Two options:
 
 ```bash
-pip install qimp-mi
-```
-
-For development from a clone:
-
-```bash
-git clone https://github.com/Metabolic-Intelligence-Lab/QIMP
+# Editable install from a clone (recommended for development)
+git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git
 cd QIMP
 pip install -e ".[dev]"
+
+# Or install a pinned tag directly with pip
+pip install "git+https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.1.0"
 ```
+
+A future public release will simplify this to `pip install qimp-mi`.
 
 ## Optional extras
 

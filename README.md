@@ -30,20 +30,36 @@ extensions are available as optional sub-modules.
 
 ## Install
 
-Once published to PyPI:
+The repository is currently **private**. Installation requires a GitHub
+Personal Access Token with `repo` scope:
+
+```bash
+# Editable install from a clone (recommended for development)
+git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git
+cd QIMP
+pip install -e ".[dev]"
+
+# Or install a pinned tag directly with pip (no clone needed)
+pip install "git+https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.1.0"
+```
+
+Substitute `<TOKEN>` with a fresh PAT (https://github.com/settings/tokens →
+*Fine-grained* → grant *Contents: Read* on this repo). Don't paste your token
+into shell history or chat logs — use a `.netrc` file or `GH_TOKEN`
+environment variable instead.
+
+When the project is released publicly (target: v0.2.0), the install will
+simplify to:
 
 ```bash
 pip install qimp-mi
 ```
 
-For development from a clone:
+### Optional extras
 
-```bash
-pip install -e ".[dev]"
-```
-
-Optional extras: `[ibm]` (IBM Quantum Runtime), `[gpu]` (Aer GPU), `[qml]`
-(qiskit-machine-learning), `[notebooks]` (JupyterLab), `[docs]` (mkdocs-material).
+`[ibm]` (IBM Quantum Runtime), `[gpu]` (Aer GPU), `[qml]`
+(qiskit-machine-learning), `[notebooks]` (JupyterLab), `[docs]` (mkdocs-material),
+`[dev]` (pytest, ruff, mypy, pre-commit).
 
 ## Repository layout
 
