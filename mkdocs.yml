@@ -1,0 +1,79 @@
+site_name: QIMP — Quantum Image Processing
+site_description: Modular Python library for FRQI / NEQR / QPIE quantum image processing on top of Qiskit.
+site_url: https://Metabolic-Intelligence-Lab.github.io/QIMP/
+repo_url: https://github.com/Metabolic-Intelligence-Lab/QIMP
+repo_name: Metabolic-Intelligence-Lab/QIMP
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: numpy
+            show_source: false
+            show_root_heading: true
+            show_signature_annotations: true
+            members_order: source
+            separate_signature: true
+            heading_level: 3
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Encodings: encoding.md
+  - Processing: processing.md
+  - Examples: examples.md
+  - API Reference:
+      - Encoding: api/encoding.md
+      - Processing: api/processing.md
+      - I/O & Metrics: api/io-metrics.md
+      - Runtime & Testing: api/runtime-testing.md

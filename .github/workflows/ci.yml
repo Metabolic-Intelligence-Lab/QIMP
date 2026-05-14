@@ -20,8 +20,8 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e ".[dev]"
-      - run: ruff check src tests
-      - run: ruff format --check src tests
+      - run: ruff check src tests examples
+      - run: ruff format --check src tests examples
       - run: mypy src/qimp
 
   test:
@@ -38,3 +38,20 @@ jobs:
           cache: pip
       - run: pip install -e ".[dev]"
       - run: pytest -v --cov=qimp --cov-report=term-missing
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e .
+      - name: Run all examples (smoke test)
+        run: |
+          set -e
+          for f in examples/*.py; do
+            echo "=== $f ==="
+            python "$f"
+          done
