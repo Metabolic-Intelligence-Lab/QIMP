@@ -135,3 +135,62 @@ def test_restr_flip_validates_region_bits() -> None:
         geometric.restr_flip(qc, n=2, axis="x", region_bits="012")
     with pytest.raises(ValueError, match="region_bits"):
         geometric.restr_flip(qc, n=2, axis="x", region_bits="000")  # too long
+
+
+@pytest.mark.parametrize(
+    "op_kw",
+    [
+        {"axis": "y"},
+        {"axis": "x"},
+    ],
+)
+def test_axis_flip_rejects_undersized_pos_offset(op_kw: dict) -> None:
+    """Validation: pos_offset + 2n must fit in the circuit."""
+    from qiskit import QuantumCircuit
+
+    qc = QuantumCircuit(3)
+    with pytest.raises(ValueError, match="position register"):
+        geometric.axis_flip(qc, n=2, pos_offset=0, **op_kw)
+
+
+def test_coord_swap_rejects_undersized_pos_offset() -> None:
+    from qiskit import QuantumCircuit
+
+    qc = QuantumCircuit(4)
+    with pytest.raises(ValueError, match="position register"):
+        geometric.coord_swap(qc, n=3, pos_offset=0)
+
+
+@pytest.mark.parametrize("n,q", [(2, 4)])
+def test_restr_flip_only_touches_selected_region(n: int, q: int) -> None:
+    """``restr_flip(axis='y', region_bits='1')`` should flip columns only on rows
+    whose MSB is 1 (the bottom half of a 4-row image with n=2).
+    """
+    img = _make_test_image(n)
+    out = _round_trip(
+        img,
+        n,
+        q,
+        lambda qc, **kw: geometric.restr_flip(qc, axis="y", region_bits="1", **kw),
+    )
+    expected = img.copy()
+    expected[2:, :] = np.fliplr(img[2:, :])  # rows 2-3 (MSB=1) get column-flipped
+    np.testing.assert_array_equal(out, expected)
+
+
+@pytest.mark.parametrize("n,q", [(2, 4)])
+def test_restr_coord_swap_only_touches_selected_region(n: int, q: int) -> None:
+    """``restr_coord_swap(region_bits='1')`` swaps coords inside the bottom-right
+    quadrant only (where both row MSB and col MSB are 1).
+    """
+    img = _make_test_image(n)
+    out = _round_trip(
+        img,
+        n,
+        q,
+        lambda qc, **kw: geometric.restr_coord_swap(qc, region_bits="1", **kw),
+    )
+    # The quadrant rows=[2:4], cols=[2:4] should be transposed; the rest unchanged.
+    expected = img.copy()
+    expected[2:4, 2:4] = img[2:4, 2:4].T
+    np.testing.assert_array_equal(out, expected)

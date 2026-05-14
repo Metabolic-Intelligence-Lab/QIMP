@@ -78,6 +78,25 @@ proportional reconstruction otherwise.
 - Don't have multi-controlled X gates with auxiliary qubits but accept
   amplitude encoding of intensity? → FRQI.
 
+## Qubit layout convention
+
+All three encodings share the same position-register layout:
+
+| Qubit indices | Role |
+|---|---|
+| `0 .. n-1` | **X axis** (column). Qubit ``i`` holds bit ``i`` of the column index (LSB-first). |
+| `n .. 2n-1` | **Y axis** (row). Qubit ``n + i`` holds bit ``i`` of the row index (LSB-first). |
+| Above `2n` | Encoding-specific: FRQI color qubit at `2n`, NEQR intensity qubits *below* position (qubits 0..q-1), QPIE has nothing above. |
+
+This means that when you read a Qiskit count bitstring (MSB-first), the
+**leftmost** bit (after the color/intensity prefix) is the high bit of the
+row index, and the **rightmost** is the LSB of the column index. The
+`np.fliplr` / `np.flipud` / `np.transpose` mapping used by
+`qimp.processing.geometric` follows this convention.
+
+For NEQR, position qubits start at offset ``q`` (the intensity register
+occupies qubits 0..q-1). Pass `pos_offset=q` to any geometric operation.
+
 ## RGB extensions (v0.2)
 
 `MCRQI` (FRQI for RGB) and `NCQI` (NEQR for RGB) are scaffolded but not yet

@@ -5,6 +5,7 @@ Reference: docs/tesi.pdf §3.1.6
 
 from __future__ import annotations
 
+import warnings
 from collections import OrderedDict
 from typing import TYPE_CHECKING, Any
 
@@ -52,19 +53,36 @@ def psnr(image_a: np.ndarray, image_b: np.ndarray, max_intensity: float | None =
     if err == 0:
         return float("inf")
     if max_intensity is None:
-        max_intensity = _infer_max_intensity(image_a)
+        max_intensity = _infer_max_intensity(image_a, image_b)
     return float(20.0 * np.log10(max_intensity / np.sqrt(err)))
 
 
-def _infer_max_intensity(image: np.ndarray) -> float:
-    if np.issubdtype(image.dtype, np.integer):
-        info = np.iinfo(image.dtype)
+def _infer_max_intensity(image_a: np.ndarray, image_b: np.ndarray) -> float:
+    """Pick a PSNR peak from the dtype (integers) or both images' observed max
+    (floats).
+    """
+    if np.issubdtype(image_a.dtype, np.integer):
+        info = np.iinfo(image_a.dtype)
         return float(info.max)
+    observed = max(float(np.asarray(image_a).max()), float(np.asarray(image_b).max()))
+    if observed > 1.0:
+        warnings.warn(
+            f"PSNR called on float image with max={observed:.3g} but no "
+            "max_intensity given. Defaulting to 1.0 — pass `max_intensity` "
+            "explicitly (e.g. 255.0 for float-but-8-bit-style images) to "
+            "avoid an absurdly low result.",
+            UserWarning,
+            stacklevel=3,
+        )
     return 1.0
 
 
 def total_variation(image: np.ndarray) -> float:
-    """Anisotropic total variation: sum of |∇x| + |∇y| over the image."""
+    """Isotropic total variation: sum of ``√(|∇x|² + |∇y|²)`` over the image.
+
+    Pixels at the boundary use a one-sided difference (replicate-edge padding).
+    Strictly non-negative; equal to 0 only for a constant image.
+    """
     f = image.astype(np.float64)
     dx = np.diff(f, axis=0, append=f[-1:])
     dy = np.diff(f, axis=1, append=f[:, -1:])

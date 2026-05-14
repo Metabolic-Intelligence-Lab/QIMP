@@ -5,6 +5,61 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] — 2026-05-14
+
+Patch release addressing all findings from the v0.1.0 code review.
+
+### Fixed (bugs)
+- **`encoding/frqi.py`**: float images with intensity > 1 were silently saturated
+  because the default normalization was 1.0 for any float dtype. A new
+  `_infer_normalization` helper now uses `image.max()` for floats and the dtype
+  max for integers.
+- **`runtime/memory_pool.py`**: `get_image_buffer` no longer returns the same
+  buffer on consecutive calls. The cursor advances on every call now,
+  matching the documented round-robin behaviour and `get_angle_buffer`.
+- **`processing/geometric.py`**: `pos_shift` used to use `axis` before
+  validating it; ill-typed `axis` values silently took the X branch. The
+  validation is now first. A new `_validate_position_register` helper is
+  called by every public geometric operation, surfacing
+  "`pos_offset + 2n` doesn't fit in circuit" errors instead of producing
+  silently-wrong gates.
+- **`processing/filters.py`**: stopped reaching into the private
+  `qpie._validate_and_normalize`. The helper is now public as
+  `qimp.encoding.qpie.normalize_amplitudes`.
+- **`encoding/qpie.py`**: an all-zero image is still encoded as a uniform
+  superposition (so the circuit construction doesn't blow up) but now emits a
+  `UserWarning` explaining that decoders with `rms ≠ 0` will return spurious
+  intensities.
+- **`metrics.psnr`**: emits a `UserWarning` if called on float images whose
+  observed max exceeds 1.0 without an explicit `max_intensity`. Previously
+  this returned absurdly low dB values silently.
+
+### Changed
+- **`processing/filters.py`**: `qhed_filter` docstring rewritten with an
+  explicit warning that the cyclic decrement produces a *row-major flattened*
+  gradient, not a pure horizontal one. The wrap-around at row boundaries is
+  documented as a feature of the algorithm, not noise.
+- **`metrics.total_variation`**: docstring corrected — the implementation is
+  isotropic (``√(∇x² + ∇y²)``), the previous wording said "anisotropic".
+- **`pyproject.toml`**: pytest now deselects `slow` tests by default. CI has a
+  separate `test-slow` job that runs everything.
+- **Geometric private helpers `_increment`/`_decrement`** consolidated into the
+  new public `qimp.runtime.arithmetic_gates` module
+  (`cyclic_increment`, `cyclic_decrement`). Both `pos_shift` and `qhed_filter`
+  use the shared implementation.
+
+### Added (tests)
+- Regression tests for every bug above (float normalization, memory-pool
+  cursor, pos_offset validation, QPIE all-zero warn, PSNR float warn).
+- Semantic round-trip tests for `restr_flip` and `restr_coord_swap`
+  (previously only their input-validation was covered).
+- Tests for `cyclic_increment` / `cyclic_decrement` (round-trip identity).
+- `transpile_summary` test with a custom basis.
+
+### Added (docs)
+- `docs/encoding.md`: explicit qubit-layout convention table.
+- `docs/processing.md`: QHED wrap-around warning admonition.
+
 ## [0.1.0] — 2026-05-14
 
 First tagged release. Repository remains **private** while we iterate;

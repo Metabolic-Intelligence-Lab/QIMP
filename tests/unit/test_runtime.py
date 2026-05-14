@@ -101,3 +101,42 @@ def test_performance_monitor_runs_function() -> None:
         return a + b
 
     assert add(2, 3) == 5
+
+
+def test_memory_pool_image_buffer_advances_cursor() -> None:
+    """Regression: get_image_buffer used to NOT advance the cursor, so
+    consecutive calls returned the same buffer.
+    """
+    pool = MemoryPool(max_buffers=3, image_size=4)
+    a = pool.get_image_buffer()
+    a[0, 0] = 7.0
+    b = pool.get_image_buffer()
+    assert not np.shares_memory(a, b)
+    # a's data is untouched until we wrap around to its slot again.
+    assert a[0, 0] == 7.0
+
+
+def test_cyclic_increment_decrement_are_inverses() -> None:
+    from qiskit import QuantumCircuit
+    from qiskit.quantum_info import Statevector
+
+    from qimp.runtime import cyclic_decrement, cyclic_increment
+
+    qc = QuantumCircuit(3)
+    qubits = [0, 1, 2]
+    cyclic_increment(qc, qubits)
+    cyclic_decrement(qc, qubits)
+    sv = Statevector.from_instruction(qc)
+    # |000⟩ + 1 - 1 should return to |000⟩.
+    assert abs(sv.data[0] - 1.0) < 1e-10
+
+
+def test_cyclic_increment_rejects_empty() -> None:
+    import pytest
+    from qiskit import QuantumCircuit
+
+    from qimp.runtime import cyclic_increment
+
+    qc = QuantumCircuit(1)
+    with pytest.raises(ValueError, match="empty"):
+        cyclic_increment(qc, [])

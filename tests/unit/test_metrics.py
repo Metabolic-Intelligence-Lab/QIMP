@@ -78,3 +78,47 @@ def test_transpile_summary_shape() -> None:
     assert set(summary.keys()) == {"depth", "ops", "depth_transpiled", "ops_transpiled"}
     assert summary["depth"] >= 1
     assert summary["depth_transpiled"] >= 1
+
+
+def test_transpile_summary_custom_basis() -> None:
+    from qiskit import QuantumCircuit
+
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    summary = metrics.transpile_summary(qc, basis_gates=["sx", "rz", "cx"])
+    assert summary["depth_transpiled"] >= 1
+
+
+def test_psnr_warns_on_float_image_with_max_above_one() -> None:
+    """Regression: PSNR(float-array with values in [0, 255], None) silently returned
+    ~0 dB. Now it emits a UserWarning so users notice the missing max_intensity.
+    """
+    a = np.zeros((4, 4))
+    b = np.full((4, 4), 100.0)
+    with pytest.warns(UserWarning, match="max_intensity"):
+        metrics.psnr(a, b)
+
+
+def test_psnr_no_warning_with_explicit_max() -> None:
+    import warnings as _warnings
+
+    a = np.zeros((4, 4))
+    b = np.full((4, 4), 100.0)
+    with _warnings.catch_warnings():
+        _warnings.simplefilter("error")
+        # Should NOT warn.
+        metrics.psnr(a, b, max_intensity=255.0)
+
+
+def test_total_variation_isotropic_formula() -> None:
+    """Regression: docstring used to say 'anisotropic |∇x| + |∇y|' but the
+    implementation always computed the isotropic √(∇x² + ∇y²). The docstring is
+    now correct.
+    """
+    # On a pure horizontal-edge image, the anisotropic and isotropic forms
+    # coincide only on a single column. Verify isotropic via explicit value.
+    img = np.array([[0.0, 0.0], [1.0, 1.0]])
+    # dx = [[1,1],[0,0]], dy = [[0,0],[0,0]]  (with replicate-edge padding)
+    # TV = sum(sqrt(1²+0²)) = sum([1,1,0,0]) = 2
+    assert metrics.total_variation(img) == pytest.approx(2.0)

@@ -108,3 +108,36 @@ def test_frqi_decode_rejects_invalid_n() -> None:
         frqi_decode({}, n=0)
     with pytest.raises(ValueError):
         frqi_decode({}, n=1, m=-1)
+
+
+def test_frqi_decode_empty_counts_returns_zeros() -> None:
+    result = frqi_decode({}, n=1, m=0)
+    assert len(result) == 1
+    assert result[0].shape == (2, 2)
+    assert np.all(result[0] == 0.0)
+
+
+def test_frqi_float_image_auto_normalization() -> None:
+    """Regression: float images with values > 1 must not be silently clipped.
+
+    Previously the default normalization was 1.0 for any float dtype, which
+    saturated all pixels above 1 to π. Now the encoder infers `max(image)` as
+    the normalization. Verified at the configuration level here, end-to-end
+    in the slow test below.
+    """
+    image = np.array([[0.0, 64.0], [128.0, 200.0]], dtype=np.float64)
+    encoder = FrqiEncoder()
+    encoder.encode(image)
+    assert encoder.normalization == 200.0
+
+
+@pytest.mark.slow
+def test_frqi_float_image_round_trip_recovers_intensities() -> None:
+    from qimp.testing import ideal_simulation
+
+    image = np.array([[0.0, 64.0], [128.0, 200.0]], dtype=np.float64)
+    encoder = FrqiEncoder()
+    qc = encoder.encode(image)
+    counts = ideal_simulation(qc, shots=40_000)
+    decoded = encoder.decode(counts)[0]
+    np.testing.assert_allclose(decoded, image, atol=8.0)

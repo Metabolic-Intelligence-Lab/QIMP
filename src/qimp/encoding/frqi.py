@@ -45,6 +45,21 @@ def angles_to_intensities(angles: np.ndarray, normalization: float) -> np.ndarra
     return np.sin(angles / 2.0) ** 2 * normalization
 
 
+def _infer_normalization(stack: np.ndarray) -> float:
+    """Pick a sensible default normalization for an image stack.
+
+    For integer dtypes: dtype max (255 / 65535 / …). For float dtypes: the
+    stack's actual max value (1.0 if the max is ≤ 1.0). Always strictly
+    positive — falls back to 1.0 for an all-zero stack.
+    """
+    if np.issubdtype(stack.dtype, np.integer):
+        return float(np.iinfo(stack.dtype).max)
+    observed_max = float(np.asarray(stack).max())
+    if observed_max <= 1.0:
+        return 1.0
+    return observed_max
+
+
 def _validate_image_shape(image: np.ndarray) -> int:
     if image.ndim != 2 or image.shape[0] != image.shape[1]:
         raise ValueError(f"image must be square 2D, got shape {image.shape}")
@@ -109,9 +124,7 @@ def frqi_circuit(
     """
     stack, n, m = _stack_images(images)
     if normalization is None:
-        normalization = (
-            float(np.iinfo(stack.dtype).max) if np.issubdtype(stack.dtype, np.integer) else 1.0
-        )
+        normalization = _infer_normalization(stack)
     total_qubits = 2 * n + m + 1
     # No classical bits: the caller (or qimp.testing._ensure_measured) appends
     # measurement when needed, avoiding a duplicate classical register.
@@ -200,7 +213,11 @@ def frqi_decode(
     Returns
     -------
     list[np.ndarray]
-        One `(2^n, 2^n)` float array per image. Empty buckets are filled with 0.
+        Always a list — one ``(2^n, 2^n)`` float array per image (``2^m``
+        elements). The single-image case (``m=0``) returns a 1-element list;
+        index it with ``[0]`` to get the array. This asymmetry vs.
+        `neqr_decode` / `qpie_decode` is intentional: only FRQI supports the
+        multi-image encoding via image-selection qubits.
     """
     if n < 1 or m < 0:
         raise ValueError("n must be >= 1 and m >= 0")
@@ -257,9 +274,7 @@ class FrqiEncoder:
     def encode(self, images: np.ndarray | Sequence[np.ndarray]) -> QuantumCircuit:
         stack, n, m = _stack_images(images)
         if self._normalization is None:
-            self._normalization = (
-                float(np.iinfo(stack.dtype).max) if np.issubdtype(stack.dtype, np.integer) else 1.0
-            )
+            self._normalization = _infer_normalization(stack)
         self.n = n
         self.m = m
         return frqi_circuit(images, normalization=self._normalization)

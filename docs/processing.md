@@ -65,9 +65,13 @@ counts_v = ideal_simulation(qc_v, shots=40_000)
 edges = qhed_full_edges(image, counts, counts_v)
 ```
 
-QHED is *cyclic*: edges at the wrap-around boundary of each scan line also
-appear in the output. For non-cyclic edge detection, threshold or post-process
-the result classically.
+!!! warning "QHED is *not* a pure horizontal-only filter"
+    The QHED implementation runs a single cyclic decrement on the combined
+    aux+position register. The resulting adjacency is **row-major Z-curve**:
+    pixel ``(r, 2^n − 1)`` is considered adjacent to ``(r + 1, 0)``. This
+    creates spurious "edges" at the last column of every row. Inspect the
+    output carefully — at minimum, mask out the last column before
+    visualising; for true row-only gradients, post-process classically.
 
 ## Arithmetic (`qimp.processing.arithmetic`) — v0.2
 

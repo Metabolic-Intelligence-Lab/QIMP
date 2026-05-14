@@ -69,7 +69,24 @@ def test_qpie_encoder_rejects_decode_before_encode() -> None:
         enc.decode({})
 
 
-def test_qpie_handles_all_zero_image() -> None:
+def test_qpie_handles_all_zero_image_warns() -> None:
+    """All-zero image is silently uniform-encoded — must warn the caller."""
     image = np.zeros((2, 2))
-    qc = qpie_circuit(image)  # encodes as uniform superposition
+    with pytest.warns(UserWarning, match="All-zero image"):
+        qc = qpie_circuit(image)
     assert qc.num_qubits == 2
+
+
+def test_qpie_normalize_amplitudes_is_public() -> None:
+    """Regression: filters.py used to reach into qpie._validate_and_normalize.
+
+    The helper is now part of the public API as `normalize_amplitudes`.
+    """
+    from qimp.encoding.qpie import normalize_amplitudes
+
+    img = np.array([[1.0, 2.0], [3.0, 4.0]])
+    amps, n, rms = normalize_amplitudes(img)
+    assert n == 1
+    assert amps.shape == (4,)
+    assert np.allclose(np.sum(amps**2), 1.0)
+    assert rms > 0.0

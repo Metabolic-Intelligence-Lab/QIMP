@@ -15,31 +15,39 @@ import math
 import numpy as np
 from qiskit import QuantumCircuit
 
-from qimp.encoding.qpie import _validate_and_normalize
+from qimp.encoding.qpie import normalize_amplitudes
+from qimp.runtime.arithmetic_gates import cyclic_decrement
 
 __all__ = ["qhed_decode", "qhed_filter", "qhed_full_edges"]
 
 
-def _decrement(qc: QuantumCircuit, qubits: list[int]) -> None:
-    """Cyclic decrement on a little-endian register (qubits[0] = LSB).
-
-    Implements ``|k⟩ → |k − 1 mod 2^N⟩``. Inverse of the standard ripple
-    incrementer. ``O(N²)`` gates after Toffoli decomposition.
-    """
-    qc.x(qubits[0])
-    for k in range(1, len(qubits)):
-        qc.mcx(qubits[:k], qubits[k])
-
-
 def qhed_filter(image: np.ndarray) -> tuple[QuantumCircuit, int, float]:
-    """Build a QHED circuit that computes horizontal gradients of `image`.
+    """Build a QHED circuit that exposes adjacent-pixel gradients of `image`.
 
     The circuit has ``2n + 1`` qubits:
+
     - qubit 0: auxiliary qubit (LSB)
     - qubits 1..2n: position register holding the QPIE-encoded image
 
-    After execution, measuring with ``aux = 1`` reveals gradient magnitudes:
-    ``P(aux=1, pos=i) = (1/2) (c_i − c_{i+1})²``.
+    After execution, measuring with ``aux = 1`` at position `i` gives a
+    magnitude proportional to ``|c_i − c_{i+1}|`` where ``c`` are the QPIE
+    amplitudes in **row-major flattened order**.
+
+    .. warning::
+       This is **not** a pure horizontal-only gradient. The cyclic decrement
+       acts on the full register modulo ``2^{2n+1}``, so adjacency wraps
+       around at every row boundary: pixel ``(r, 2^n − 1)`` is adjacent to
+       pixel ``(r + 1, 0)`` in the flattened representation. The output
+       therefore contains spurious "edges" at the last column of every row,
+       which reflect the wrap-around, not the image. For a pure
+       horizontal-only filter, transpose the image and run QHED on the
+       transposed version, then compose horizontally / vertically yourself
+       and discard the boundary columns.
+
+    Parameters
+    ----------
+    image
+        Square ``(2^n, 2^n)`` non-negative intensity array.
 
     Returns
     -------
@@ -48,12 +56,16 @@ def qhed_filter(image: np.ndarray) -> tuple[QuantumCircuit, int, float]:
     n
         Spatial qubits per axis.
     rms
-        Root-mean-square of the input intensities, ``√(mean(I²))``.
-        Forward this to `qhed_decode` to recover gradient units.
+        Root-mean-square of the input intensities, ``√(mean(I²))``. Forward
+        this to `qhed_decode` to recover the absolute gradient scale.
 
-    Scales freely with ``n`` (image side = 2^n).
+    Notes
+    -----
+    Complexity is ``O(poly(n))`` after Hadamard + Toffoli decomposition,
+    excluding the QPIE `initialize` which dominates and is itself ``O(2^{2n})``
+    in depth.
     """
-    amplitudes, n, rms = _validate_and_normalize(image)
+    amplitudes, n, rms = normalize_amplitudes(image)
     total = 1 << (2 * n)
 
     # Inject aux=|0⟩ at the LSB: full amplitudes = [c_0, 0, c_1, 0, …, c_{N-1}, 0].
@@ -66,7 +78,7 @@ def qhed_filter(image: np.ndarray) -> tuple[QuantumCircuit, int, float]:
     aux = 0
     qc.h(aux)
     qc.barrier()
-    _decrement(qc, list(range(2 * n + 1)))
+    cyclic_decrement(qc, list(range(2 * n + 1)))
     qc.barrier()
     qc.h(aux)
     return qc, n, rms
@@ -148,7 +160,7 @@ def qhed_full_edges(
         counts_v = ideal_simulation(qc_v, shots=N)
         edges    = qhed_full_edges(image, counts_h, counts_v, max_gradient=5.0)
     """
-    amplitudes, n, rms = _validate_and_normalize(image)
+    amplitudes, n, rms = normalize_amplitudes(image)
     del amplitudes  # only used for n / rms
     edges_h = qhed_decode(counts_horizontal, n=n, rms=rms)
     edges_v = qhed_decode(counts_vertical, n=n, rms=rms).T

@@ -148,10 +148,13 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
+    # Slow tests are deselected by default; opt in explicitly with `-m slow`
+    # or `-m "slow or not slow"` to run everything. CI runs both.
+    "-m", "not slow",
 ]
 testpaths = ["tests"]
 markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "slow: marks tests as slow (run with '-m slow' or '-m \"slow or not slow\"')",
     "hardware: marks tests that require IBM Quantum hardware credentials",
     "gpu: marks tests that require a CUDA-capable GPU",
 ]

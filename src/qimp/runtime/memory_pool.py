@@ -55,13 +55,21 @@ class MemoryPool:
         )
 
     def get_image_buffer(self) -> np.ndarray:
-        """Return a zeroed (image_size, image_size) buffer. Buffers are reused."""
+        """Return the next zeroed (image_size, image_size) buffer.
+
+        Advances the round-robin cursor: consecutive calls return distinct
+        buffers, wrapping around after `max_buffers` calls.
+        """
         buf: np.ndarray = self._image_pool[self._cursor % self.max_buffers]
         buf.fill(0)
+        self._cursor += 1
         return buf
 
     def get_angle_buffer(self) -> np.ndarray:
-        """Return a zeroed flat (image_size**2,) buffer and advance the cursor."""
+        """Return the next zeroed flat (image_size**2,) buffer.
+
+        Advances the round-robin cursor like `get_image_buffer`.
+        """
         buf: np.ndarray = self._angle_pool[self._cursor % self.max_buffers]
         buf.fill(0)
         self._cursor += 1

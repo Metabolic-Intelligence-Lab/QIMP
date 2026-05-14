@@ -26,6 +26,8 @@ from typing import Literal
 
 from qiskit import QuantumCircuit
 
+from qimp.runtime.arithmetic_gates import cyclic_decrement, cyclic_increment
+
 Axis = Literal["x", "y"]
 
 __all__ = [
@@ -46,6 +48,24 @@ def _y_qubits(n: int, pos_offset: int) -> list[int]:
     return list(range(pos_offset + n, pos_offset + 2 * n))
 
 
+def _validate_position_register(qc: QuantumCircuit, n: int, pos_offset: int) -> None:
+    """Verify ``[pos_offset, pos_offset + 2n)`` fits inside the circuit.
+
+    Raises a `ValueError` rather than producing wrong gates on a malformed
+    invocation (e.g. forgetting `pos_offset=q` for an NEQR circuit).
+    """
+    if n < 1:
+        raise ValueError(f"n must be >= 1, got {n}")
+    if pos_offset < 0:
+        raise ValueError(f"pos_offset must be >= 0, got {pos_offset}")
+    end = pos_offset + 2 * n
+    if end > qc.num_qubits:
+        raise ValueError(
+            f"position register [{pos_offset}, {end}) does not fit in circuit "
+            f"with {qc.num_qubits} qubits"
+        )
+
+
 def axis_flip(qc: QuantumCircuit, n: int, axis: Axis, *, pos_offset: int = 0) -> QuantumCircuit:
     """Flip the image about the given axis.
 
@@ -55,12 +75,10 @@ def axis_flip(qc: QuantumCircuit, n: int, axis: Axis, *, pos_offset: int = 0) ->
 
     Complexity: ``O(n)`` X gates.
     """
-    if axis == "x":
-        targets = _y_qubits(n, pos_offset)
-    elif axis == "y":
-        targets = _x_qubits(n, pos_offset)
-    else:
+    if axis not in ("x", "y"):
         raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
+    _validate_position_register(qc, n, pos_offset)
+    targets = _y_qubits(n, pos_offset) if axis == "x" else _x_qubits(n, pos_offset)
     for q in targets:
         qc.x(q)
     return qc
@@ -72,6 +90,7 @@ def coord_swap(qc: QuantumCircuit, n: int, *, pos_offset: int = 0) -> QuantumCir
     Applies ``n`` SWAP gates between paired position qubits ``(x_i, y_i)``.
     Complexity: ``O(n)`` SWAPs ≡ ``3n`` CNOTs.
     """
+    _validate_position_register(qc, n, pos_offset)
     for i in range(n):
         qc.swap(pos_offset + i, pos_offset + n + i)
     return qc
@@ -88,6 +107,7 @@ def ort_rotation(qc: QuantumCircuit, n: int, angle: int, *, pos_offset: int = 0)
 
     Reference: docs/tesi.pdf §2.3.3
     """
+    _validate_position_register(qc, n, pos_offset)
     if angle == 90:
         coord_swap(qc, n, pos_offset=pos_offset)
         axis_flip(qc, n, "y", pos_offset=pos_offset)
@@ -119,41 +139,21 @@ def pos_shift(
 
     Reference: docs/tesi.pdf §2.3.5
     """
+    if axis not in ("x", "y"):
+        raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
     if magnitude < 0:
         raise ValueError("magnitude must be >= 0")
     if direction not in ("+", "-"):
         raise ValueError("direction must be '+' or '-'")
+    _validate_position_register(qc, n, pos_offset)
     axis_qubits = _y_qubits(n, pos_offset) if axis == "y" else _x_qubits(n, pos_offset)
-    if axis not in ("x", "y"):
-        raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
 
     for _ in range(magnitude):
         if direction == "+":
-            _increment(qc, axis_qubits)
+            cyclic_increment(qc, axis_qubits)
         else:
-            _decrement(qc, axis_qubits)
+            cyclic_decrement(qc, axis_qubits)
     return qc
-
-
-def _increment(qc: QuantumCircuit, qubits: list[int]) -> None:
-    """Cyclic increment on a little-endian register (qubits[0] = LSB)."""
-    # Standard ripple: ccc…cx on the MSB, then ccc…x on the next, …, down to x on LSB.
-    n = len(qubits)
-    for k in range(n - 1, 0, -1):
-        controls = qubits[:k]
-        target = qubits[k]
-        qc.mcx(controls, target)
-    qc.x(qubits[0])
-
-
-def _decrement(qc: QuantumCircuit, qubits: list[int]) -> None:
-    """Cyclic decrement: inverse of `_increment` (X first, then MCX downward-up)."""
-    n = len(qubits)
-    qc.x(qubits[0])
-    for k in range(1, n):
-        controls = qubits[:k]
-        target = qubits[k]
-        qc.mcx(controls, target)
 
 
 def restr_flip(
@@ -177,14 +177,15 @@ def restr_flip(
 
     Reference: docs/tesi.pdf §2.3.4
     """
+    if axis not in ("x", "y"):
+        raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
+    _validate_position_register(qc, n, pos_offset)
     if axis == "x":
         targets = _y_qubits(n, pos_offset)
         ctrl_register = _x_qubits(n, pos_offset)
-    elif axis == "y":
+    else:
         targets = _x_qubits(n, pos_offset)
         ctrl_register = _y_qubits(n, pos_offset)
-    else:
-        raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
 
     if len(region_bits) > n or any(c not in "01" for c in region_bits):
         raise ValueError(
@@ -227,6 +228,7 @@ def restr_coord_swap(
         raise ValueError(
             f"region_bits must be at most {n} characters of '0'/'1', got {region_bits!r}"
         )
+    _validate_position_register(qc, n, pos_offset)
     x_qs = _x_qubits(n, pos_offset)
     y_qs = _y_qubits(n, pos_offset)
     # Use the highest-order |region_bits| qubits of each axis as joint controls.

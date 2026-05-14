@@ -1,5 +1,6 @@
 """Runtime infrastructure: memory pooling, simulator manager, circuit caching, monitoring."""
 
+from qimp.runtime.arithmetic_gates import cyclic_decrement, cyclic_increment
 from qimp.runtime.caching import adaptive_shots, base_frqi_circuit, clear_circuit_cache
 from qimp.runtime.memory_pool import MemoryPool, clear_memory_pool, get_memory_pool
 from qimp.runtime.monitoring import performance_monitor
@@ -12,6 +13,8 @@ __all__ = [
     "base_frqi_circuit",
     "clear_circuit_cache",
     "clear_memory_pool",
+    "cyclic_decrement",
+    "cyclic_increment",
     "get_memory_pool",
     "get_simulator",
     "performance_monitor",

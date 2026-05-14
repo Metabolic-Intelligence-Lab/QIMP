@@ -11,15 +11,35 @@ Reference: docs/tesi.pdf §2.2.3, §3.1.3
 from __future__ import annotations
 
 import math
+import warnings
 
 import numpy as np
 from qiskit import QuantumCircuit
 
-__all__ = ["QpieEncoder", "qpie_circuit", "qpie_decode"]
+__all__ = ["QpieEncoder", "normalize_amplitudes", "qpie_circuit", "qpie_decode"]
 
 
-def _validate_and_normalize(image: np.ndarray) -> tuple[np.ndarray, int, float]:
-    """Return (amplitudes, n, rms) for a square 2^n × 2^n image."""
+def normalize_amplitudes(image: np.ndarray) -> tuple[np.ndarray, int, float]:
+    """Convert a square 2^n × 2^n image into QPIE amplitudes.
+
+    Returns
+    -------
+    amplitudes
+        Length-``2^(2n)`` float64 array with ``Σ amplitudes² = 1``.
+    n
+        ``log2(side)``.
+    rms
+        Root-mean-square of the original intensities: ``√(mean(I²))``. Forward
+        this to `qpie_decode` to recover gradient or intensity units. Zero if
+        the input image is all-zero (in which case a uniform-superposition
+        fallback is emitted and a warning is raised).
+
+    Raises
+    ------
+    ValueError
+        If the image is not square, side is not a power of two, or any
+        intensity is negative.
+    """
     if image.ndim != 2 or image.shape[0] != image.shape[1]:
         raise ValueError(f"image must be square 2D, got shape {image.shape}")
     side = image.shape[0]
@@ -31,7 +51,13 @@ def _validate_and_normalize(image: np.ndarray) -> tuple[np.ndarray, int, float]:
         raise ValueError("QPIE requires non-negative intensities")
     norm = float(np.linalg.norm(flat))
     if norm == 0:
-        # All-zero image: encode as uniform superposition.
+        warnings.warn(
+            "All-zero image: encoding as uniform superposition. The decoder "
+            "will return zeros only if rms=0.0 is passed; any other rms gives "
+            "spurious intensities.",
+            UserWarning,
+            stacklevel=2,
+        )
         amplitudes = np.full(flat.size, 1.0 / math.sqrt(flat.size))
         rms = 0.0
     else:
@@ -49,7 +75,7 @@ def qpie_circuit(image: np.ndarray) -> QuantumCircuit:
     Scales freely with n. The intensity resolution is bounded only by the number
     of measurement shots (no `q` parameter — QPIE has no intensity register).
     """
-    amplitudes, n, _ = _validate_and_normalize(image)
+    amplitudes, n, _ = normalize_amplitudes(image)
     qc = QuantumCircuit(2 * n)
     qc.initialize(amplitudes, range(2 * n))
     return qc
@@ -117,7 +143,7 @@ class QpieEncoder:
         self.rms: float | None = None
 
     def encode(self, image: np.ndarray) -> QuantumCircuit:
-        amplitudes, n, rms = _validate_and_normalize(image)
+        amplitudes, n, rms = normalize_amplitudes(image)
         qc = QuantumCircuit(2 * n)
         qc.initialize(amplitudes, range(2 * n))
         self.n = n
