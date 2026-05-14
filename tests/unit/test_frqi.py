@@ -63,15 +63,18 @@ def test_frqi_circuit_rejects_non_pow2() -> None:
 
 @pytest.mark.slow
 def test_frqi_round_trip_uniform_intensity() -> None:
-    """Encode a uniform image, measure, decode — recovered intensity should match."""
+    """Encode a uniform image, measure, decode — recovered intensity should match.
+
+    Shot-noise budget: with N=40k total shots and 4 pixels, each gets ~10k. With
+    p = 100/255, σ_pixel ≈ √(p(1-p)/10000) · 255 ≈ 1.25, so 5σ ≈ 6.
+    """
     target_intensity = 100.0
     image = np.full((2, 2), target_intensity, dtype=np.float64)
     qc = frqi_circuit(image, normalization=255.0)
-    counts = ideal_simulation(qc, shots=20_000)
+    counts = ideal_simulation(qc, shots=40_000)
     decoded = frqi_decode(counts, n=1, m=0, normalization=255.0)
     assert len(decoded) == 1
-    # Each pixel intensity recovered to within ~2 (shot noise ≈ √(p(1-p)/N) · 255 ≈ 1.5).
-    np.testing.assert_allclose(decoded[0], target_intensity, atol=4.0)
+    np.testing.assert_allclose(decoded[0], target_intensity, atol=6.0)
 
 
 @pytest.mark.slow
