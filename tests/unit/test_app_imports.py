@@ -34,7 +34,7 @@ def _ensure_repo_on_path() -> None:
 
 def test_io_module_imports() -> None:
     _ensure_repo_on_path()
-    mod = importlib.import_module("apps.qimp_explorer._io")
+    mod = importlib.import_module("apps.qimp_explorer.app_io")
     for name in (
         "DATASET_GRAYSCALE",
         "DATASET_RGB",
@@ -108,7 +108,7 @@ def test_helpers_save_named_panels(tmp_path: Path) -> None:
     """Round-trip the public helper used by every page's Save button."""
     _ensure_repo_on_path()
     import numpy as np
-    from apps.qimp_explorer._io import save_named_panels
+    from apps.qimp_explorer.app_io import save_named_panels
 
     panels = [
         ("alpha", np.zeros((4, 4), dtype=np.uint8)),

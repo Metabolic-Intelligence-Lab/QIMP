@@ -134,6 +134,12 @@ ignore = [
     "RUF003", # same, in comments
 ]
 
+[tool.ruff.lint.per-file-ignores]
+# Streamlit pages need to bootstrap sys.path before importing app-local
+# modules (see the `_QIMP_APP_ROOT` block at the top of each file).
+"apps/qimp_explorer/app.py" = ["E402", "I001"]
+"apps/qimp_explorer/pages/*.py" = ["E402", "I001"]
+
 [tool.ruff.format]
 quote-style = "double"
 

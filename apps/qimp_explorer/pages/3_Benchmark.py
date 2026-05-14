@@ -2,17 +2,25 @@
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+_QIMP_APP_ROOT = Path(__file__).resolve().parent.parent
+if str(_QIMP_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(_QIMP_APP_ROOT))
+
+
 import time
 
 import numpy as np
 import pandas as pd
 import streamlit as st
-from apps.qimp_explorer._io import (
+from app_io import (
     infer_n_from_image,
     new_output_dir,
     save_named_panels,
 )
-from apps.qimp_explorer._viz import bar_chart_figure, panel_grid_figure
+from _viz import bar_chart_figure, panel_grid_figure
 
 from qimp.encoding.frqi import FrqiEncoder
 from qimp.encoding.neqr import NeqrEncoder

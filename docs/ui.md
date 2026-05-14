@@ -54,7 +54,7 @@ to `data/output/run_<timestamp>/`.
 ```
 apps/qimp_explorer/
 ├── app.py                          # Home + image picker
-├── _io.py                          # I/O helpers (streamlit-free, unit-tested)
+├── app_io.py                          # I/O helpers (streamlit-free, unit-tested)
 ├── _viz.py                         # matplotlib helpers
 └── pages/
     ├── 1_Encoder_Explorer.py

@@ -6,19 +6,27 @@ sidebar take it through every step of the QIMP pipeline.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+_QIMP_APP_ROOT = Path(__file__).resolve().parent
+if str(_QIMP_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(_QIMP_APP_ROOT))
+
+
 import io
 from pathlib import Path
 
 import numpy as np
 import streamlit as st
-from apps.qimp_explorer._io import (
+from app_io import (
     DATASET_GRAYSCALE,
     discover_dataset_images,
     infer_n_from_image,
     is_power_of_two,
     load_image,
 )
-from apps.qimp_explorer._viz import image_figure
+from _viz import image_figure
 from PIL import Image
 
 st.set_page_config(

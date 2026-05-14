@@ -50,5 +50,5 @@ to `data/output/run_<timestamp>/`.
 - `pages/2_Processing_Playground.py`
 - `pages/3_Benchmark.py`
 - `pages/4_GP_Ratio.py`
-- `_io.py` — image loaders, output-dir helpers (Streamlit-free for unit tests).
+- `app_io.py` — image loaders, output-dir helpers (Streamlit-free for unit tests).
 - `_viz.py` — matplotlib panel-grid / bar-chart / circuit-figure helpers.

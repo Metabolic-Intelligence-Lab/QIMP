@@ -6,14 +6,22 @@ the quantum result with the numpy ground truth byte-for-byte.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+_QIMP_APP_ROOT = Path(__file__).resolve().parent.parent
+if str(_QIMP_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(_QIMP_APP_ROOT))
+
+
 import numpy as np
 import streamlit as st
-from apps.qimp_explorer._io import (
+from app_io import (
     infer_n_from_image,
     new_output_dir,
     save_named_panels,
 )
-from apps.qimp_explorer._viz import panel_grid_figure
+from _viz import panel_grid_figure
 
 from qimp.encoding.neqr import neqr_circuit, neqr_decode
 from qimp.processing import chromatic, geometric

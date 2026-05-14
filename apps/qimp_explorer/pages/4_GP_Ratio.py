@@ -10,18 +10,26 @@ takes 10+ minutes per image and is best done in a notebook.
 
 from __future__ import annotations
 
+import sys
+from pathlib import Path
+
+_QIMP_APP_ROOT = Path(__file__).resolve().parent.parent
+if str(_QIMP_APP_ROOT) not in sys.path:
+    sys.path.insert(0, str(_QIMP_APP_ROOT))
+
+
 import io
 from pathlib import Path
 
 import numpy as np
 import streamlit as st
-from apps.qimp_explorer._io import (
+from app_io import (
     DATASET_RGB,
     discover_dataset_images,
     new_output_dir,
     save_tiff,
 )
-from apps.qimp_explorer._viz import panel_grid_figure
+from _viz import panel_grid_figure
 from PIL import Image
 from qiskit.circuit import Parameter
 
