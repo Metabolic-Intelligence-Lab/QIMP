@@ -104,6 +104,65 @@ def test_streamlit_page_runs(relative_path: str) -> None:
     assert not at.exception, f"Streamlit page raised: {at.exception}"
 
 
+@pytest.mark.parametrize("target", [2, 4, 8, 16, 32, 64])
+def test_resize_to_square_preserves_shape_and_dtype_grayscale(target: int) -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import resize_to_square
+
+    img = np.arange(40 * 30, dtype=np.uint8).reshape(40, 30)
+    out = resize_to_square(img, target)
+    assert out.shape == (target, target)
+    assert out.dtype == np.uint8
+
+
+def test_resize_to_square_handles_rgb() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import resize_to_square
+
+    img = np.zeros((110, 110, 3), dtype=np.uint8)
+    img[:, :, 0] = 200  # solid red
+    out = resize_to_square(img, 16)
+    assert out.shape == (16, 16, 3)
+    # Center pixels should still be red after LANCZOS down-sample.
+    assert out[8, 8, 0] > 150
+
+
+def test_resize_to_square_preserves_uint16() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import resize_to_square
+
+    img = (np.arange(32 * 32, dtype=np.uint16) * 100).reshape(32, 32)
+    out = resize_to_square(img, 8)
+    assert out.shape == (8, 8)
+    assert out.dtype == np.uint16
+
+
+def test_resize_to_square_center_crops_non_square() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import resize_to_square
+
+    img = np.zeros((100, 50), dtype=np.uint8)
+    img[40:60, 15:35] = 255  # bright square at the geometric center
+    out = resize_to_square(img, 8)
+    assert out.shape == (8, 8)
+    # After center-cropping a 100×50 to 50×50 then resizing to 8×8, the bright
+    # square is roughly at the centre.
+    assert out[3:5, 3:5].mean() > out[0:2, 0:2].mean()
+
+
+def test_resize_to_square_rejects_non_pow2_target() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import resize_to_square
+
+    with pytest.raises(ValueError, match="power of two"):
+        resize_to_square(np.zeros((16, 16), dtype=np.uint8), target_side=10)
+
+
 def test_helpers_save_named_panels(tmp_path: Path) -> None:
     """Round-trip the public helper used by every page's Save button."""
     _ensure_repo_on_path()

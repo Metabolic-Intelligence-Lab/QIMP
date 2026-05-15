@@ -59,6 +59,74 @@ def is_power_of_two(n: int) -> bool:
     return n > 0 and (n & (n - 1)) == 0
 
 
+#: Power-of-two image sizes offered by the resize utility.
+RESIZE_OPTIONS: tuple[int, ...] = (2, 4, 8, 16, 32, 64)
+
+
+def resize_to_square(image: np.ndarray, target_side: int) -> np.ndarray:
+    """Resize ``image`` to a ``target_side × target_side`` square.
+
+    - For grayscale (2-D) or RGB / RGBA (3-D) arrays alike.
+    - Non-square inputs are center-cropped to a square first, then resized.
+    - Down-scaling uses LANCZOS; up-scaling uses NEAREST (preserves discrete
+      intensity values for NEQR-style encoders).
+    - Preserves the dtype where possible (uint8 / uint16 round-trip cleanly).
+
+    Parameters
+    ----------
+    image
+        2-D ``(H, W)`` or 3-D ``(H, W, C)`` numpy array.
+    target_side
+        Output side in pixels. Must be a positive power of two.
+    """
+    from PIL import Image
+
+    if not is_power_of_two(target_side):
+        raise ValueError(f"target_side must be a power of two, got {target_side}")
+    if image.ndim not in (2, 3):
+        raise ValueError(f"image must be 2-D or 3-D, got shape {image.shape}")
+
+    arr = np.asarray(image)
+    h, w = arr.shape[:2]
+
+    # Center-crop to square if needed.
+    if h != w:
+        s = min(h, w)
+        top = (h - s) // 2
+        left = (w - s) // 2
+        if arr.ndim == 3:
+            arr = arr[top : top + s, left : left + s, :]
+        else:
+            arr = arr[top : top + s, left : left + s]
+
+    current = arr.shape[0]
+    if current == target_side:
+        return arr
+
+    # PIL needs a specific mode for 16-bit grayscale; everything else is auto.
+    if arr.ndim == 2 and arr.dtype == np.uint16:
+        pil = Image.fromarray(arr, mode="I;16")
+    elif arr.ndim == 2 and np.issubdtype(arr.dtype, np.floating):
+        # Float grayscale: rescale to uint16 for resize, then back.
+        lo, hi = float(arr.min()), float(arr.max())
+        if hi > lo:
+            arr_u16 = np.interp(arr, [lo, hi], [0, 65535]).astype(np.uint16)
+        else:
+            arr_u16 = np.zeros_like(arr, dtype=np.uint16)
+        pil = Image.fromarray(arr_u16, mode="I;16")
+        method = Image.Resampling.LANCZOS if target_side < current else Image.Resampling.NEAREST
+        resized_u16 = np.asarray(pil.resize((target_side, target_side), method))
+        # Map back to original float range.
+        if hi > lo:
+            return np.interp(resized_u16, [0, 65535], [lo, hi]).astype(arr.dtype)
+        return resized_u16.astype(arr.dtype)
+    else:
+        pil = Image.fromarray(arr)
+
+    method = Image.Resampling.LANCZOS if target_side < current else Image.Resampling.NEAREST
+    return np.asarray(pil.resize((target_side, target_side), method))
+
+
 def infer_n_from_image(image: np.ndarray) -> int | None:
     """Return ``log2(side)`` if `image` is square with a power-of-two side, else None."""
     if image.ndim < 2 or image.shape[0] != image.shape[1]:

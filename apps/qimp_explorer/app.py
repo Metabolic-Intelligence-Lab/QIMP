@@ -21,10 +21,12 @@ import numpy as np
 import streamlit as st
 from app_io import (
     DATASET_GRAYSCALE,
+    RESIZE_OPTIONS,
     discover_dataset_images,
     infer_n_from_image,
     is_power_of_two,
     load_image,
+    resize_to_square,
 )
 from _viz import image_figure
 from PIL import Image
@@ -151,14 +153,58 @@ with col_info:
         else:
             side = image.shape[0] if image.shape[0] == image.shape[1] else None
             if side is None:
-                st.warning("Not square. Crop or resize before encoding.")
+                st.warning("Not square. Use the resize utility below.")
             elif not is_power_of_two(side):
                 st.warning(
                     f"Square ({side}×{side}) but side is not a power of two. "
-                    "Use the **Processing Playground → resize** option, or pick a different tile."
+                    "Use the resize utility below."
                 )
     elif image.ndim == 3:
         st.info("RGB image — head to **GP-ratio** in the sidebar.")
+
+# ------------------------------------------------------ Resize utility ----
+
+st.divider()
+st.markdown("### Resize")
+st.caption(
+    "Resize the active image to a power-of-two square. Non-square inputs are "
+    "center-cropped first. The resized image **replaces** the active one for "
+    "all pages — keep the source file if you want to start over."
+)
+
+# Pick a sensible default: the largest option ≤ current side.
+current_side = image.shape[0] if image.shape[0] == image.shape[1] else min(image.shape[:2])
+default_target = max((s for s in RESIZE_OPTIONS if s <= current_side), default=RESIZE_OPTIONS[0])
+col_size, col_apply = st.columns([3, 1])
+with col_size:
+    target_side = st.select_slider(
+        "Target side (pixels)",
+        options=list(RESIZE_OPTIONS),
+        value=default_target,
+        help="Image becomes (target × target). Down-scaling uses LANCZOS; up-scaling uses NEAREST.",
+    )
+with col_apply:
+    st.markdown("&nbsp;")  # vertical spacer
+    apply_resize = st.button("Apply resize", use_container_width=True)
+
+resize_n = int(np.log2(target_side))
+st.caption(
+    f"Target: **{target_side}×{target_side}** (n = {resize_n}). "
+    f"FRQI / QPIE will use {2 * resize_n + 1} / {2 * resize_n} qubits. "
+    f"NEQR will use {2 * resize_n} + q qubits."
+)
+
+if apply_resize:
+    try:
+        st.session_state["image"] = resize_to_square(image, target_side)
+        st.session_state["image_source"] = f"{source_name} → resized to {target_side}×{target_side}"
+        st.success(
+            f"Resized to {target_side}×{target_side}. "
+            "Reloading the page will refresh the preview above."
+        )
+        st.rerun()
+    except Exception as exc:
+        st.error(f"Resize failed: {exc}")
 
 st.divider()
 st.markdown(
