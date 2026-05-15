@@ -79,9 +79,10 @@ with st.sidebar:
         help="Used by geometric and chromatic ops to encode the image exactly.",
     )
     downsample = st.select_slider(
-        "Down-sample factor (NEQR circuits are expensive at n ≥ 3)",
+        "Down-sample factor",
         options=[1, 2, 4, 8],
-        value=4,
+        value=1,
+        help="NEQR circuits become expensive at n ≥ 4. Increase if the run takes too long.",
     )
     shots = st.slider("Shots", 1_000, 50_000, 8_192, step=1_000)
     run = st.button("Run", type="primary", use_container_width=True)
@@ -94,10 +95,24 @@ if downsample > 1 and image.shape[0] % downsample != 0:
     st.stop()
 target = image[::downsample, ::downsample]
 target_n = int(np.log2(target.shape[0]))
-st.markdown(
+
+info_block = (
     f"**Working image:** {target.shape[0]}×{target.shape[0]} "
     f"(n = {target_n}, dtype = {target.dtype}, range [{target.min()}, {target.max()}])"
 )
+if downsample > 1:
+    st.warning(
+        f"⚠️ Image was down-sampled {downsample}× — original was "
+        f"{image.shape[0]}×{image.shape[0]}. "
+        "Set **Down-sample factor** to 1 in the sidebar to process the full image.\n\n" + info_block
+    )
+else:
+    st.info(info_block)
+
+with st.expander("Preview the image being processed", expanded=False):
+    from _viz import image_figure
+
+    st.pyplot(image_figure(target, title=f"{target.shape[0]}×{target.shape[0]} input"))
 
 
 if not run:

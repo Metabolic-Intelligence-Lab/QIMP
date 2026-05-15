@@ -53,15 +53,27 @@ with st.sidebar:
     frqi_downsample = st.select_slider(
         "FRQI down-sample",
         options=[1, 2, 4, 8],
-        value=4,
-        help="FRQI is impractical above n=3 due to the multi-controlled RY gates.",
+        value=1,
+        help="FRQI gets expensive above n=3 due to multi-controlled RY gates. "
+        "Bump this up if the FRQI step is too slow.",
     )
-    neqr_downsample = st.select_slider("NEQR down-sample", options=[1, 2, 4], value=2)
+    neqr_downsample = st.select_slider("NEQR down-sample", options=[1, 2, 4], value=1)
     neqr_q = st.slider("NEQR intensity qubits q", 1, 8, 4)
     frqi_shots = st.number_input("FRQI shots", 1_000, 200_000, 40_000, step=1_000, format="%d")
     neqr_shots = st.number_input("NEQR shots", 1_000, 50_000, 8_192, step=1_000, format="%d")
     qpie_shots = st.number_input("QPIE shots", 1_000, 500_000, 100_000, step=1_000, format="%d")
     run = st.button("Run all", type="primary", use_container_width=True)
+
+side = image.shape[0]
+frqi_side = side // frqi_downsample
+neqr_side = side // neqr_downsample
+st.info(
+    f"**Working sizes:**  \n"
+    f"- FRQI: {frqi_side}×{frqi_side} (n = {int(np.log2(frqi_side))}, {2 * int(np.log2(frqi_side)) + 1} qubits)  \n"
+    f"- NEQR: {neqr_side}×{neqr_side} (n = {int(np.log2(neqr_side))}, q = {neqr_q}, "
+    f"{2 * int(np.log2(neqr_side)) + neqr_q} qubits)  \n"
+    f"- QPIE: {side}×{side} (n = {n}, {2 * n} qubits) — always full size"
+)
 
 
 # ------------------------------------------------------------ Helper closures ----

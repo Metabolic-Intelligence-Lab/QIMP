@@ -43,6 +43,9 @@ if image.ndim != 2:
 
 # -------------------------------------------------------------- Sidebar UI ----
 
+image_n_default = infer_n_from_image(image) or 0
+image_side_default = 1 << image_n_default if image_n_default else image.shape[0]
+
 with st.sidebar:
     st.header("Encoding")
     encoding = st.radio("Method", ["FRQI", "NEQR", "QPIE"], horizontal=True)
@@ -55,9 +58,10 @@ with st.sidebar:
         downsample = st.select_slider(
             "Down-sample factor",
             options=[1, 2, 4, 8],
-            value=4,
-            help="FRQI's multi-controlled RY gates explode in depth for n > 3. "
-            "Down-sampling keeps the demo snappy.",
+            value=1,
+            help="FRQI uses a fully-controlled RY for every pixel. At n=4 "
+            "(16×16) the transpile is heavy (~minutes). Pick 2× / 4× to "
+            "trade fidelity for speed.",
         )
         shots = st.slider("Shots", 1_000, 200_000, 40_000, step=1_000)
     elif encoding == "NEQR":
@@ -65,8 +69,9 @@ with st.sidebar:
         downsample = st.select_slider(
             "Down-sample factor",
             options=[1, 2, 4],
-            value=2,
-            help="NEQR uses 2n+q qubits and many multi-CX per pixel.",
+            value=1,
+            help="NEQR is exact (any pixel value recovered byte-for-byte), "
+            "but each pixel triggers a multi-CX gate per intensity bit.",
         )
         shots = st.slider("Shots", 1_000, 50_000, 8_192, step=1_000)
     else:  # QPIE
@@ -96,10 +101,47 @@ else:
     target = image
 
 target_n = int(np.log2(target.shape[0]))
-st.markdown(
+
+# Estimated circuit complexity for the chosen encoding + size.
+if encoding == "FRQI":
+    qubits_estimate = 2 * target_n + 1
+    cost_note = (
+        f"Each of the {1 << (2 * target_n)} pixels uses a {2 * target_n}-controlled RY. "
+        "Expect minutes of transpile/run time at n=4."
+        if target_n >= 4
+        else "Fast at this size."
+    )
+elif encoding == "NEQR":
+    qubits_estimate = 2 * target_n + q_qubits
+    cost_note = (
+        f"{1 << (2 * target_n)} pixels × up to {q_qubits} multi-CX each. Slow at n ≥ 4."
+        if target_n >= 4
+        else "Fast at this size."
+    )
+else:  # QPIE
+    qubits_estimate = 2 * target_n
+    cost_note = "QPIE is a single state-preparation; runtime is dominated by `initialize`."
+
+complexity_msg = (
     f"**Working image:** {target.shape[0]}×{target.shape[0]} "
-    f"(n = {target_n}, dtype = {target.dtype}, range [{target.min()}, {target.max()}])"
+    f"(n = {target_n}, dtype = {target.dtype}, range [{target.min()}, {target.max()}])  \n"
+    f"**Estimated circuit:** {qubits_estimate} qubits. {cost_note}"
 )
+if downsample > 1:
+    st.warning(
+        f"⚠️ Image was down-sampled {downsample}× — original was "
+        f"{image.shape[0]}×{image.shape[0]} (n = {image_n_default}). "
+        "Set the **Down-sample factor** to 1 in the sidebar to encode the full image.\n\n"
+        + complexity_msg
+    )
+else:
+    st.info(complexity_msg)
+
+# Show the actual working image so the user *sees* what's being processed.
+with st.expander("Preview the image being encoded", expanded=False):
+    from _viz import image_figure
+
+    st.pyplot(image_figure(target, title=f"{target.shape[0]}×{target.shape[0]} input"))
 
 
 # ------------------------------------------------------------------ Run ----
