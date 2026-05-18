@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0] — 2026-05-18
+
+Implements every previously-stubbed library module: RGB encodings, NEQR
+arithmetic, FRQI/NEQR compression, the variational image classifier, and
+folder-level dataset iteration. All thesis-spec features are now live.
+
+### Added — encoding
+- **`qimp.encoding.mcrqi`** — FRQI extension to RGB. ``2n + 3`` qubits,
+  one color qubit per channel, separate controlled-RY per (pixel, channel).
+  `McrqiEncoder` mirrors `FrqiEncoder`.
+- **`qimp.encoding.ncqi`** — NEQR extension to RGB. ``2n + 3q`` qubits with
+  per-channel intensity registers. Exact retrieval.
+- **`qimp.encoding.compression`** — Quine–McCluskey prime-implicant
+  generation plus greedy disjoint-cover selection. `FrqiCompressor` and
+  `NeqrCompressor` emit reduced multi-controlled gate sequences. Disjoint
+  cover required for correctness (XOR / angle-sum semantics).
+
+### Added — processing
+- **`qimp.processing.arithmetic`** — `qc_add_1`, `q_add` (ripple-carry on
+  arbitrary widths), `q_sub` (two's-complement), `neqr_comparator`
+  (sets a gt-qubit iff a > b).
+
+### Added — qml
+- **`qimp.qml.classifier`** — `FrqiClassifier`, a binary variational
+  classifier with a `RealAmplitudes` ansatz on top of FRQI features,
+  trained with `scipy.optimize.minimize` (COBYLA) against ±1 labels.
+
+### Added — io
+- **`qimp.io.datasets`** — `ImageDataset` (folder iterator with
+  square / pow2 / blank filtering) and `batch_process_images` helper.
+
+### App
+- `apps/qimp_explorer/pages/5_System_Info.py` updated: the previous
+  "stubs not yet implemented" list has been replaced with the current
+  implementation status (everything green except `neqr_sort` and the
+  ESPRESSO compression heuristic, deferred to v0.3).
+
+### Tests
+- 49 new tests across the new modules.
+- ruff / mypy strict / mkdocs `--strict` all clean.
+
 ## [0.1.1] — 2026-05-14
 
 Patch release addressing all findings from the v0.1.0 code review.

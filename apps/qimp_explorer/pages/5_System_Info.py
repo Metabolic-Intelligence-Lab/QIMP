@@ -136,14 +136,20 @@ with col_b:
 
 st.divider()
 
-# ----------------------------------------------------------- Roadmap stubs ----
-st.subheader("Library stubs (not yet implemented)")
+# ----------------------------------------------------------- Module status ----
+st.subheader("Library modules (v0.2)")
 st.markdown(
-    "The following modules exist in the library but contain only `TODO` "
-    "stubs — track v0.2 for their implementation:\n\n"
-    "- `qimp.encoding.mcrqi` / `qimp.encoding.ncqi` — FRQI / NEQR for RGB.\n"
-    "- `qimp.encoding.compression` — Boolean-function minimisation (Quine–McCluskey).\n"
-    "- `qimp.processing.arithmetic` — quantum ADD/SUB, comparator, sort on NEQR.\n"
-    "- `qimp.qml.classifier` — variational image classifier.\n"
-    "- `qimp.io.datasets` — batch iterator over image folders."
+    "All thesis-spec modules are now implemented:\n\n"
+    "- ✅ `qimp.encoding.frqi`, `qimp.encoding.neqr`, `qimp.encoding.qpie`\n"
+    "- ✅ `qimp.encoding.mcrqi` / `qimp.encoding.ncqi` — FRQI / NEQR for RGB.\n"
+    "- ✅ `qimp.encoding.compression` — Boolean-function minimisation (Quine–McCluskey + greedy disjoint cover).\n"
+    "- ✅ `qimp.processing.{geometric, chromatic, filters, gp_ratio}`\n"
+    "- ✅ `qimp.processing.arithmetic` — quantum ADD/SUB and comparator on NEQR.\n"
+    "- ✅ `qimp.qml.classifier` — variational FRQI image classifier.\n"
+    "- ✅ `qimp.io.{image, datasets}`\n"
+    "- ✅ `qimp.metrics`, `qimp.qft`, `qimp.runtime`, `qimp.testing`\n\n"
+    "Still on the roadmap (v0.3+):\n\n"
+    "- `qimp.processing.arithmetic.neqr_sort` — pairwise compare-and-swap sort.\n"
+    "- ESPRESSO heuristic for `compression` at large fan-in (≥ 5).\n"
+    "- IBM Quantum hardware integration in the UI."
 )
