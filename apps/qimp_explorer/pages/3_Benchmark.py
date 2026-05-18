@@ -25,7 +25,7 @@ from _viz import bar_chart_figure, panel_grid_figure
 from qimp.encoding.frqi import FrqiEncoder
 from qimp.encoding.neqr import NeqrEncoder
 from qimp.encoding.qpie import QpieEncoder
-from qimp.metrics import psnr, transpile_summary
+from qimp.metrics import psnr, total_variation, transpile_summary
 from qimp.testing import ideal_simulation
 
 st.set_page_config(page_title="Benchmark", page_icon="📊", layout="wide")
@@ -97,6 +97,7 @@ def _bench_frqi() -> dict:
         "shots": int(frqi_shots),
         "runtime_s": round(elapsed, 3),
         "psnr_dB": round(psnr(img_uint8, decoded, max_intensity=255.0), 2),
+        "tv_decoded": round(total_variation(decoded.astype(np.float64)), 2),
         "exact": False,
         "input": img_uint8,
         "decoded": decoded,
@@ -124,6 +125,7 @@ def _bench_neqr() -> dict:
         "shots": int(neqr_shots),
         "runtime_s": round(elapsed, 3),
         "psnr_dB": float("inf"),
+        "tv_decoded": round(total_variation(decoded.astype(np.float64)), 2),
         "exact": bool(np.array_equal(decoded, img_int)),
         "input": img_int,
         "decoded": decoded.astype(np.float64),
@@ -147,6 +149,7 @@ def _bench_qpie() -> dict:
         "shots": int(qpie_shots),
         "runtime_s": round(elapsed, 3),
         "psnr_dB": round(psnr(img, decoded, max_intensity=float(max(img.max(), 1.0))), 2),
+        "tv_decoded": round(total_variation(decoded.astype(np.float64)), 2),
         "exact": False,
         "input": img,
         "decoded": decoded,
@@ -179,6 +182,7 @@ table_cols = [
     "shots",
     "runtime_s",
     "psnr_dB",
+    "tv_decoded",
     "exact",
 ]
 df = pd.DataFrame([{k: r[k] for k in table_cols} for r in results])

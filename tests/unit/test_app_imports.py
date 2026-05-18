@@ -65,6 +65,7 @@ def test_viz_module_imports() -> None:
         "apps/qimp_explorer/pages/2_Processing_Playground.py",
         "apps/qimp_explorer/pages/3_Benchmark.py",
         "apps/qimp_explorer/pages/4_GP_Ratio.py",
+        "apps/qimp_explorer/pages/5_System_Info.py",
     ],
 )
 def test_streamlit_page_compiles(relative_path: str) -> None:
@@ -87,6 +88,7 @@ def test_streamlit_page_compiles(relative_path: str) -> None:
         "apps/qimp_explorer/pages/2_Processing_Playground.py",
         "apps/qimp_explorer/pages/3_Benchmark.py",
         "apps/qimp_explorer/pages/4_GP_Ratio.py",
+        "apps/qimp_explorer/pages/5_System_Info.py",
     ],
 )
 def test_streamlit_page_runs(relative_path: str) -> None:

@@ -28,8 +28,9 @@ A browser tab opens at <http://localhost:8501>.
 | **Home** | Pick an image (upload or from `data/immagini/`); preview + image info. |
 | **Encoder Explorer** | Run FRQI / NEQR / QPIE round-trips with configurable shots and qubit counts; see PSNR, MSE, depth, and (optionally) the circuit diagram. |
 | **Processing Playground** | Apply geometric transforms (flip, rotate, swap, shift), chromatic ops (NEQR), or QHED edge detection; compare against the numpy reference. |
-| **Benchmark** | Run all three encoders on the same image; sortable `pandas` table + PSNR / depth bar charts. |
-| **GP-ratio** | Microscopy pipeline: classical GP image (`(G − α·R)/(G + α·R)`) and parametric quantum circuit construction. |
+| **Benchmark** | Run all three encoders on the same image; sortable `pandas` table (PSNR + TV + depth + runtime) + bar charts. |
+| **GP-ratio** | Microscopy pipeline: classical GP image in all 3 output formats (normalized / uint8 / 16-bit), optional Gaussian + median preprocessing, and parametric quantum circuit construction. |
+| **System Info** | Library / Qiskit / Python versions, simulator backend (GPU detection), dataset stats, past-run inventory, cache-clearing buttons, and roadmap stubs. |
 
 Every page has a **Save outputs** button that writes TIFFs + a comparison PNG
 to `data/output/run_<timestamp>/`.
@@ -48,6 +49,14 @@ to `data/output/run_<timestamp>/`.
   (it takes 10+ minutes per image on a CPU simulator). The page builds the
   parametric circuit and reports depth / gate counts; use a notebook for the
   full COBYLA optimisation.
+- The **Encoder Explorer** can run an ideal simulation or a noisy one with a
+  configurable per-gate depolarizing probability (slider in the sidebar).
+  Useful for sensitivity studies before committing to a real backend.
+- The **Processing Playground** exposes every public operation:
+  `axis_flip`, `coord_swap`, `ort_rotation`, `pos_shift` (bidirectional,
+  arbitrary magnitude), `restr_flip`, `restr_coord_swap`, FRQI and NEQR
+  chromatic operations, `apply_qft` / `apply_inverse_qft`, and both QHED
+  variants. Parameter widgets adapt per operation.
 
 ## Architecture
 

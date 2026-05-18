@@ -37,8 +37,11 @@ A browser tab opens at <http://localhost:8501>.
 4. **Benchmark** — runs FRQI / NEQR / QPIE on the same image and shows a
    `pandas` table + bar charts of PSNR and transpiled depth.
 5. **GP-ratio** — Green-Purple microscopy pipeline. Computes the classical
-   GP image and constructs the parametric quantum sub-circuit (full
+   GP image in all three output formats, optional Gaussian + median
+   preprocessing, and constructs the parametric quantum sub-circuit (full
    variational optimisation is left to a notebook).
+6. **System Info** — Python / Qiskit / library versions, simulator backend
+   (CPU / GPU), dataset stats, past-run inventory, and cache controls.
 
 Every page has a **Save outputs** button that writes TIFFs + a comparison PNG
 to `data/output/run_<timestamp>/`.
@@ -50,5 +53,6 @@ to `data/output/run_<timestamp>/`.
 - `pages/2_Processing_Playground.py`
 - `pages/3_Benchmark.py`
 - `pages/4_GP_Ratio.py`
+- `pages/5_System_Info.py`
 - `app_io.py` — image loaders, output-dir helpers (Streamlit-free for unit tests).
 - `_viz.py` — matplotlib panel-grid / bar-chart / circuit-figure helpers.

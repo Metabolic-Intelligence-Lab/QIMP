@@ -34,8 +34,8 @@ from PIL import Image
 from qiskit.circuit import Parameter
 
 from qimp.encoding.frqi import frqi_circuit
-from qimp.io.image import calculate_gp_image
-from qimp.metrics import transpile_summary
+from qimp.io.image import apply_filters, calculate_gp_image
+from qimp.metrics import total_variation, transpile_summary
 from qimp.processing.gp_ratio import apply_gp_function, classical_gp_image
 
 st.set_page_config(page_title="GP-ratio", page_icon="🟢🟣", layout="wide")
@@ -73,6 +73,12 @@ with st.sidebar:
         help="The lab pipeline uses 16×16 for tractable circuits.",
     )
     G_param = st.slider("GP parameter G (α)", 0.0, 2.0, 0.5, step=0.05)
+
+    st.markdown("**Preprocessing filters (optional)**")
+    use_filters = st.checkbox("Apply Gaussian + median before GP", value=False)
+    sigma = st.slider("Gaussian σ", 0.1, 3.0, 1.0, step=0.1, disabled=not use_filters)
+    median_size = st.slider("Median kernel", 1, 7, 3, step=2, disabled=not use_filters)
+
     run_classical = st.button("Compute classical GP", type="primary", use_container_width=True)
     run_quantum = st.button("Build quantum GP circuit", use_container_width=True)
 
@@ -108,6 +114,11 @@ green = rgb[:, :, 1].astype(np.float64)
 blue = rgb[:, :, 2].astype(np.float64)
 n = int(np.log2(target_size))
 
+if use_filters:
+    red = apply_filters(red, sigma=sigma, median_size=median_size)
+    green = apply_filters(green, sigma=sigma, median_size=median_size)
+    blue = apply_filters(blue, sigma=sigma, median_size=median_size)
+
 st.markdown(f"**Working RGB tile:** {target_size}×{target_size} (n = {n})")
 st.pyplot(
     panel_grid_figure(
@@ -121,22 +132,27 @@ st.pyplot(
 
 if run_classical:
     classical_gp = calculate_gp_image(green, red, G=G_param, output_format="16bit")
+    gp_uint8 = calculate_gp_image(green, red, G=G_param, output_format="uint8")
     reference = classical_gp_image(green, red)
-    st.markdown("### Classical GP image")
+    st.markdown("### Classical GP image (every output format)")
     st.pyplot(
         panel_grid_figure(
             [
-                ("GP (16-bit [0, 4096])", classical_gp),
-                ("GP (raw, [-1, 1])", reference),
+                ("GP normalized [-1, 1]", reference),
+                ("GP uint8 [0, 255]", gp_uint8),
+                ("GP 16-bit [0, 4096]", classical_gp),
             ],
-            cols=2,
+            cols=3,
         )
     )
     st.write(
         {
             "GP shape": classical_gp.shape,
             "16-bit range": [int(classical_gp.min()), int(classical_gp.max())],
+            "uint8 range": [int(gp_uint8.min()), int(gp_uint8.max())],
             "raw range": [round(float(reference.min()), 3), round(float(reference.max()), 3)],
+            "TV (normalized)": round(total_variation(reference), 3),
+            "filters applied": (f"σ={sigma}, median={median_size}" if use_filters else "none"),
         }
     )
     if st.button("Save classical outputs", key="save_classical", use_container_width=True):
@@ -144,7 +160,8 @@ if run_classical:
         save_tiff(red, out_dir / "00_red.tif")
         save_tiff(green, out_dir / "01_green.tif")
         save_tiff(classical_gp, out_dir / "02_gp_16bit.tif")
-        save_tiff(reference, out_dir / "03_gp_normalized.tif")
+        save_tiff(gp_uint8, out_dir / "03_gp_uint8.tif")
+        save_tiff(reference, out_dir / "04_gp_normalized.tif")
         st.success(f"Saved to {out_dir}")
 
 
