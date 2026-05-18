@@ -127,6 +127,26 @@ def resize_to_square(image: np.ndarray, target_side: int) -> np.ndarray:
     return np.asarray(pil.resize((target_side, target_side), method))
 
 
+def to_grayscale(image: np.ndarray) -> np.ndarray:
+    """Convert 3-D RGB/RGBA images to 2-D grayscale via the ITU-R BT.601 luma.
+
+    2-D inputs are returned unchanged. Preserves the dtype where possible.
+    """
+    arr = np.asarray(image)
+    if arr.ndim == 2:
+        return arr
+    if arr.ndim != 3 or arr.shape[-1] not in (3, 4):
+        raise ValueError(f"can't convert shape {arr.shape} to grayscale")
+    r = arr[..., 0].astype(np.float64)
+    g = arr[..., 1].astype(np.float64)
+    b = arr[..., 2].astype(np.float64)
+    luma = 0.299 * r + 0.587 * g + 0.114 * b
+    if np.issubdtype(arr.dtype, np.integer):
+        info = np.iinfo(arr.dtype)
+        return np.clip(luma, info.min, info.max).astype(arr.dtype)
+    return luma.astype(arr.dtype)
+
+
 def infer_n_from_image(image: np.ndarray) -> int | None:
     """Return ``log2(side)`` if `image` is square with a power-of-two side, else None."""
     if image.ndim < 2 or image.shape[0] != image.shape[1]:

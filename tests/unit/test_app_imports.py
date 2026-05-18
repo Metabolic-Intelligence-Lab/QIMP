@@ -196,6 +196,64 @@ def test_resize_to_square_rejects_non_pow2_target() -> None:
         resize_to_square(np.zeros((16, 16), dtype=np.uint8), target_side=10)
 
 
+def test_to_grayscale_preserves_2d_input() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import to_grayscale
+
+    img = np.arange(16, dtype=np.uint8).reshape(4, 4)
+    out = to_grayscale(img)
+    assert out is img or np.array_equal(out, img)
+
+
+def test_to_grayscale_converts_rgb_via_luma() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer.app_io import to_grayscale
+
+    img = np.zeros((4, 4, 3), dtype=np.uint8)
+    img[..., 1] = 100  # pure green
+    out = to_grayscale(img)
+    assert out.shape == (4, 4)
+    assert out.dtype == np.uint8
+    # BT.601: green coefficient is 0.587 → ≈ 58.
+    assert 55 <= int(out[0, 0]) <= 62
+
+
+def test_to_grayscale_rejects_unsupported_shape() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    import pytest as _pytest
+    from apps.qimp_explorer.app_io import to_grayscale
+
+    with _pytest.raises(ValueError, match="grayscale"):
+        to_grayscale(np.zeros((2, 2, 5), dtype=np.uint8))
+
+
+def test_ibm_module_qasm_export() -> None:
+    """`circuit_to_qasm3` should produce a parsable string for a tiny circuit."""
+    _ensure_repo_on_path()
+    from apps.qimp_explorer._ibm import circuit_to_qasm3
+    from qiskit import QuantumCircuit
+
+    qc = QuantumCircuit(2)
+    qc.h(0)
+    qc.cx(0, 1)
+    qc.measure_all()
+    qasm = circuit_to_qasm3(qc)
+    assert isinstance(qasm, str)
+    assert len(qasm) > 0
+    # Either QASM 3 or QASM 2 header.
+    assert "OPENQASM" in qasm.upper()
+
+
+def test_ibm_module_have_runtime_returns_bool() -> None:
+    _ensure_repo_on_path()
+    from apps.qimp_explorer._ibm import have_ibm_runtime
+
+    assert isinstance(have_ibm_runtime(), bool)
+
+
 def test_helpers_save_named_panels(tmp_path: Path) -> None:
     """Round-trip the public helper used by every page's Save button."""
     _ensure_repo_on_path()
