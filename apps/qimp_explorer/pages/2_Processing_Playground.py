@@ -179,9 +179,10 @@ else:
     st.info(info_block)
 
 with st.expander("Preview the image being processed", expanded=False):
-    from _viz import image_figure
+    from _viz import to_display_uint8
 
-    st.pyplot(image_figure(target, title=f"{target.shape[0]}×{target.shape[0]} input"))
+    st.caption(f"{target.shape[0]}×{target.shape[0]} input")
+    st.image(to_display_uint8(target), width=240, clamp=True)
 
 
 if not run:

@@ -53,8 +53,39 @@ def test_io_module_imports() -> None:
 def test_viz_module_imports() -> None:
     _ensure_repo_on_path()
     mod = importlib.import_module("apps.qimp_explorer._viz")
-    for name in ("image_figure", "panel_grid_figure", "bar_chart_figure", "safe_circuit_figure"):
+    for name in (
+        "image_figure",
+        "panel_grid_figure",
+        "bar_chart_figure",
+        "safe_circuit_figure",
+        "to_display_uint8",
+    ):
         assert hasattr(mod, name), f"_viz missing {name}"
+
+
+def test_to_display_uint8_handles_common_shapes() -> None:
+    _ensure_repo_on_path()
+    import numpy as np
+    from apps.qimp_explorer._viz import to_display_uint8
+
+    # uint8 grayscale: pass-through after normalization.
+    out = to_display_uint8(np.arange(16, dtype=np.uint8).reshape(4, 4))
+    assert out.shape == (4, 4) and out.dtype == np.uint8
+    assert out.max() == 255
+
+    # uint16 RGB: down-shifted to uint8.
+    rgb16 = np.full((4, 4, 3), 30000, dtype=np.uint16)
+    out_rgb = to_display_uint8(rgb16)
+    assert out_rgb.shape == (4, 4, 3) and out_rgb.dtype == np.uint8
+
+    # Float grayscale with arbitrary range: linear stretched.
+    out_f = to_display_uint8(np.linspace(-3.0, 7.0, 16).reshape(4, 4))
+    assert out_f.shape == (4, 4) and out_f.dtype == np.uint8
+    assert out_f.min() == 0 and out_f.max() == 255
+
+    # All-zero image: returns zeros.
+    zeros = np.zeros((4, 4), dtype=np.float32)
+    assert to_display_uint8(zeros).max() == 0
 
 
 @pytest.mark.parametrize(

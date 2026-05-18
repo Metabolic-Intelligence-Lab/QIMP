@@ -10,6 +10,32 @@ from typing import Any
 import numpy as np
 
 
+def to_display_uint8(img: np.ndarray) -> np.ndarray:
+    """Normalize any 2-D or 3-D image to uint8 [0, 255] for ``st.image``.
+
+    - 2-D grayscale: linear stretch from ``[min, max]`` to ``[0, 255]``.
+    - 3-D uint8 RGB/RGBA: returned unchanged.
+    - 3-D uint16 RGB: downshifted to uint8 (divide by 257).
+    - 3-D float RGB: scaled if max ≤ 1.0, else clipped to [0, 255].
+    """
+    arr = np.asarray(img)
+    if arr.ndim == 3:
+        if arr.dtype == np.uint8:
+            return arr
+        if arr.dtype == np.uint16:
+            return (arr // 257).astype(np.uint8)
+        if np.issubdtype(arr.dtype, np.floating):
+            if float(arr.max()) <= 1.0:
+                return np.clip(arr * 255, 0, 255).astype(np.uint8)
+            return np.clip(arr, 0, 255).astype(np.uint8)
+        return np.clip(arr, 0, 255).astype(np.uint8)
+    # Grayscale.
+    lo, hi = float(arr.min()), float(arr.max())
+    if hi > lo:
+        return np.interp(arr, [lo, hi], [0, 255]).astype(np.uint8)
+    return np.zeros_like(arr, dtype=np.uint8)
+
+
 def image_figure(
     image: np.ndarray,
     *,

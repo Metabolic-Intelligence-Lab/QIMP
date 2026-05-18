@@ -28,7 +28,7 @@ from app_io import (
     load_image,
     resize_to_square,
 )
-from _viz import image_figure
+from _viz import to_display_uint8
 from PIL import Image
 
 st.set_page_config(
@@ -115,24 +115,24 @@ source_name = st.session_state.get("image_source", "<unknown>")
 
 col_image, col_info = st.columns([2, 1])
 with col_image:
+    st.caption(source_name)
     if image.ndim == 2:
-        fig = image_figure(image, title=source_name)
+        st.image(to_display_uint8(image), width=320, clamp=True)
     elif image.ndim == 3 and image.shape[-1] in (3, 4):
-        # Stack RGB channels next to each other to make picking obvious.
-        import matplotlib.pyplot as plt
-
-        fig, axs = plt.subplots(1, 3, figsize=(9, 3.2))
-        for i, (label, cmap) in enumerate([("R", "Reds"), ("G", "Greens"), ("B", "Blues")]):
-            axs[i].imshow(image[:, :, i], cmap=cmap, interpolation="nearest")
-            axs[i].set_title(label)
-            axs[i].axis("off")
-        fig.suptitle(source_name)
-        fig.tight_layout()
+        # Show the full RGB at thumbnail size + each channel as a row of smaller images.
+        st.image(to_display_uint8(image), width=320)
+        cr, cg, cb = st.columns(3)
+        with cr:
+            st.caption("R")
+            st.image(to_display_uint8(image[:, :, 0]), width=120, clamp=True)
+        with cg:
+            st.caption("G")
+            st.image(to_display_uint8(image[:, :, 1]), width=120, clamp=True)
+        with cb:
+            st.caption("B")
+            st.image(to_display_uint8(image[:, :, 2]), width=120, clamp=True)
     else:
-        fig = None
         st.warning(f"Unsupported image shape {image.shape}.")
-    if fig is not None:
-        st.pyplot(fig)
 
 with col_info:
     st.markdown("**Image info**")

@@ -160,9 +160,10 @@ else:
 
 # Show the actual working image so the user *sees* what's being processed.
 with st.expander("Preview the image being encoded", expanded=False):
-    from _viz import image_figure
+    from _viz import to_display_uint8
 
-    st.pyplot(image_figure(target, title=f"{target.shape[0]}×{target.shape[0]} input"))
+    st.caption(f"{target.shape[0]}×{target.shape[0]} input")
+    st.image(to_display_uint8(target), width=240, clamp=True)
 
 
 # ------------------------------------------------------------------ Run ----
@@ -292,9 +293,10 @@ if encoding == "FRQI":
                 "angle at intensity=norm": round(float(np.pi), 4),
             }
         )
-        from _viz import image_figure as _image_figure
+        from _viz import to_display_uint8 as _to_display_uint8
 
-        st.pyplot(_image_figure(angles, title="θ map (rad)"))
+        st.caption("θ map (rad) — bright = π, dark = 0")
+        st.image(_to_display_uint8(angles), width=240, clamp=True)
 
 if show_circuit:
     fig_qc = safe_circuit_figure(qc, max_ops=80)
