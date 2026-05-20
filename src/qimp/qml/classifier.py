@@ -22,8 +22,19 @@ from collections.abc import Sequence
 
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import RealAmplitudes
 from qiskit.quantum_info import SparsePauliOp, Statevector
+
+# Qiskit ≥ 2.1: the functional ``real_amplitudes`` is the replacement for the
+# now-deprecated ``RealAmplitudes`` class (removed in 3.x). Fall back to the
+# class form on older Qiskit so users on 1.x still work.
+try:
+    from qiskit.circuit.library import real_amplitudes as _real_amplitudes
+except ImportError:  # pragma: no cover - older Qiskit
+    from qiskit.circuit.library import RealAmplitudes as _RealAmplitudesClass
+
+    def _real_amplitudes(num_qubits: int, *, reps: int) -> QuantumCircuit:
+        return _RealAmplitudesClass(num_qubits=num_qubits, reps=reps)
+
 
 from qimp.encoding.frqi import FrqiEncoder
 
@@ -44,10 +55,8 @@ class FrqiClassifierResult:
         self.n_iter = n_iter
 
     def __repr__(self) -> str:
-        return (
-            f"FrqiClassifierResult(n_iter={self.n_iter}, "
-            f"final_loss={self.loss_history[-1]:.4f if self.loss_history else float('nan')})"
-        )
+        final = f"{self.loss_history[-1]:.4f}" if self.loss_history else "nan"
+        return f"FrqiClassifierResult(n_iter={self.n_iter}, final_loss={final})"
 
 
 class FrqiClassifier:
@@ -123,7 +132,7 @@ class FrqiClassifier:
             raise ValueError(f"images must be square 2^n × 2^n, got shape {first.shape}")
 
         self._n = n
-        self._ansatz = RealAmplitudes(num_qubits=2 * n + 1, reps=self.reps)
+        self._ansatz = _real_amplitudes(num_qubits=2 * n + 1, reps=self.reps)
         num_params = len(self._ansatz.parameters)
 
         rng = np.random.default_rng(self.seed)
@@ -159,7 +168,9 @@ class FrqiClassifier:
     def _build_full_circuit(self, image: np.ndarray, params: np.ndarray) -> QuantumCircuit:
         if self._n is None or self._ansatz is None:
             raise RuntimeError("internal state not initialised; call fit() first")
-        encoded = self._encoder.encode(image.astype(np.uint8) if image.dtype != np.uint8 else image)
+        # FRQI handles its own dtype/normalisation via _infer_normalization; don't
+        # force-cast to uint8 here or 16-bit / float inputs get silently truncated.
+        encoded = self._encoder.encode(image)
         # Positional binding by parameter order — same ansatz object that holds the
         # parameter symbols, so binding always finds them.
         bound = self._ansatz.assign_parameters(list(params))

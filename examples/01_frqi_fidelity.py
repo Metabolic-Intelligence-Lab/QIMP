@@ -33,7 +33,7 @@ def main() -> int:
     )
 
     counts = ideal_simulation(qc, shots=40_000)
-    decoded = encoder.decode(counts)[0]
+    decoded = encoder.decode(counts)
     print("\nDecoded image (float):")
     print(np.round(decoded, 1))
 

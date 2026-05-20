@@ -50,12 +50,6 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--version", action="version", version=f"qimp {__version__}")
     subparsers = parser.add_subparsers(dest="command")
 
-    # Placeholders for Fase 3+ subcommands — kept so `qimp --help` lists them.
-    subparsers.add_parser("encode", help="Encode an image into a quantum circuit")
-    subparsers.add_parser("process", help="Apply a processing operation to an encoded circuit")
-    subparsers.add_parser("measure", help="Measure a circuit (ideal/noisy/device)")
-    subparsers.add_parser("benchmark", help="Benchmark a pipeline over varying n / q")
-
     ui_parser = subparsers.add_parser(
         "ui",
         help="Launch the Streamlit QIMP Explorer (requires the [ui] extra)",
@@ -66,10 +60,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.command is None:
         parser.print_help()
         return 0
-    if hasattr(args, "func"):
-        return int(args.func(args))
-    print(f"`qimp {args.command}` not yet implemented (Fase 3+)", file=sys.stderr)
-    return 1
+    return int(args.func(args))
 
 
 if __name__ == "__main__":

@@ -115,32 +115,31 @@ def calculate_gp_image(
     G: float = 0.5,
     output_format: str = "normalized",
 ) -> np.ndarray:
-    """Green-Purple ratio image: (G - α·R) / (G + α·R).
+    """Green-Purple ratio image, with selectable output range.
+
+    Thin wrapper around :func:`qimp.processing.gp_ratio.classical_gp_image`
+    that adds the legacy ``output_format`` argument the lab pipeline expects.
 
     Parameters
     ----------
     green, red
         Channel arrays with matching shape.
     G
-        Weight applied to the red channel (called α in some literature).
+        Red-channel weight (the ``alpha`` of the canonical formula). Default
+        ``0.5`` matches the legacy lab convention.
     output_format
-        - "normalized": float array in [-1, 1]
-        - "16bit": uint16 array in [0, 4096]
-        - "uint8": uint8 array in [0, 255]
+        - ``"normalized"``: ``float64`` in ``[-1, 1]``
+        - ``"16bit"``: ``uint16`` in ``[0, 4096]``
+        - ``"uint8"``: ``uint8`` in ``[0, 255]``
     """
-    if green.shape != red.shape:
-        raise ValueError(f"Channel shape mismatch: {green.shape} vs {red.shape}")
-    g = green.astype(np.float64)
-    r = red.astype(np.float64)
-    denom = g + G * r
-    safe_denom = denom + 1e-10
-    out = (g - G * r) / safe_denom
-    out = np.clip(out, -1.0, 1.0)
-    out[denom == 0] = 0.0
+    # Lazy import to avoid a cycle if a downstream module imports both.
+    from qimp.processing.gp_ratio import classical_gp_image
+
+    out: np.ndarray = np.clip(classical_gp_image(green, red, alpha=G), -1.0, 1.0)
     if output_format == "normalized":
         return out
     if output_format == "16bit":
-        return np.interp(out, [-1.0, 1.0], [0, 4096]).astype(np.uint16)
+        return np.asarray(np.interp(out, [-1.0, 1.0], [0, 4096]), dtype=np.uint16)
     if output_format == "uint8":
-        return np.interp(out, [-1.0, 1.0], [0, 255]).astype(np.uint8)
+        return np.asarray(np.interp(out, [-1.0, 1.0], [0, 255]), dtype=np.uint8)
     raise ValueError(f"Unknown output_format: {output_format!r}")

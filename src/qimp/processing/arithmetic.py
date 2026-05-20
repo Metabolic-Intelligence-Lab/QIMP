@@ -90,19 +90,25 @@ def q_sub(
 ) -> QuantumCircuit:
     """Subtractor via two's-complement: ``b ← (b - a) mod 2^(n+1)``.
 
-    Implemented as ``b ← b + (~a + 1)`` using the same `q_add` plumbing.
-    `a` is restored at the end of the call (the two's-complement is reversed).
+    Implemented as ``b ← b + (~a + 1)`` using the same ``q_add`` plumbing.
+    On exit:
+
+    - ``a_qubits`` are restored to their input state (bitwise-NOT reversed).
+    - ``c_qubits[0]`` is restored to ``|0⟩`` (the +1 preload is uncomputed).
+    - ``c_qubits[1..n]`` hold the carry chain produced by the addition;
+      ``c_qubits[-1]`` is the final borrow bit (used by ``neqr_comparator``).
     """
     _check_registers(a_qubits, b_qubits, c_qubits)
     # ~a: flip every a bit.
     _bitwise_not(qc, a_qubits)
-    # +1: pre-load the LSB of the carry register.
+    # +1: pre-load the carry-in of bit 0. qc_add_1 reads c_in but never
+    # writes to it, so after q_add this qubit still holds |1⟩.
     qc.x(c_qubits[0])
     q_add(qc, a_qubits, b_qubits, c_qubits)
-    # Undo the +1 setup on c_qubits[0] (it's used as carry-in by qc_add_1).
-    # qc_add_1 has already mutated c_qubits[0]; the cleanest restore is to flip
-    # `a` back so the encoded image isn't lost.
+    # Restore ``a`` and the +1 preload so the only persistent side effects
+    # are the new ``b`` (= b - a) and the carry chain on c_qubits[1..n].
     _bitwise_not(qc, a_qubits)
+    qc.x(c_qubits[0])
     return qc
 
 

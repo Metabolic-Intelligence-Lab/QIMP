@@ -193,8 +193,8 @@ def frqi_decode(
     n: int,
     m: int = 0,
     normalization: float = 1.0,
-) -> list[np.ndarray]:
-    """Decode measurement counts from an FRQI circuit into images.
+) -> np.ndarray | list[np.ndarray]:
+    """Decode measurement counts from an FRQI circuit into one or more images.
 
     Parameters
     ----------
@@ -212,12 +212,11 @@ def frqi_decode(
 
     Returns
     -------
-    list[np.ndarray]
-        Always a list — one ``(2^n, 2^n)`` float array per image (``2^m``
-        elements). The single-image case (``m=0``) returns a 1-element list;
-        index it with ``[0]`` to get the array. This asymmetry vs.
-        `neqr_decode` / `qpie_decode` is intentional: only FRQI supports the
-        multi-image encoding via image-selection qubits.
+    np.ndarray | list[np.ndarray]
+        - When ``m == 0`` (single image): a single ``(2^n, 2^n)`` float array,
+          matching the shape contract of ``neqr_decode`` / ``qpie_decode``.
+        - When ``m > 0``: a list of ``2^m`` images, since only FRQI supports
+          multi-image encoding via image-selection qubits.
     """
     if n < 1 or m < 0:
         raise ValueError("n must be >= 1 and m >= 0")
@@ -250,6 +249,10 @@ def frqi_decode(
             col = int(bits[n:], 2)
             img[row, col] = intensities[s, pixel_idx]
         images.append(img)
+    # Single-image case (m == 0) returns the array directly, matching the
+    # NEQR / QPIE decoders. Multi-image (m > 0) keeps the list shape.
+    if m == 0:
+        return images[0]
     return images
 
 
@@ -279,7 +282,7 @@ class FrqiEncoder:
         self.m = m
         return frqi_circuit(images, normalization=self._normalization)
 
-    def decode(self, counts: dict[str, int]) -> list[np.ndarray]:
+    def decode(self, counts: dict[str, int]) -> np.ndarray | list[np.ndarray]:
         if self.n is None or self._normalization is None:
             raise RuntimeError("call encode() before decode()")
         m = self.m if self.m is not None else 0

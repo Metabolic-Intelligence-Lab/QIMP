@@ -130,7 +130,7 @@ def main() -> int:
     qc = encoder.encode(img4)
     print(f"  circuit: {qc.num_qubits} qubits, depth pre-transpile = {qc.depth()}")
     counts = ideal_simulation(qc, shots=40_000)
-    decoded = encoder.decode(counts)[0]
+    decoded = encoder.decode(counts)
     _save_tiff(decoded, out_dir / "02_frqi_decoded_4x4.tif")
     panels.append(("FRQI decoded", decoded))
     print(f"  PSNR: {psnr(img4, decoded, max_intensity=255.0):.2f} dB")

@@ -32,7 +32,11 @@ def base_frqi_circuit(n: int, m: int = 0) -> QuantumCircuit:
     if m < 0:
         raise ValueError("m must be >= 0")
     num_qubits = 2 * n + m + 1
-    qc = QuantumCircuit(num_qubits, num_qubits)
+    # FrqiEncoder builds without a classical register and relies on
+    # _ensure_measured / measure_all to attach one at measure time. Including
+    # classical bits here would let the same circuit pick up a duplicate
+    # classical register downstream — keep it pure-quantum.
+    qc = QuantumCircuit(num_qubits)
     qc.h(range(2 * n))
     qc.barrier()
     return qc

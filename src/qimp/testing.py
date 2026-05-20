@@ -14,7 +14,7 @@ from qimp.runtime import get_simulator
 if TYPE_CHECKING:
     from qiskit_aer.noise import NoiseModel
 
-__all__ = ["device_test", "ideal_simulation", "noisy_simulation"]
+__all__ = ["device_test", "exact_counts", "ideal_simulation", "noisy_simulation"]
 
 Counts = dict[str, int]
 
@@ -37,6 +37,38 @@ def ideal_simulation(qc: QuantumCircuit, shots: int = 8192) -> Counts:
     transpiled = transpile(measured, sim)
     result = sim.run(transpiled, shots=shots).result()
     return dict(result.get_counts())
+
+
+def exact_counts(qc: QuantumCircuit, *, total: int = 1_000_000) -> Counts:
+    """Return the *noise-free* counts dict from a statevector simulation.
+
+    This is the deterministic equivalent of ``ideal_simulation`` for tests of
+    exact encoders (NEQR / NCQI / compression): no shot noise, no flakiness
+    at higher n/q. Uses :class:`qiskit.quantum_info.Statevector` to compute
+    each basis-state probability exactly, then rescales by ``total`` and
+    rounds — every non-zero probability appears in the result.
+
+    Parameters
+    ----------
+    qc
+        Circuit to evaluate (no need to attach measurements; the statevector
+        is computed before any measurement op).
+    total
+        Synthetic "shots" count to multiply probabilities by. Choose a value
+        ≫ 2^num_qubits so rounding doesn't drop tiny but real amplitudes.
+    """
+    from qiskit.quantum_info import Statevector
+
+    # Drop measurements so the statevector simulator sees a pure unitary.
+    stripped = qc.remove_final_measurements(inplace=False) or qc
+    sv = Statevector.from_instruction(stripped)
+    probs = sv.probabilities_dict()
+    counts: Counts = {}
+    for state, prob in probs.items():
+        n = round(prob * total)
+        if n > 0:
+            counts[state] = n
+    return counts
 
 
 def noisy_simulation(
