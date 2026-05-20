@@ -66,11 +66,42 @@ def test_classifier_learns_separable_2x2() -> None:
     assert set(preds.tolist()) <= {-1, 1}
 
 
-def test_classifier_expectation_value_is_finite() -> None:
-    """Make sure a single forward pass produces a real number in [-1, 1]."""
+def test_classifier_expectation_distinguishes_classes() -> None:
+    """After fitting on a separable dataset, the expectation must actually
+    differ between classes — not just be a finite number.
+
+    This catches degenerate ansatz / parameter-binding bugs where the
+    classifier produces the same output regardless of input.
+    """
     images, labels = _two_class_2x2_dataset()
-    clf = FrqiClassifier(reps=1, seed=0)
-    clf.fit(images[:2], labels[:2], max_iter=2)
-    val = clf.predict_expectation(images[0])
-    assert isinstance(val, float)
-    assert -1.0 - 1e-9 <= val <= 1.0 + 1e-9
+    clf = FrqiClassifier(reps=2, seed=7)
+    clf.fit(images, labels, max_iter=30)
+
+    bright_exp = clf.predict_expectation(images[0])  # label +1
+    dark_exp = clf.predict_expectation(images[1])  # label -1
+
+    assert isinstance(bright_exp, float)
+    assert isinstance(dark_exp, float)
+    # Expectations live in [-1, 1] by construction (Hermitian observable with
+    # unit eigenvalues), but more importantly the two classes must be
+    # distinguishable: the gap should exceed pure shot/optim noise.
+    assert abs(bright_exp - dark_exp) > 0.05, (
+        f"classifier is degenerate: bright={bright_exp:.4f}, dark={dark_exp:.4f}"
+    )
+
+
+def test_classifier_repr_works_on_empty_history() -> None:
+    """``FrqiClassifierResult.__repr__`` must not crash when fit produced no
+    iterations (this used to fail with a malformed conditional inside the
+    f-string format-spec).
+    """
+    from qimp.qml.classifier import FrqiClassifierResult
+
+    result = FrqiClassifierResult(
+        params=np.array([0.0]),
+        loss_history=[],
+        n_iter=0,
+    )
+    text = repr(result)
+    assert "n_iter=0" in text
+    assert "nan" in text

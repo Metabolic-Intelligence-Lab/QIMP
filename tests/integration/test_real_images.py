@@ -1,15 +1,20 @@
-"""End-to-end integration tests using real microscopy images from `data/`.
+"""End-to-end integration tests on a small 16×16 grayscale tile.
 
-Skipped automatically if `data/immagini/trainQML/Train_QML_16/` is empty
-(e.g. on CI where data isn't checked in). Run locally with:
+The fixtures yield the lab's real microscopy data when ``data/immagini/`` is
+synced, and a small deterministic synthetic image otherwise (see
+``tests/integration/conftest.py``). That way the suite actually runs in CI
+instead of being silently skipped.
+
+Run locally with:
 
     pytest tests/integration -v -m "slow or not slow"
 
 These tests cross-validate:
-- FRQI / NEQR / QPIE round-trips on a real 16×16 grayscale tile.
+- FRQI / NEQR / QPIE round-trips on a 16×16 grayscale tile.
 - Geometric operations against numpy ground-truth.
 - QHED edge detection sanity (gradient maxima at known edges).
-- Classical GP-ratio vs. the lab's reference `GP_output/` files.
+- Classical GP-ratio vs. the lab's reference ``GP_output/`` files (skipped
+  when the reference is absent).
 """
 
 from __future__ import annotations
@@ -21,7 +26,6 @@ import pytest
 
 # Resolve the data directory relative to the repo root (two levels up from this file).
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-_TRAIN_DIR = _REPO_ROOT / "data" / "immagini" / "trainQML" / "Train_QML_16"
 _GP_DIR = _REPO_ROOT / "data" / "immagini" / "trainQML" / "GP_output"
 _RGB_DIR = _REPO_ROOT / "data" / "immagini" / "trainQML"
 
@@ -35,26 +39,6 @@ def _load_first(directory: Path, pattern: str = "*.tif") -> np.ndarray:
 
     path = sorted(directory.glob(pattern))[0]
     return np.asarray(Image.open(path))
-
-
-pytestmark = [
-    pytest.mark.skipif(
-        not _have_samples(_TRAIN_DIR),
-        reason=f"no real images in {_TRAIN_DIR} (data/ not synced)",
-    ),
-]
-
-
-@pytest.fixture(scope="module")
-def real_grayscale_16() -> np.ndarray:
-    """A real 16×16 uint8 grayscale tile from the lab's training set."""
-    return _load_first(_TRAIN_DIR)
-
-
-@pytest.fixture(scope="module")
-def real_rgb_110() -> np.ndarray:
-    """A real 110×110 RGB uint8 tile (raw microscopy frame)."""
-    return _load_first(_RGB_DIR)
 
 
 # ---------------------------------------------------------------------- FRQI ----
@@ -76,7 +60,7 @@ def test_frqi_on_real_4x4_tile(real_grayscale_16: np.ndarray) -> None:
     assert qc.num_qubits == 2 * 2 + 1  # n=2 → 5 qubits
 
     counts = ideal_simulation(qc, shots=40_000)
-    decoded = encoder.decode(counts)[0]
+    decoded = encoder.decode(counts)
     fidelity = psnr(img4, decoded.astype(np.uint8), max_intensity=255.0)
     print(f"\nFRQI 4×4 PSNR: {fidelity:.1f} dB")
     # Even with low base intensities this lab uses, the round-trip should

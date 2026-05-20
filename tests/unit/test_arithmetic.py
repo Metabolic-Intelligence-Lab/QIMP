@@ -90,9 +90,23 @@ def test_q_sub_b_minus_a(n: int, a_val: int, b_val: int) -> None:
     assert result == expected
 
 
-@pytest.mark.parametrize("a_val, b_val, expected_gt", [(3, 1, 1), (1, 3, 0), (2, 2, 0), (5, 4, 1)])
-def test_neqr_comparator(a_val: int, b_val: int, expected_gt: int) -> None:
-    n = 3
+@pytest.mark.parametrize(
+    "n, a_val, b_val, expected_gt",
+    [
+        # n = 2
+        (2, 3, 1, 1),
+        (2, 1, 3, 0),
+        (2, 2, 2, 0),
+        # n = 3
+        (3, 5, 4, 1),
+        (3, 4, 5, 0),
+        (3, 7, 0, 1),
+        # n = 4 (carry-chain stress)
+        (4, 15, 14, 1),
+        (4, 0, 1, 0),
+    ],
+)
+def test_neqr_comparator(n: int, a_val: int, b_val: int, expected_gt: int) -> None:
     a = QuantumRegister(n, "a")
     b = QuantumRegister(n, "b")
     c = QuantumRegister(n + 1, "c")

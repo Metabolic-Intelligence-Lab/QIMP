@@ -21,4 +21,12 @@ repos:
     hooks:
       - id: mypy
         files: ^src/qimp/
-        additional_dependencies: [numpy, pytest]
+        additional_dependencies:
+          - numpy
+          - pytest
+          - qiskit>=1.0
+          - qiskit-aer>=0.14
+          - scipy>=1.11
+          - scipy-stubs
+          - pillow>=10.0
+          - imageio>=2.31

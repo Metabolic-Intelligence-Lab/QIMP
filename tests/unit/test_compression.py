@@ -11,8 +11,9 @@ from qimp.encoding.compression import (
     compress_minterms,
     position_strings_to_implicants,
 )
+from qimp.encoding.frqi import FrqiEncoder
 from qimp.encoding.neqr import neqr_decode
-from qimp.testing import ideal_simulation
+from qimp.testing import exact_counts
 
 
 def test_compress_minterms_basic_cover() -> None:
@@ -58,24 +59,40 @@ def test_position_strings_to_implicants_three_of_four_disjoint() -> None:
         )
 
 
-def test_neqr_compressor_round_trip_n1_q2() -> None:
-    """Compressed NEQR should still recover the original image exactly."""
-    image = np.array([[0, 1], [2, 3]], dtype=np.int64)
-    compressor = NeqrCompressor(image, q=2)
+@pytest.mark.parametrize("n,q", [(1, 1), (1, 2), (2, 2), (2, 3)])
+def test_neqr_compressor_round_trip_parametrized(n: int, q: int) -> None:
+    """Compressed NEQR must still recover the original image exactly for moderate (n, q)."""
+    rng = np.random.default_rng(seed=n * 19 + q)
+    side = 1 << n
+    image = rng.integers(0, 1 << q, size=(side, side), dtype=np.int64)
+    compressor = NeqrCompressor(image, q=q)
     qc = compressor.neqr_image()
-    counts = ideal_simulation(qc, shots=4096)
-    decoded = neqr_decode(counts, n=1, q=2)
+    counts = exact_counts(qc)
+    decoded = neqr_decode(counts, n=n, q=q)
     np.testing.assert_array_equal(decoded, image)
 
 
-def test_neqr_compressor_round_trip_n2_q3() -> None:
-    rng = np.random.default_rng(123)
-    image = rng.integers(0, 8, size=(4, 4), dtype=np.int64)
-    compressor = NeqrCompressor(image, q=3)
-    qc = compressor.neqr_image()
-    counts = ideal_simulation(qc, shots=16_384)
-    decoded = neqr_decode(counts, n=2, q=3)
-    np.testing.assert_array_equal(decoded, image)
+@pytest.mark.parametrize("n", [1, 2])
+def test_frqi_compressor_round_trip(n: int) -> None:
+    """Compressed FRQI recovers the same intensities as the brute-force encoder."""
+    rng = np.random.default_rng(seed=n * 23)
+    side = 1 << n
+    # Pick few distinct intensities so compression actually merges minterms.
+    image = rng.integers(0, 4, size=(side, side), dtype=np.uint8) * 60
+    compressor = FrqiCompressor(image, normalization=255.0)
+    qc_compressed = compressor.frqi_image()
+    counts_compressed = exact_counts(qc_compressed)
+
+    encoder = FrqiEncoder(normalization=255.0)
+    qc_reference = encoder.encode(image)
+    counts_reference = exact_counts(qc_reference)
+
+    # Decode both via the FRQI decoder (same n, m=0) and compare.
+    from qimp.encoding.frqi import frqi_decode
+
+    decoded_compressed = frqi_decode(counts_compressed, n=n, m=0, normalization=255.0)
+    decoded_reference = frqi_decode(counts_reference, n=n, m=0, normalization=255.0)
+    np.testing.assert_allclose(decoded_compressed, decoded_reference, atol=1e-6)
 
 
 def test_frqi_compressor_circuit_is_smaller() -> None:

@@ -23,7 +23,7 @@ keywords = [
     "qimp",
 ]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
@@ -31,6 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Physics",
 ]
@@ -74,6 +75,7 @@ dev = [
     "pytest-xdist>=3.5",
     "ruff>=0.4",
     "mypy>=1.10",
+    "scipy-stubs",
     "pre-commit>=3.7",
 ]
 
@@ -81,6 +83,8 @@ dev = [
 Homepage = "https://github.com/Metabolic-Intelligence-Lab/QIMP"
 Repository = "https://github.com/Metabolic-Intelligence-Lab/QIMP"
 Issues = "https://github.com/Metabolic-Intelligence-Lab/QIMP/issues"
+Documentation = "https://Metabolic-Intelligence-Lab.github.io/QIMP/"
+Changelog = "https://github.com/Metabolic-Intelligence-Lab/QIMP/blob/main/CHANGELOG.md"
 
 [project.scripts]
 qimp = "qimp.cli:main"
@@ -105,6 +109,9 @@ exclude = [
     "legacy",
     "notebooks",
     "docs/_site",
+    # 15 MB PDF — far too big to ship in source distributions. Link from
+    # the GitHub release page instead.
+    "docs/tesi.pdf",
 ]
 
 [tool.ruff]
@@ -154,16 +161,16 @@ files = ["src/qimp"]
 exclude = ["legacy", "data", "tests/fixtures", "apps"]
 
 [[tool.mypy.overrides]]
+# Only mask libs that genuinely lack inline type info / stubs. scipy, pandas,
+# matplotlib ship usable stubs (scipy ≥ 1.13 has inline annotations; pandas
+# has its own stubs); silencing them masks real type errors. Streamlit is
+# only imported under `apps/` (excluded from mypy anyway).
 module = [
     "qiskit.*",
     "qiskit_aer.*",
     "qiskit_ibm_runtime.*",
-    "matplotlib.*",
     "imageio.*",
     "PIL.*",
-    "scipy.*",
-    "streamlit.*",
-    "pandas.*",
 ]
 ignore_missing_imports = true
 
@@ -186,7 +193,7 @@ markers = [
 
 [tool.coverage.run]
 source = ["src/qimp"]
-omit = ["src/qimp/_version.py", "src/qimp/cli.py"]
+omit = ["src/qimp/_version.py"]
 
 [tool.coverage.report]
 exclude_lines = [

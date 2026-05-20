@@ -92,11 +92,9 @@ def test_to_display_uint8_handles_common_shapes() -> None:
     "relative_path",
     [
         "apps/qimp_explorer/app.py",
-        "apps/qimp_explorer/pages/1_Encoder_Explorer.py",
-        "apps/qimp_explorer/pages/2_Processing_Playground.py",
-        "apps/qimp_explorer/pages/3_Benchmark.py",
-        "apps/qimp_explorer/pages/4_GP_Ratio.py",
-        "apps/qimp_explorer/pages/5_System_Info.py",
+        "apps/qimp_explorer/pages/1_Benchmark.py",
+        "apps/qimp_explorer/pages/2_GP_Ratio.py",
+        "apps/qimp_explorer/pages/3_System_Info.py",
     ],
 )
 def test_streamlit_page_compiles(relative_path: str) -> None:
@@ -115,11 +113,9 @@ def test_streamlit_page_compiles(relative_path: str) -> None:
     "relative_path",
     [
         "apps/qimp_explorer/app.py",
-        "apps/qimp_explorer/pages/1_Encoder_Explorer.py",
-        "apps/qimp_explorer/pages/2_Processing_Playground.py",
-        "apps/qimp_explorer/pages/3_Benchmark.py",
-        "apps/qimp_explorer/pages/4_GP_Ratio.py",
-        "apps/qimp_explorer/pages/5_System_Info.py",
+        "apps/qimp_explorer/pages/1_Benchmark.py",
+        "apps/qimp_explorer/pages/2_GP_Ratio.py",
+        "apps/qimp_explorer/pages/3_System_Info.py",
     ],
 )
 def test_streamlit_page_runs(relative_path: str) -> None:

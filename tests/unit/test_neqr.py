@@ -6,7 +6,7 @@ import numpy as np
 import pytest
 
 from qimp.encoding.neqr import NeqrEncoder, neqr_circuit, neqr_decode
-from qimp.testing import ideal_simulation
+from qimp.testing import exact_counts
 
 
 def test_neqr_circuit_qubit_count(n_qubits: int, q_qubits: int) -> None:
@@ -39,28 +39,45 @@ def test_neqr_decode_rejects_invalid_params() -> None:
         neqr_decode({}, n=2, q=0)
 
 
-def test_neqr_round_trip_n1_q2() -> None:
-    """NEQR is exact, so even a small shot count recovers the image perfectly."""
-    image = np.array([[0, 1], [2, 3]], dtype=np.int64)
-    qc = neqr_circuit(image, q=2)
-    counts = ideal_simulation(qc, shots=4096)
-    decoded = neqr_decode(counts, n=1, q=2)
+@pytest.mark.parametrize(
+    "n,q",
+    [
+        (1, 1),
+        (1, 2),
+        (1, 3),
+        (2, 1),
+        (2, 2),
+        (2, 3),
+        (3, 1),
+        (3, 2),
+        # (n=3, q=3) and beyond are exercised by the slow round-trip suite —
+        # the statevector dimension (2^(2n+q)) becomes expensive to compute.
+    ],
+)
+def test_neqr_round_trip_parametrized(n: int, q: int) -> None:
+    """NEQR is exact for any (n, q): statevector counts must round-trip bit-perfect.
+
+    Uses ``exact_counts`` so there's no shot noise — any mismatch is a real
+    encoder/decoder bug, not a flake.
+    """
+    rng = np.random.default_rng(seed=n * 31 + q)
+    side = 1 << n
+    image = rng.integers(0, 1 << q, size=(side, side), dtype=np.int64)
+    qc = neqr_circuit(image, q=q)
+    counts = exact_counts(qc)
+    decoded = neqr_decode(counts, n=n, q=q)
     np.testing.assert_array_equal(decoded, image)
 
 
-def test_neqr_round_trip_n2_q3() -> None:
-    image = np.array(
-        [
-            [0, 1, 2, 3],
-            [4, 5, 6, 7],
-            [7, 6, 5, 4],
-            [3, 2, 1, 0],
-        ],
-        dtype=np.int64,
-    )
-    qc = neqr_circuit(image, q=3)
-    counts = ideal_simulation(qc, shots=8192)
-    decoded = neqr_decode(counts, n=2, q=3)
+@pytest.mark.slow
+@pytest.mark.parametrize("n,q", [(3, 3), (4, 2)])
+def test_neqr_round_trip_large(n: int, q: int) -> None:
+    rng = np.random.default_rng(seed=n + q)
+    side = 1 << n
+    image = rng.integers(0, 1 << q, size=(side, side), dtype=np.int64)
+    qc = neqr_circuit(image, q=q)
+    counts = exact_counts(qc)
+    decoded = neqr_decode(counts, n=n, q=q)
     np.testing.assert_array_equal(decoded, image)
 
 
@@ -68,7 +85,7 @@ def test_neqr_encoder_round_trip() -> None:
     image = np.array([[1, 2], [3, 0]], dtype=np.int64)
     encoder = NeqrEncoder(q=2)
     qc = encoder.encode(image)
-    counts = ideal_simulation(qc, shots=4096)
+    counts = exact_counts(qc)
     decoded = encoder.decode(counts)
     np.testing.assert_array_equal(decoded, image)
 

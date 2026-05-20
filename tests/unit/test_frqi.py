@@ -73,8 +73,8 @@ def test_frqi_round_trip_uniform_intensity() -> None:
     qc = frqi_circuit(image, normalization=255.0)
     counts = ideal_simulation(qc, shots=40_000)
     decoded = frqi_decode(counts, n=1, m=0, normalization=255.0)
-    assert len(decoded) == 1
-    np.testing.assert_allclose(decoded[0], target_intensity, atol=6.0)
+    assert decoded.shape == (2, 2)
+    np.testing.assert_allclose(decoded, target_intensity, atol=6.0)
 
 
 @pytest.mark.slow
@@ -83,7 +83,7 @@ def test_frqi_round_trip_varying_image() -> None:
     image = np.array([[0.0, 64.0], [128.0, 200.0]], dtype=np.float64)
     qc = frqi_circuit(image, normalization=255.0)
     counts = ideal_simulation(qc, shots=50_000)
-    decoded = frqi_decode(counts, n=1, m=0, normalization=255.0)[0]
+    decoded = frqi_decode(counts, n=1, m=0, normalization=255.0)
     np.testing.assert_allclose(decoded, image, atol=5.0)
 
 
@@ -112,9 +112,8 @@ def test_frqi_decode_rejects_invalid_n() -> None:
 
 def test_frqi_decode_empty_counts_returns_zeros() -> None:
     result = frqi_decode({}, n=1, m=0)
-    assert len(result) == 1
-    assert result[0].shape == (2, 2)
-    assert np.all(result[0] == 0.0)
+    assert result.shape == (2, 2)
+    assert np.all(result == 0.0)
 
 
 def test_frqi_float_image_auto_normalization() -> None:
@@ -139,5 +138,5 @@ def test_frqi_float_image_round_trip_recovers_intensities() -> None:
     encoder = FrqiEncoder()
     qc = encoder.encode(image)
     counts = ideal_simulation(qc, shots=40_000)
-    decoded = encoder.decode(counts)[0]
+    decoded = encoder.decode(counts)
     np.testing.assert_allclose(decoded, image, atol=8.0)

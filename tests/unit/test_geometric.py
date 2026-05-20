@@ -12,56 +12,63 @@ import pytest
 
 from qimp.encoding.neqr import neqr_circuit, neqr_decode
 from qimp.processing import geometric
-from qimp.testing import ideal_simulation
+from qimp.testing import exact_counts
 
 
-def _make_test_image(n: int) -> np.ndarray:
-    """Square image of side 2^n with distinct intensities at each pixel."""
+def _make_test_image(n: int, q: int) -> np.ndarray:
+    """Square image of side 2^n with distinct intensities at each pixel.
+
+    Intensities are taken modulo ``2^q`` so the image fits the NEQR encoder.
+    With distinct values the geometric ops are uniquely identifiable from
+    the decoded output (no aliasing between two pixels that happened to
+    share an intensity).
+    """
     side = 1 << n
-    return np.arange(side * side, dtype=np.int64).reshape(side, side)
+    return (np.arange(side * side, dtype=np.int64) % (1 << q)).reshape(side, side)
 
 
 def _round_trip(image: np.ndarray, n: int, q: int, op: callable) -> np.ndarray:
     """Encode → apply op (with pos_offset=q for NEQR) → measure → decode."""
     qc = neqr_circuit(image, q=q)
     op(qc, n=n, pos_offset=q)
-    counts = ideal_simulation(qc, shots=8192)
+    counts = exact_counts(qc)
     return neqr_decode(counts, n=n, q=q)
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+_GEOM_NQ = [(1, 2), (2, 2), (2, 3), (3, 2)]
+
+
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_axis_flip_y(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(img, n, q, lambda qc, **kw: geometric.axis_flip(qc, axis="y", **kw))
-    expected = np.fliplr(img)
-    np.testing.assert_array_equal(out, expected)
+    np.testing.assert_array_equal(out, np.fliplr(img))
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_axis_flip_x(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(img, n, q, lambda qc, **kw: geometric.axis_flip(qc, axis="x", **kw))
-    expected = np.flipud(img)
-    np.testing.assert_array_equal(out, expected)
+    np.testing.assert_array_equal(out, np.flipud(img))
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_coord_swap_is_transpose(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(img, n, q, lambda qc, **kw: geometric.coord_swap(qc, **kw))
     np.testing.assert_array_equal(out, img.T)
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_ort_rotation_180(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(img, n, q, lambda qc, **kw: geometric.ort_rotation(qc, angle=180, **kw))
     np.testing.assert_array_equal(out, np.rot90(img, 2))
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_ort_rotation_90(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(img, n, q, lambda qc, **kw: geometric.ort_rotation(qc, angle=90, **kw))
     # The library defines 90° as coord_swap then axis_flip('y'), matching numpy's
     # rot90(image, 1) only after we also account for the (row, col) orientation.
@@ -85,30 +92,28 @@ def test_axis_flip_rejects_bad_axis() -> None:
         geometric.axis_flip(qc, n=1, axis="z")  # type: ignore[arg-type]
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_pos_shift_x_plus_one(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(
         img,
         n,
         q,
         lambda qc, **kw: geometric.pos_shift(qc, axis="x", direction="+", magnitude=1, **kw),
     )
-    expected = np.roll(img, shift=1, axis=1)
-    np.testing.assert_array_equal(out, expected)
+    np.testing.assert_array_equal(out, np.roll(img, shift=1, axis=1))
 
 
-@pytest.mark.parametrize("n,q", [(1, 2), (2, 4)])
+@pytest.mark.parametrize("n,q", _GEOM_NQ)
 def test_pos_shift_y_minus_one(n: int, q: int) -> None:
-    img = _make_test_image(n)
+    img = _make_test_image(n, q)
     out = _round_trip(
         img,
         n,
         q,
         lambda qc, **kw: geometric.pos_shift(qc, axis="y", direction="-", magnitude=1, **kw),
     )
-    expected = np.roll(img, shift=-1, axis=0)
-    np.testing.assert_array_equal(out, expected)
+    np.testing.assert_array_equal(out, np.roll(img, shift=-1, axis=0))
 
 
 def test_pos_shift_rejects_negative_magnitude() -> None:
@@ -161,12 +166,12 @@ def test_coord_swap_rejects_undersized_pos_offset() -> None:
         geometric.coord_swap(qc, n=3, pos_offset=0)
 
 
-@pytest.mark.parametrize("n,q", [(2, 4)])
-def test_restr_flip_only_touches_selected_region(n: int, q: int) -> None:
+def test_restr_flip_only_touches_selected_region() -> None:
     """``restr_flip(axis='y', region_bits='1')`` should flip columns only on rows
     whose MSB is 1 (the bottom half of a 4-row image with n=2).
     """
-    img = _make_test_image(n)
+    n, q = 2, 4
+    img = _make_test_image(n, q)
     out = _round_trip(
         img,
         n,
@@ -178,19 +183,18 @@ def test_restr_flip_only_touches_selected_region(n: int, q: int) -> None:
     np.testing.assert_array_equal(out, expected)
 
 
-@pytest.mark.parametrize("n,q", [(2, 4)])
-def test_restr_coord_swap_only_touches_selected_region(n: int, q: int) -> None:
+def test_restr_coord_swap_only_touches_selected_region() -> None:
     """``restr_coord_swap(region_bits='1')`` swaps coords inside the bottom-right
     quadrant only (where both row MSB and col MSB are 1).
     """
-    img = _make_test_image(n)
+    n, q = 2, 4
+    img = _make_test_image(n, q)
     out = _round_trip(
         img,
         n,
         q,
         lambda qc, **kw: geometric.restr_coord_swap(qc, region_bits="1", **kw),
     )
-    # The quadrant rows=[2:4], cols=[2:4] should be transposed; the rest unchanged.
     expected = img.copy()
     expected[2:4, 2:4] = img[2:4, 2:4].T
     np.testing.assert_array_equal(out, expected)
