@@ -31,9 +31,11 @@ from qimp.testing import ideal_simulation
 st.set_page_config(page_title="Benchmark", page_icon="📊", layout="wide")
 st.title("📊 Benchmark: FRQI vs NEQR vs QPIE")
 
-image = st.session_state.get("image")
+image = st.session_state.get("wiz_image")
 if image is None:
-    st.warning("Load an image from the **Home** page first.")
+    image = st.session_state.get("wiz_image_raw")
+if image is None:
+    st.warning("Load and (optionally) preprocess an image in the **Workflow** wizard first.")
     st.stop()
 
 if image.ndim != 2:
@@ -86,7 +88,7 @@ def _bench_frqi() -> dict:
     enc = FrqiEncoder()
     qc = enc.encode(img_uint8)
     counts = ideal_simulation(qc, shots=int(frqi_shots))
-    decoded = enc.decode(counts)[0]
+    decoded = enc.decode(counts)
     elapsed = time.perf_counter() - start
     summary = transpile_summary(qc)
     return {

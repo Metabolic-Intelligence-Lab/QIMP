@@ -7,6 +7,7 @@ the QASM export path always works.
 
 from __future__ import annotations
 
+import re
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -18,23 +19,57 @@ __all__ = [
     "have_ibm_runtime",
     "list_ibm_backends",
     "run_on_ibm",
+    "sanitize_exception",
 ]
+
+
+# IBM API tokens are long opaque hex / base64 strings. Match anything that
+# looks like one and scrub it before surfacing an error to the UI.
+_TOKEN_PATTERN = re.compile(r"[A-Za-z0-9_\-]{32,}")
+
+
+def sanitize_exception(exc: BaseException, token: str | None = None) -> str:
+    """Return ``str(exc)`` with the user's IBM token (and similar-looking
+    long opaque strings) masked out.
+
+    The masking is conservative: any contiguous run of ≥ 32 URL-safe chars
+    is replaced with ``***`` even if it wasn't the literal token, because
+    bearer tokens can be wrapped in JWT headers or URL parameters with
+    arbitrary surrounding text.
+    """
+    text = str(exc)
+    if token:
+        text = text.replace(token, "***")
+    return _TOKEN_PATTERN.sub("***", text)
 
 
 def circuit_to_qasm3(qc: QuantumCircuit) -> str:
     """Serialize a circuit to OpenQASM 3.
 
     The Composer at https://quantum.ibm.com/composer imports QASM 3 directly.
-    Falls back to QASM 2 if Qiskit's qasm3 module isn't available (unlikely
-    on Qiskit ≥ 1.0).
+    If the circuit contains gates that ``qasm3.dumps`` can't serialise
+    directly (e.g. annotated controlled rotations produced by FRQI / MCRQI),
+    we decompose first and retry; if that still fails we fully transpile to
+    a basis-gate set as a last resort.
     """
-    try:
-        from qiskit import qasm3
+    from qiskit import qasm3, transpile
 
+    try:
         return qasm3.dumps(qc)
     except Exception:
-        # Last-ditch fallback (legacy Qiskit).
-        return qc.qasm()
+        pass
+    # Decompose annotated / library gates one level and retry.
+    try:
+        return qasm3.dumps(qc.decompose())
+    except Exception:
+        pass
+    # Last resort: transpile to a known basis set and try again. This may
+    # change the gate-count but keeps the unitary equivalent and produces
+    # QASM the Composer can import.
+    transpiled = transpile(
+        qc, basis_gates=["u", "cx", "id", "measure", "reset", "barrier"], optimization_level=0
+    )
+    return qasm3.dumps(transpiled)
 
 
 def have_ibm_runtime() -> bool:

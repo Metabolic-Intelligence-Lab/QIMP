@@ -13,11 +13,11 @@ if str(_QIMP_APP_ROOT) not in sys.path:
 import platform
 
 import streamlit as st
+from _cached import cached_discover_dataset_images
 from app_io import (
     DATASET_GRAYSCALE,
     DATASET_RGB,
     OUTPUT_ROOT,
-    discover_dataset_images,
 )
 
 st.set_page_config(page_title="System Info", page_icon="ℹ️", layout="wide")
@@ -86,8 +86,8 @@ st.divider()
 
 # ----------------------------------------------------------- Dataset stats ----
 st.subheader("Dataset")
-gs = discover_dataset_images(DATASET_GRAYSCALE, max_items=10_000)
-rgb = discover_dataset_images(DATASET_RGB, max_items=10_000)
+gs = cached_discover_dataset_images(str(DATASET_GRAYSCALE), max_items=10_000)
+rgb = cached_discover_dataset_images(str(DATASET_RGB), max_items=10_000)
 st.write(
     {
         "grayscale_dir": str(DATASET_GRAYSCALE),

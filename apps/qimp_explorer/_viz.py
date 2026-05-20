@@ -10,13 +10,42 @@ from typing import Any
 import numpy as np
 
 
-def to_display_uint8(img: np.ndarray) -> np.ndarray:
+def upscale_for_display(arr: np.ndarray, target_min_side: int = 320) -> np.ndarray:
+    """Replicate pixels with NEAREST-neighbor so a small image stays crisp in
+    the browser regardless of CSS scaling.
+
+    Streamlit's `st.image` applies smooth-scaling when the browser has to
+    enlarge a tiny image like 16×16 → 320 px. Pre-enlarging the array via
+    `np.repeat` makes the browser display 1:1 pixels.
+
+    `target_min_side` is the minimum side we want before handing off to the
+    browser. Returned array's side is the smallest integer multiple of the
+    original side that's ≥ `target_min_side`.
+    """
+    a = np.asarray(arr)
+    if a.ndim not in (2, 3):
+        return a
+    side = a.shape[0]
+    if side >= target_min_side or side == 0:
+        return a
+    factor = (target_min_side + side - 1) // side  # ceil division
+    return np.repeat(np.repeat(a, factor, axis=0), factor, axis=1)
+
+
+def to_display_uint8(
+    img: np.ndarray, *, vmin: float | None = None, vmax: float | None = None
+) -> np.ndarray:
     """Normalize any 2-D or 3-D image to uint8 [0, 255] for ``st.image``.
 
     - 2-D grayscale: linear stretch from ``[min, max]`` to ``[0, 255]``.
     - 3-D uint8 RGB/RGBA: returned unchanged.
     - 3-D uint16 RGB: downshifted to uint8 (divide by 257).
     - 3-D float RGB: scaled if max ≤ 1.0, else clipped to [0, 255].
+
+    Pass ``vmin`` / ``vmax`` to override the auto-stretch with a fixed
+    intensity window — useful when rendering before/after panels that must
+    share a scale (otherwise the same content can appear with different
+    brightness if the two images have different ``max`` values).
     """
     arr = np.asarray(img)
     if arr.ndim == 3:
@@ -30,9 +59,10 @@ def to_display_uint8(img: np.ndarray) -> np.ndarray:
             return np.clip(arr, 0, 255).astype(np.uint8)
         return np.clip(arr, 0, 255).astype(np.uint8)
     # Grayscale.
-    lo, hi = float(arr.min()), float(arr.max())
+    lo = float(arr.min()) if vmin is None else float(vmin)
+    hi = float(arr.max()) if vmax is None else float(vmax)
     if hi > lo:
-        return np.interp(arr, [lo, hi], [0, 255]).astype(np.uint8)
+        return np.clip(np.interp(arr, [lo, hi], [0, 255]), 0, 255).astype(np.uint8)
     return np.zeros_like(arr, dtype=np.uint8)
 
 
