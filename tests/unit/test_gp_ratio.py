@@ -224,6 +224,38 @@ def test_analytical_gp_params_rejects_non_square() -> None:
         analytical_gp_params(np.zeros((2, 4)), np.zeros((2, 4)))
 
 
+def test_analytical_gp_params_accepts_custom_target() -> None:
+    """Corollary 1 of the methods paper: any bounded per-pixel target in
+    [-1, 1] can be passed via the ``target`` argument and the closed-form
+    solver returns parameters that reproduce that target exactly."""
+    from qimp.processing.gp_ratio import analytical_gp_params, evaluate_gp
+
+    rng = np.random.default_rng(0)
+    n = 1
+    side = 1 << n
+    I1 = rng.uniform(20, 70, size=(side, side))
+    I2 = rng.uniform(20, 70, size=(side, side))
+    # Pick a totally non-GP-shaped target — e.g. a rescaled bare ratio
+    # clamped into [-1, 1]. This is the kind of "any ratiometric operator"
+    # claim made in the paper's extensions section.
+    raw_ratio = I1 / (I2 + 1e-9)
+    target = np.clip(2.0 * raw_ratio / raw_ratio.max() - 1.0, -1.0, 1.0)
+
+    params = analytical_gp_params(I1, I2, target=target)
+    decoded = evaluate_gp(I1, I2, params, exact=True)
+    mse = float(((target - decoded) ** 2).mean())
+    assert mse < 1e-6, f"custom-target closed form should be exact, got MSE={mse:.3e}"
+
+
+def test_analytical_gp_params_rejects_target_shape_mismatch() -> None:
+    from qimp.processing.gp_ratio import analytical_gp_params
+
+    I1 = np.ones((2, 2))
+    I2 = np.ones((2, 2))
+    with pytest.raises(ValueError, match="target shape"):
+        analytical_gp_params(I1, I2, target=np.zeros((4, 4)))
+
+
 def test_apply_gp_function_parameters_are_non_degenerate() -> None:
     """Setting different individual parameters to π/3 must produce different decoded
     images. Regression test for the bug where all 2·2^(2n) parameters collapsed

@@ -264,33 +264,46 @@ def analytical_gp_params(
     *,
     alpha: float = 1.0,
     normalization: float | None = None,
+    target: np.ndarray | None = None,
 ) -> np.ndarray:
     """Return the closed-form optimal parameters for :func:`apply_gp_function`.
 
-    With the H moved outside the per-pixel loop (see ``apply_gp_function``
-    docstring), each pixel ``p`` has an independent 2-parameter block and
-    the decoded value is
+    With the final Hadamard moved outside the per-pixel loop (see
+    ``apply_gp_function`` docstring), each pixel ``p`` has an independent
+    two-parameter block and the decoded value is
 
-        ``gp[p] = −(sin(φ_R + β_p) + sin(φ_G + α_p)) / 2``
+        ``GP[p] = −(sin(φ_2 + β_p) + sin(φ_1 + α_p)) / 2``
 
-    where ``φ_R = arccos(1 − 2·R[p]/N)`` and ``φ_G = arccos(1 − 2·G[p]/N)``
-    are the FRQI angles (``N`` is the normalisation used at encoding).
-    Setting ``gp[p] = target[p]`` is solved by
+    where ``φ_1 = arccos(1 − 2·I_1[p]/N)`` and ``φ_2 = arccos(1 − 2·I_2[p]/N)``
+    are the FRQI angles for the two channels (``N`` is the normalisation
+    used at encoding). Setting ``GP[p] = target[p]`` is solved by
 
-        ``α_p = arcsin(−target[p]) − φ_G``
-        ``β_p = arcsin(−target[p]) − φ_R``
+        ``α_p = arcsin(−target[p]) − φ_1``
+        ``β_p = arcsin(−target[p]) − φ_2``
 
     giving the exact circuit output without any numerical optimisation.
 
     Parameters
     ----------
     green, red
-        Matching-shape ``(2^n, 2^n)`` channel arrays.
+        Matching-shape ``(2^n, 2^n)`` channel arrays. The argument names
+        track the lab-historical (green, red) labels; the function is
+        channel-agnostic and applies to any two intensity bands.
     alpha
-        Red-channel weight used to compute the classical target.
+        Sensitivity correction factor for the second channel (the G-factor
+        of the Generalized Polarization formula). Ignored when an explicit
+        ``target`` is supplied.
     normalization
         FRQI normalisation. Defaults to ``max(green.max(), red.max())`` —
         the same value :func:`evaluate_gp` uses internally.
+    target
+        Optional explicit per-pixel target in [-1, 1]. When supplied, the
+        solver fits the circuit to this target instead of the classical
+        Generalized Polarization image. This is the entry point for the
+        Corollary-1 extensions discussed in the companion paper: any
+        bounded ratiometric operator of the two channels (Fura-2 calcium
+        ratio, FRET efficiency, SNARF pH, NDVI, …) may be supplied as
+        ``target`` and the closed form recovers the matching parameters.
 
     Returns
     -------
@@ -311,13 +324,21 @@ def analytical_gp_params(
 
     phi_R = np.arccos(np.clip(1.0 - 2.0 * r / normalization, -1.0, 1.0))
     phi_G = np.arccos(np.clip(1.0 - 2.0 * g / normalization, -1.0, 1.0))
-    target = np.clip(classical_gp_image(g, r, alpha=alpha), -1.0, 1.0)
-    base = np.arcsin(-target)
+    if target is None:
+        t = np.clip(classical_gp_image(g, r, alpha=alpha), -1.0, 1.0)
+    else:
+        t = np.asarray(target, dtype=np.float64)
+        if t.shape != g.shape:
+            raise ValueError(
+                f"target shape {t.shape} must match channel shape {g.shape}"
+            )
+        t = np.clip(t, -1.0, 1.0)
+    base = np.arcsin(-t)
     alpha_per_pixel = (base - phi_G).flatten()
     beta_per_pixel = (base - phi_R).flatten()
 
-    # Layout: params[2p] = α_p (G half, fires first inside the loop),
-    #         params[2p+1] = β_p (R half).
+    # Layout: params[2p] = α_p (G-half, fires first inside the loop),
+    #         params[2p+1] = β_p (R-half).
     params = np.empty(2 * alpha_per_pixel.size, dtype=np.float64)
     params[0::2] = alpha_per_pixel
     params[1::2] = beta_per_pixel
