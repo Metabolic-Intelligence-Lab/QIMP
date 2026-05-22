@@ -130,6 +130,117 @@ def add_table(doc: Document, headers: list[str], rows: list[list[str]],
     doc.add_paragraph()
 
 
+# ---------------------------------------------------------- API table ----
+
+
+def _add_api_table(doc: Document) -> None:
+    """Insert Table 2: full public API listing grouped by subpackage."""
+    rows: list[tuple[str, str, str]] = [
+        # (module, symbol, purpose) — module column is left blank on
+        # consecutive rows of the same module so the visual grouping is clear.
+        ("qimp.encoding.frqi",
+         "FrqiEncoder, frqi_circuit, frqi_decode",
+         "FRQI encoder / decoder; single- or multi-image stack."),
+        ("qimp.encoding.neqr",
+         "NeqrEncoder, neqr_circuit, neqr_decode",
+         "NEQR encoder / decoder; exact basis encoding."),
+        ("qimp.encoding.qpie",
+         "QpieEncoder, qpie_circuit, qpie_decode",
+         "QPIE amplitude-encoding; 2n qubits, lossy for normalisation."),
+        ("qimp.encoding.mcrqi",
+         "McrqiEncoder, mcrqi_circuit, mcrqi_decode",
+         "FRQI multi-channel for RGB; 2n+3 qubits."),
+        ("qimp.encoding.ncqi",
+         "NcqiEncoder, ncqi_circuit, ncqi_decode",
+         "NEQR multi-channel for RGB; 2n+3q qubits."),
+        ("qimp.encoding.compression",
+         "FrqiCompressor, NeqrCompressor,\ncompress_minterms",
+         "Quine–McCluskey + greedy disjoint cover."),
+        ("qimp.processing.geometric",
+         "axis_flip, coord_swap, ort_rotation,\npos_shift, restr_flip, restr_coord_swap",
+         "Position-register transformations (flip, swap, rotate, shift)."),
+        ("qimp.processing.chromatic",
+         "frqi_color_complement, frqi_color_change,\n"
+         "neqr_color_complement, neqr_half_intensity,\n"
+         "neqr_classify_complement",
+         "Intensity-register transformations."),
+        ("qimp.processing.arithmetic",
+         "qc_add_1, q_add, q_sub, neqr_comparator",
+         "Quantum arithmetic on NEQR registers."),
+        ("qimp.processing.filters",
+         "qhed_filter, qhed_decode, qhed_full_edges",
+         "Quantum Hadamard edge-detection (QHED)."),
+        ("qimp.processing.gp_ratio",
+         "apply_gp_function, decode_gp_counts,\n"
+         "classical_gp_image, evaluate_gp,\n"
+         "optimize_gp, analytical_gp_params",
+         "Generalized Polarization circuit + closed-form solver."),
+        ("qimp.qml.classifier",
+         "FrqiClassifier, FrqiClassifierResult",
+         "Variational FRQI classifier (RealAmplitudes + COBYLA)."),
+        ("qimp.io.image",
+         "calculate_gp_image, load_tiff_16bit,\n"
+         "image_conv, color_image_conv, apply_filters",
+         "TIFF / image I/O and classical GP reference."),
+        ("qimp.io.datasets",
+         "ImageDataset, batch_process_images",
+         "Folder iterators and batch helpers."),
+        ("qimp.runtime",
+         "get_simulator, SimulatorManager,\n"
+         "base_frqi_circuit, clear_circuit_cache,\n"
+         "clear_memory_pool",
+         "Simulator backend, circuit cache, memory pool."),
+        ("qimp.metrics",
+         "mse, psnr, total_variation,\ntranspile_summary",
+         "Image-quality metrics and circuit-size summary."),
+        ("qimp.testing",
+         "ideal_simulation, noisy_simulation,\nexact_counts, device_test",
+         "Simulation / hardware-execution dispatch."),
+        ("qimp.qft",
+         "apply_qft, apply_inverse_qft",
+         "QFT / inverse QFT on arbitrary qubit subsets."),
+        ("qimp.cli",
+         "qimp ui",
+         "CLI entry point — launches the Streamlit explorer."),
+    ]
+
+    cap = doc.add_paragraph()
+    cr = cap.add_run("Table 2. ")
+    cr.bold = True
+    cr.font.size = Pt(10)
+    tr = cap.add_run(
+        "Public API surface of qimp-mi v0.3.0, grouped by subpackage. The "
+        "table omits private helpers (leading underscore) and re-exports; "
+        "the full auto-generated reference is at the project documentation site."
+    )
+    tr.font.size = Pt(10)
+    tr.italic = True
+
+    t = doc.add_table(rows=1 + len(rows), cols=3)
+    t.style = "Light Grid Accent 1"
+    t.alignment = WD_ALIGN_PARAGRAPH.CENTER
+    headers = ("Module", "Public symbols", "Purpose")
+    for i, h in enumerate(headers):
+        cell = t.rows[0].cells[i]
+        cell.text = ""
+        p = cell.paragraphs[0]
+        r = p.add_run(h)
+        r.bold = True
+        r.font.size = Pt(10)
+        r.font.name = SERIF
+        cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        shade(cell, "D9E1F2")
+    for r_i, (mod, syms, purpose) in enumerate(rows, start=1):
+        for c_i, val in enumerate((mod, syms, purpose)):
+            cell = t.rows[r_i].cells[c_i]
+            cell.text = ""
+            p = cell.paragraphs[0]
+            r = p.add_run(val)
+            r.font.size = Pt(9)
+            r.font.name = MONO if c_i in (0, 1) else SERIF
+    doc.add_paragraph()
+
+
 # ---------------------------------------------------------- build --------
 
 
@@ -279,6 +390,17 @@ def build() -> Document:
 
     # ---- Core abstractions ---------------------------------------------
     doc.add_heading("Core abstractions", level=1)
+    add_figure(doc, FIG / "fig_roundtrip.png",
+        "Encoder / decoder roundtrip data flow. Every encoder in qimp.encoding "
+        "exposes a symmetric pair encode(image) -> QuantumCircuit and "
+        "decode(counts) -> ndarray. The simulation / execution step (centre, "
+        "yellow) is provided by qimp.testing and dispatches transparently to "
+        "the noise-free shot-based simulator, the exact statevector path, or "
+        "IBM Quantum hardware via the Sampler primitive. The dashed arc "
+        "indicates the roundtrip property: NEQR and NCQI recover the input "
+        "exactly given an exact simulator; FRQI, QPIE and MCRQI recover it up "
+        "to shot noise.",
+        fig_n=2, width_in=6.4)
     add_para(doc,
         "The library exposes a small number of abstractions that compose "
         "uniformly across operations. The central one is the encoder / decoder "
@@ -337,6 +459,15 @@ def build() -> Document:
     # ---- Subpackages ---------------------------------------------------
     doc.add_heading("Subpackages", level=1)
 
+    add_para(doc,
+        "Table 2 summarises the public API surface of qimp-mi by subpackage. "
+        "The five subpackage-level subsections below give a one-paragraph "
+        "tour of each. Every function in Table 2 is fully documented in the "
+        "auto-generated API reference (mkdocstrings) and has at least one "
+        "unit test in the regression suite.",
+    )
+    _add_api_table(doc)
+
     doc.add_heading("qimp.encoding", level=2)
     add_para(doc,
         "Five encoder classes (FrqiEncoder, NeqrEncoder, QpieEncoder, "
@@ -358,13 +489,43 @@ def build() -> Document:
         "frqi_color_change, neqr_color_complement, neqr_half_intensity and "
         "neqr_classify_complement. arithmetic provides qc_add_1, q_add, q_sub "
         "and neqr_comparator. filters provides QHED (the quantum Hadamard-edge-"
-        "detection filter) and its two-pass full-edge variant. gp_ratio "
-        "provides the corrected Generalized Polarization circuit "
-        "(apply_gp_function), its decoder (decode_gp_counts), the classical "
-        "reference image (classical_gp_image), the runnable end-to-end pipeline "
-        "(evaluate_gp), the COBYLA wrapper (optimize_gp), and the closed-form "
-        "parameter solver (analytical_gp_params).",
+        "detection filter) and its two-pass full-edge variant.",
     )
+    add_para(doc,
+        "The gp_ratio module hosts the showcase application of the library: "
+        "the Generalized Polarization (GP) circuit for two-channel ratiometric "
+        "fluorescence imaging. The pipeline composes a two-image FRQI "
+        "encoding of the (I1, I2) channels (m = 1 selection qubit) with a "
+        "per-pixel parametric block, a single unconditional Hadamard on the "
+        "color qubit, and the marginal P(color = 1 | pos) -> GP[p] decoding "
+        "described in the companion methods paper (Fig. 3).",
+    )
+    add_figure(doc, FIG / "fig_pipeline_block.png",
+        "End-to-end GP-ratio pipeline as exposed by qimp.processing.gp_ratio. "
+        "The R and G channels are stacked into a two-image FRQI encoding, "
+        "the per-pixel block applies the two parametric MCRY rotations "
+        "conditioned on position + selection, a single unconditional Hadamard "
+        "mixes the two channel amplitudes on the color qubit, and the "
+        "marginal P(color = 1 | pos) is mapped to GP in [-1, +1]. The "
+        "corresponding API is apply_gp_function + decode_gp_counts.",
+        fig_n=3, width_in=6.4)
+    add_para(doc,
+        "The per-pixel parametric block (Fig. 4) admits a closed-form "
+        "analytical solution for its 2 * 2^(2n) rotation parameters; "
+        "analytical_gp_params returns the optimal parameter vector in pure "
+        "NumPy time (sub-millisecond up to n = 5). The same module also "
+        "exposes a COBYLA numerical baseline (optimize_gp) for comparison.",
+    )
+    add_figure(doc, FIG / "fig_per_pixel_ansatz.png",
+        "Per-pixel block of the GP circuit. The naive ansatz (top) suffers "
+        "from two architectural defects — the CRYs are conditioned only on "
+        "the selection qubit and the Hadamard is inside the per-pixel loop. "
+        "The corrected ansatz (bottom) raises the rotation controls to "
+        "include the full position register, splits the two halves of each "
+        "pair across the two selection branches via an X-sandwich, and "
+        "moves the Hadamard outside the per-pixel loop. The closed-form "
+        "solver analytical_gp_params targets the corrected variant.",
+        fig_n=4, width_in=6.4)
 
     doc.add_heading("qimp.qml", level=2)
     add_para(doc,
