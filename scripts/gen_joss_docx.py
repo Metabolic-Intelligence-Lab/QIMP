@@ -11,13 +11,14 @@ from pathlib import Path
 
 from docx import Document
 from docx.enum.text import WD_ALIGN_PARAGRAPH, WD_LINE_SPACING
-from docx.shared import Cm, Pt, RGBColor
+from docx.shared import Cm, Inches, Pt, RGBColor
 
 REPO = Path(
     "/mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/"
     "Metabolic Intelligence - Projects-MI/2024_QIMP/repo"
 )
 OUT = REPO / "paper" / "joss_paper_preview.docx"
+FIG = REPO / "paper" / "figures"
 
 SERIF = "Times New Roman"
 DARK = RGBColor(0x1F, 0x3A, 0x5F)
@@ -171,6 +172,30 @@ def build() -> Document:
 
     # ---- Functionality ------------------------------------------------
     doc.add_heading("Functionality", level=1)
+
+    if (FIG / "fig_qimp_architecture.png").exists():
+        p = doc.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        p.add_run().add_picture(
+            str(FIG / "fig_qimp_architecture.png"), width=Inches(6.0)
+        )
+        cap = doc.add_paragraph()
+        cap.alignment = WD_ALIGN_PARAGRAPH.LEFT
+        cap.paragraph_format.line_spacing_rule = WD_LINE_SPACING.SINGLE
+        cap_run = cap.add_run("Fig. 1 ")
+        cap_run.bold = True
+        cap_run.font.size = Pt(10)
+        txt = cap.add_run(
+            "Architecture of the qimp-mi library. Bottom layer: the "
+            "external dependencies (Qiskit 2.x, qiskit-aer, NumPy, SciPy, "
+            "Pillow). Middle layer: the four problem-domain subpackages "
+            "(encoding, processing, qml, io). Above them: the runtime / "
+            "metrics / testing helpers used by every other module. Top: "
+            "the Streamlit explorer application and its IBM Quantum "
+            "Runtime hook."
+        )
+        txt.font.size = Pt(10)
+
     add_para(
         doc,
         "The library is organised into five subpackages plus a top-level "
