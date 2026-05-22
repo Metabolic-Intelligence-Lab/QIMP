@@ -22,6 +22,7 @@ from qiskit.circuit.library import HGate, RYGate
 
 __all__ = [
     "OptimizationResult",
+    "analytical_gp_params",
     "apply_gp_function",
     "classical_gp_image",
     "combined_objective",
@@ -158,12 +159,21 @@ def apply_gp_function(
         norm = RYGate(params[param_idx]).control(num_controls, annotated=True)
         qc.append(norm, control_target)
         qc.x(selection_qubit)
-        qc.append(HGate(), [color_qubit])
         param_idx += 1
 
         for q in flips:
             qc.x(q)
         qc.barrier()
+
+    # Final unconditional Hadamard on the color qubit. This was previously
+    # inside the per-pixel loop (one H per pixel), which collapsed pairwise
+    # (H² = I) on even-index pos branches and produced an H · MCRY · H
+    # sandwich (≡ MCRY(−θ)) on odd-index branches — i.e. the H's were
+    # asymmetric across pixels and the optimisation problem had no clean
+    # per-pixel closed form. With the H moved here, every pixel sees the
+    # same sequence MCRY_G · MCRY_R · H and the analytical solver in
+    # ``analytical_gp_params`` produces exact targets.
+    qc.append(HGate(), [color_qubit])
 
     return qc
 
@@ -246,6 +256,72 @@ def decode_gp_counts(counts: dict[str, int], n: int, m: int = 1) -> np.ndarray:
         col = int(bits[n:], 2)
         img[row, col] = gp_flat[pixel_idx]
     return img
+
+
+def analytical_gp_params(
+    green: np.ndarray,
+    red: np.ndarray,
+    *,
+    alpha: float = 1.0,
+    normalization: float | None = None,
+) -> np.ndarray:
+    """Return the closed-form optimal parameters for :func:`apply_gp_function`.
+
+    With the H moved outside the per-pixel loop (see ``apply_gp_function``
+    docstring), each pixel ``p`` has an independent 2-parameter block and
+    the decoded value is
+
+        ``gp[p] = −(sin(φ_R + β_p) + sin(φ_G + α_p)) / 2``
+
+    where ``φ_R = arccos(1 − 2·R[p]/N)`` and ``φ_G = arccos(1 − 2·G[p]/N)``
+    are the FRQI angles (``N`` is the normalisation used at encoding).
+    Setting ``gp[p] = target[p]`` is solved by
+
+        ``α_p = arcsin(−target[p]) − φ_G``
+        ``β_p = arcsin(−target[p]) − φ_R``
+
+    giving the exact circuit output without any numerical optimisation.
+
+    Parameters
+    ----------
+    green, red
+        Matching-shape ``(2^n, 2^n)`` channel arrays.
+    alpha
+        Red-channel weight used to compute the classical target.
+    normalization
+        FRQI normalisation. Defaults to ``max(green.max(), red.max())`` —
+        the same value :func:`evaluate_gp` uses internally.
+
+    Returns
+    -------
+    np.ndarray
+        Parameter vector of length ``2 · 2^(2n)`` ready to be passed to
+        :func:`apply_gp_function` / :func:`evaluate_gp`. Layout follows
+        the same row-major / pixel-index convention as ``frqi_circuit``.
+    """
+    g = np.asarray(green, dtype=np.float64)
+    r = np.asarray(red, dtype=np.float64)
+    if g.shape != r.shape:
+        raise ValueError(f"channel shape mismatch: {g.shape} vs {r.shape}")
+    if g.shape[0] != g.shape[1] or g.shape[0] == 0:
+        raise ValueError(f"channels must be square and non-empty, got {g.shape}")
+
+    if normalization is None:
+        normalization = float(max(g.max(), r.max())) or 1.0
+
+    phi_R = np.arccos(np.clip(1.0 - 2.0 * r / normalization, -1.0, 1.0))
+    phi_G = np.arccos(np.clip(1.0 - 2.0 * g / normalization, -1.0, 1.0))
+    target = np.clip(classical_gp_image(g, r, alpha=alpha), -1.0, 1.0)
+    base = np.arcsin(-target)
+    alpha_per_pixel = (base - phi_G).flatten()
+    beta_per_pixel = (base - phi_R).flatten()
+
+    # Layout: params[2p] = α_p (G half, fires first inside the loop),
+    #         params[2p+1] = β_p (R half).
+    params = np.empty(2 * alpha_per_pixel.size, dtype=np.float64)
+    params[0::2] = alpha_per_pixel
+    params[1::2] = beta_per_pixel
+    return params
 
 
 def evaluate_gp(

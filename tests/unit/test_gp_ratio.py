@@ -186,21 +186,64 @@ def test_optimize_gp_reaches_classical_target_n1() -> None:
     assert mse_final < 1e-4, f"optimised MSE {mse_final:.6f} above tolerance"
 
 
+@pytest.mark.parametrize("n", [1, 2])
+def test_analytical_gp_params_matches_classical(n: int) -> None:
+    """Closed-form parameters must reproduce the classical GP exactly.
+
+    With the per-pixel ansatz and the final-H structure of
+    ``apply_gp_function``, each pixel's two parameters have an analytic
+    optimum (see :func:`qimp.processing.gp_ratio.analytical_gp_params`).
+    Plugging them into :func:`evaluate_gp` must give MSE near machine
+    precision — much tighter than COBYLA can reach with any budget.
+    """
+    from qimp.processing.gp_ratio import (
+        analytical_gp_params,
+        classical_gp_image,
+        evaluate_gp,
+    )
+
+    rng = np.random.default_rng(seed=n)
+    side = 1 << n
+    # Pick intensities away from {0, max} to avoid degenerate RY angles.
+    green = rng.uniform(10, 70, size=(side, side))
+    red = rng.uniform(10, 70, size=(side, side))
+    target = classical_gp_image(green, red, alpha=0.5)
+
+    params = analytical_gp_params(green, red, alpha=0.5)
+    decoded = evaluate_gp(green, red, params, exact=True)
+
+    mse = float(((target - decoded) ** 2).mean())
+    # Statevector arithmetic at n=2 accumulates ~1e-9; n=1 hits ~1e-11.
+    assert mse < 1e-6, f"analytical params should give exact targets, got MSE={mse:.3e}"
+
+
+def test_analytical_gp_params_rejects_non_square() -> None:
+    from qimp.processing.gp_ratio import analytical_gp_params
+
+    with pytest.raises(ValueError, match="square"):
+        analytical_gp_params(np.zeros((2, 4)), np.zeros((2, 4)))
+
+
 def test_apply_gp_function_parameters_are_non_degenerate() -> None:
-    """Setting different individual parameters to π must produce different decoded
+    """Setting different individual parameters to π/3 must produce different decoded
     images. Regression test for the bug where all 2·2^(2n) parameters collapsed
     onto a single effective rotation because the CRY controlled only on the
     selection qubit and both halves of the per-pixel pair sat on the same
     selection branch.
+
+    We use π/3 rather than π and an image with no intensity at 0 or at the
+    encoding max — at those degenerate angles ``RY(π)`` produces a global
+    phase rather than a measurement-visible change, and the test would
+    spuriously fail.
     """
     from qimp.processing.gp_ratio import evaluate_gp
 
-    green = np.array([[80.0, 30.0], [60.0, 20.0]])
-    red = np.array([[20.0, 80.0], [40.0, 60.0]])
+    green = np.array([[55.0, 30.0], [42.0, 17.0]])
+    red = np.array([[19.0, 63.0], [38.0, 50.0]])
     outputs = []
     for k in range(8):
         p = np.zeros(8)
-        p[k] = np.pi
+        p[k] = np.pi / 3
         outputs.append(evaluate_gp(green, red, p, exact=True))
     # Each output should be distinct from every other (within numerical noise).
     for i in range(8):

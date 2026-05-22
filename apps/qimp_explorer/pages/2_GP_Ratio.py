@@ -33,6 +33,7 @@ from PIL import Image
 from qimp.io.image import apply_filters, calculate_gp_image
 from qimp.metrics import mse, psnr, total_variation, transpile_summary
 from qimp.processing.gp_ratio import (
+    analytical_gp_params,
     apply_gp_function,
     classical_gp_image,
     evaluate_gp,
@@ -247,22 +248,43 @@ with st.container(border=True):
                 }
             )
         with col_b:
+            run_analytical = st.button(
+                "🎯 Use analytical params (exact, ms)",
+                type="primary",
+                use_container_width=True,
+                key="gp_run_analytical",
+                help="Compute the closed-form optimal parameters and run the circuit "
+                "with them — exact match to the classical target at every n, "
+                "without any numerical optimisation. Sub-millisecond per call.",
+            )
             run_random = st.button(
-                "▶ Run with random params (preview)",
+                "▶ Run with random params",
                 use_container_width=True,
                 key="gp_run_random",
-                help="One-shot quantum evaluation with random parameters — useful "
-                "to see the circuit produces something, but the result won't match "
-                "the classical reference until you optimise.",
+                help="Useful only as a sanity check of the encoding — the result won't "
+                "match the classical reference until you optimise or use analytical params.",
             )
             run_optim = st.button(
-                "🎯 Optimise (short COBYLA)",
+                "🐢 Optimise via COBYLA (slow)",
                 use_container_width=True,
                 key="gp_run_optim",
-                help="Runs a bounded optimisation (default 20 iterations); for serious "
-                "tuning use a notebook.",
+                help="Numerical baseline (gradient-free). The analytical solver above "
+                "reaches the same optimum in microseconds; use this only to inspect "
+                "the convergence curve.",
             )
-            opt_iters = st.slider("Optimiser iterations", 5, 60, 20, step=5, key="gp_opt_iters")
+            opt_iters = st.slider("COBYLA iterations", 5, 200, 50, step=5, key="gp_opt_iters")
+
+        if run_analytical:
+            try:
+                params = analytical_gp_params(green, red, alpha=st.session_state["gp_alpha"])
+                gp_q = evaluate_gp(green, red, params, exact=True)
+                st.session_state["gp_quantum_image"] = gp_q
+                st.session_state["gp_quantum_params"] = params
+                st.session_state["gp_quantum_label"] = "analytical (closed-form)"
+                st.success("Computed analytical parameters — exact target.")
+                st.rerun()
+            except Exception as exc:
+                st.error(f"Analytical evaluation failed: {exc}")
 
         if run_random:
             rng = np.random.default_rng(0)
