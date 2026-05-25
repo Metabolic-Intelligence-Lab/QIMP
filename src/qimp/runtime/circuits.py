@@ -5,7 +5,6 @@ and the matching classical reference, so the sweep loop is one-shot
 per (encoder, n) regardless of encoder family.
 """
 
-# ruff: noqa: F822
 from __future__ import annotations
 
-__all__ = ["CircuitRecipe", "build_recipes"]
+__all__: list[str] = []
