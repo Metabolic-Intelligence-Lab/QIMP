@@ -93,3 +93,27 @@ def test_recipe_qpie(n):
     assert rec.label == f"qpie_n{n}"
     assert rec.qc.num_qubits == 2 * n
     assert rec.reference.shape == (1 << n, 1 << n)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+def test_recipe_mcrqi(n):
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_rgb(20)
+    recipes = build_recipes(img, n=n)
+    rec = next(r for r in recipes if r.encoder == "mcrqi")
+    assert rec.label == f"mcrqi_n{n}"
+    assert rec.qc.num_qubits == 2 * n + 3
+    assert rec.reference.shape == (1 << n, 1 << n, 3)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+def test_recipe_ncqi(n):
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_rgb(20)
+    recipes = build_recipes(img, n=n, q=2)
+    rec = next(r for r in recipes if r.encoder == "ncqi")
+    assert rec.label == f"ncqi_n{n}"
+    assert rec.qc.num_qubits == 2 * n + 3 * 2  # q=2
+    assert rec.reference.shape == (1 << n, 1 << n, 3)

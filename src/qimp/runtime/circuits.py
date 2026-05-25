@@ -168,4 +168,53 @@ def build_recipes(
         )
     )
 
+    # --- MCRQI ---
+    from qimp.encoding.mcrqi import mcrqi_circuit, mcrqi_decode
+
+    norm_mc = float(rgb.max()) or 1.0
+    qc_mc = mcrqi_circuit(rgb, normalization=norm_mc)
+
+    def _decode_mcrqi(
+        counts: dict[str, int], _n: int = n, _norm: float = norm_mc
+    ) -> np.ndarray:
+        return mcrqi_decode(counts, n=_n, normalization=_norm)
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"mcrqi_n{n}",
+            encoder="mcrqi",
+            n=n,
+            q=0,
+            m=0,
+            qc=qc_mc,
+            decoder=_decode_mcrqi,
+            reference=rgb.astype(np.float64),
+        )
+    )
+
+    # --- NCQI ---
+    from qimp.encoding.ncqi import ncqi_circuit, ncqi_decode
+
+    rgb_max = max(int(rgb.max()), 1)
+    ncqi_img = (rgb.astype(np.float64) / rgb_max * max_q_val).round().astype(np.uint8)
+    qc_ncqi = ncqi_circuit(ncqi_img, q=q)
+
+    def _decode_ncqi(
+        counts: dict[str, int], _n: int = n, _q: int = q
+    ) -> np.ndarray:
+        return ncqi_decode(counts, n=_n, q=_q)
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"ncqi_n{n}",
+            encoder="ncqi",
+            n=n,
+            q=q,
+            m=0,
+            qc=qc_ncqi,
+            decoder=_decode_ncqi,
+            reference=ncqi_img.astype(np.float64),
+        )
+    )
+
     return recipes
