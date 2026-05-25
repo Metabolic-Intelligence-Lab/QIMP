@@ -210,7 +210,7 @@ def main(argv: list[str] | None = None) -> int:
         psnr_raw_test = float(_psnr(ref, dec_test, max_intensity=2.0))
         print(f"\nPSNR(raw test)       = {psnr_raw_test:.2f} dB")
         print(f"PSNR(calibrated)     = {psnr_calibrated:.2f} dB   "
-              f"(Δ = {psnr_calibrated - psnr_raw_test:+.2f} dB)")
+              f"(delta = {psnr_calibrated - psnr_raw_test:+.2f} dB)")
         rows.append({
             "key": "N_calibrated_result", "status": "completed",
             "phase": "calibration_result",
