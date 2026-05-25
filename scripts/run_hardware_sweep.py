@@ -13,10 +13,13 @@ this scaffold provides argparse + the --list-backends diagnostic.
 from __future__ import annotations
 
 import argparse
+import csv
 import datetime as dt
 import json
 import sys
 from pathlib import Path
+
+import numpy as np
 
 
 def _parse_hw_whitelist(raw: list[str]) -> set[tuple[str, int]]:
@@ -80,6 +83,28 @@ def _utc_stamp() -> str:
     return dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H-%M-%SZ")
 
 
+def _write_summary(path: Path, rows: list[dict]) -> None:
+    if not rows:
+        return
+    fields = sorted({k for r in rows for k in r})
+    with open(path, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=fields)
+        writer.writeheader()
+        for r in rows:
+            writer.writerow(r)
+
+
+def _max_intensity_for_metric(ref: np.ndarray) -> float:
+    """Pick a sensible max-intensity for PSNR computation.
+
+    - Range looks like [-1, 1] (GP) -> use 2.0 (peak-to-peak).
+    - Anything else -> max(ref.max(), 1.0).
+    """
+    if ref.min() < 0:
+        return 2.0
+    return float(max(ref.max(), 1.0))
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
@@ -105,7 +130,67 @@ def main(argv: list[str] | None = None) -> int:
     # so a malformed flag fails fast.
     _parse_hw_whitelist(args.hw_circuits)
 
-    raise SystemExit("sweep loop not implemented yet -- see Tasks 13-16")
+    from PIL import Image as PilImage
+
+    from qimp.metrics import mse as _mse
+    from qimp.metrics import psnr as _psnr
+    from qimp.runtime import ibm
+    from qimp.runtime.circuits import build_recipes
+    from qimp.testing import exact_counts
+
+    raw = np.asarray(PilImage.open(args.image))
+
+    timestamp = _utc_stamp()
+    outdir = args.outdir / timestamp
+    outdir.mkdir(parents=True, exist_ok=True)
+    summary_rows: list[dict] = []
+
+    # ---- Pass 1: Aer ideal (noise-free statevector) ----
+    for n in args.sizes:
+        recipes = build_recipes(raw, n=n, q=args.q, alpha=args.alpha)
+        for rec in recipes:
+            label = rec.label
+            if ibm.is_run_complete(outdir, label, "aer-ideal"):
+                print(f"[skip] {label} aer-ideal already on disk")
+                continue
+
+            counts = exact_counts(rec.qc)
+            decoded = rec.decoder(counts)
+
+            ref = rec.reference.astype(np.float64)
+            dec_f = np.asarray(decoded, dtype=np.float64)
+            max_i = _max_intensity_for_metric(ref)
+
+            row = {
+                "label": label,
+                "encoder": rec.encoder,
+                "n": rec.n,
+                "q": rec.q,
+                "m": rec.m,
+                "pass": "aer-ideal",
+                "shots": "exact",
+                "mse": float(_mse(ref, dec_f)),
+                "psnr": float(_psnr(ref, dec_f, max_intensity=max_i)),
+                "depth": int(rec.qc.depth()),
+                "num_qubits": int(rec.qc.num_qubits),
+            }
+            summary_rows.append(row)
+            ibm.persist_run(
+                outdir,
+                label=label,
+                pass_name="aer-ideal",
+                circuit=rec.qc,
+                transpiled=None,
+                counts=counts,
+                metadata={**row, "status": "completed"},
+            )
+
+    _write_summary(outdir / "summary.csv", summary_rows)
+    print(
+        f"Pass 1 (Aer ideal) done. {len(summary_rows)} rows in "
+        f"{outdir / 'summary.csv'}"
+    )
+    return 0
 
 
 if __name__ == "__main__":
