@@ -79,7 +79,8 @@ def build_recipes(
 
     def _decode_frqi(counts: dict[str, int], _n: int = n, _norm: float = norm) -> np.ndarray:
         out = frqi_decode(counts, n=_n, m=0, normalization=_norm)
-        return out if isinstance(out, np.ndarray) else out[0]
+        assert isinstance(out, np.ndarray)  # m=0 contract
+        return out
 
     recipes.append(
         CircuitRecipe(
@@ -103,7 +104,8 @@ def build_recipes(
 
     def _decode_multi(counts: dict[str, int], _n: int = n, _norm: float = norm_multi) -> np.ndarray:
         imgs = frqi_decode(counts, n=_n, m=1, normalization=_norm)
-        return imgs[1] if isinstance(imgs, list) else imgs
+        assert isinstance(imgs, list)  # m>0 contract
+        return imgs[1]
 
     recipes.append(
         CircuitRecipe(
@@ -227,6 +229,9 @@ def build_recipes(
 
     g_chan = rgb[..., 1].astype(np.float64)
     r_chan = rgb[..., 0].astype(np.float64)
+    # Stack order [red, green] matches `qimp.processing.gp_ratio.evaluate_gp`
+    # so the m=1 selection qubit maps R -> |0>, G -> |1>; decode_gp_counts
+    # marginalises over selection without needing a channel argument.
     rg_stack = np.stack([r_chan, g_chan], axis=0)
     norm_gp = float(rg_stack.max()) or 1.0
 
