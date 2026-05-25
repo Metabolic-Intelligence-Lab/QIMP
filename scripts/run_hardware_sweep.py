@@ -114,6 +114,89 @@ def _max_intensity_for_metric(ref: np.ndarray) -> float:
     return float(max(ref.max(), 1.0))
 
 
+def _to_displayable(arr: np.ndarray) -> np.ndarray:
+    """Reduce an array to 2D for imshow.
+
+    RGB stacks (h, w, 3) pass through; everything else is squeezed.
+    """
+    if arr.ndim == 3 and arr.shape[-1] in (3, 4):
+        return arr
+    return np.asarray(arr).squeeze()
+
+
+def _normalise_rgb_or_pass(arr: np.ndarray) -> np.ndarray:
+    """RGB displays need uint-style [0,1] floats or uint8. Pass through 2D
+    arrays unchanged."""
+    if arr.ndim == 3 and arr.shape[-1] in (3, 4):
+        a = arr.astype(np.float64)
+        a_max = a.max() if a.max() > 0 else 1.0
+        return np.clip(a / a_max, 0.0, 1.0)
+    return arr
+
+
+def _render_figure(
+    outdir: Path,
+    label: str,
+    ref: np.ndarray,
+    panels: dict[str, np.ndarray],
+) -> None:
+    """Render a side-by-side comparison figure for one (encoder, n).
+
+    Layout: [classical | decoded(pass_1) | |diff|(pass_1) | decoded(pass_2) |
+             |diff|(pass_2) | ...] horizontally.
+    """
+    import matplotlib
+
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+
+    n_pass = len(panels)
+    if n_pass == 0:
+        return
+
+    ref_d = _to_displayable(ref.astype(np.float64))
+    is_rgb = ref_d.ndim == 3
+    cmap = None if is_rgb else "gray"
+    diff_cmap = "magma"
+
+    n_cols = 1 + 2 * n_pass
+    fig, axes = plt.subplots(1, n_cols, figsize=(3 * n_cols, 3))
+    if n_cols == 1:
+        axes = [axes]
+
+    # Normalisation: use ref's range for the decoded panels so the
+    # comparison is fair (GP is [-1,1], intensities are [0, max]).
+    vmin, vmax = float(ref_d.min()), float(ref_d.max())
+    if vmin == vmax:
+        vmax = vmin + 1.0  # avoid zero-range edge case
+
+    axes[0].imshow(_normalise_rgb_or_pass(ref_d), cmap=cmap, vmin=vmin, vmax=vmax)
+    axes[0].set_title("classical")
+    axes[0].axis("off")
+
+    for i, (pass_name, arr) in enumerate(panels.items()):
+        arr_d = _to_displayable(np.asarray(arr, dtype=np.float64))
+        axes[1 + 2 * i].imshow(
+            _normalise_rgb_or_pass(arr_d), cmap=cmap, vmin=vmin, vmax=vmax
+        )
+        axes[1 + 2 * i].set_title(pass_name)
+        axes[1 + 2 * i].axis("off")
+
+        diff = np.abs(arr_d - ref_d)
+        # For RGB diffs, sum across channels to get a single-channel magnitude.
+        if diff.ndim == 3:
+            diff = diff.sum(axis=-1) / diff.shape[-1]
+        axes[2 + 2 * i].imshow(diff, cmap=diff_cmap)
+        axes[2 + 2 * i].set_title(f"|diff| {pass_name}")
+        axes[2 + 2 * i].axis("off")
+
+    figdir = outdir / "figures"
+    figdir.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(figdir / f"{label}.png", dpi=120)
+    plt.close(fig)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
 
@@ -153,6 +236,7 @@ def main(argv: list[str] | None = None) -> int:
     outdir = args.outdir / timestamp
     outdir.mkdir(parents=True, exist_ok=True)
     summary_rows: list[dict] = []
+    panels_by_label: dict[str, dict[str, np.ndarray]] = {}
 
     # ---- Pass 1: Aer ideal (noise-free statevector) ----
     for n in args.sizes:
@@ -193,6 +277,7 @@ def main(argv: list[str] | None = None) -> int:
                 counts=counts,
                 metadata={**row, "status": "completed"},
             )
+            panels_by_label.setdefault(label, {})["aer-ideal"] = decoded
 
     pass1_count = len(summary_rows)
     print(
@@ -271,6 +356,7 @@ def main(argv: list[str] | None = None) -> int:
                     counts=counts,
                     metadata={**row, "status": "completed"},
                 )
+                panels_by_label.setdefault(label, {})["aer-noisy"] = decoded
         print("Pass 2 (Aer noisy) done.")
     else:
         print("Pass 2 skipped (--skip-hw and no --backend)")
@@ -364,7 +450,23 @@ def main(argv: list[str] | None = None) -> int:
                     counts=counts,
                     metadata={**row, "status": "completed"},
                 )
+                panels_by_label.setdefault(label, {})["hw"] = decoded
             print("Pass 3 (hardware) done.")
+
+    # ---- Figures ----
+    # Recompute references from a fresh `build_recipes` call rather than
+    # re-storing them in panels_by_label — references are deterministic
+    # given (raw, n, q, alpha).
+    for n in args.sizes:
+        for rec in build_recipes(raw, n=n, q=args.q, alpha=args.alpha):
+            if rec.label in panels_by_label:
+                _render_figure(
+                    outdir,
+                    rec.label,
+                    rec.reference,
+                    panels_by_label[rec.label],
+                )
+    print(f"Figures rendered under {outdir / 'figures'}")
 
     _write_summary(outdir / "summary.csv", summary_rows)
     print(
