@@ -274,9 +274,12 @@ def hw_run(
     mitigation:
         ``'trex+dd'`` enables twirled readout error extinction and XY4
         dynamical decoupling (default). ``'trex'`` enables only TREX,
-        ``'dd'`` enables only DD, ``'none'`` disables all mitigation. The
-        four modes together support ablation studies of which layer
-        contributes the recovered signal.
+        ``'dd'`` enables only DD, ``'none'`` disables all mitigation.
+        ``'zne'`` enables zero-noise extrapolation on top of TREX+DD
+        by setting ``resilience_level=2`` on SamplerOptions; the runtime
+        executes three implicit noise-scaled copies and returns the
+        extrapolated mitigated counts. The five modes together support
+        ablation studies of which layer contributes the recovered signal.
     optimization_level:
         Transpiler optimisation level (0–3). Defaults to 3.
     timeout_s:
@@ -284,7 +287,7 @@ def hw_run(
         handled by the caller (the CLI sweep script in Task 15 persists
         ``job_id`` before awaiting ``job.result()``).
     """
-    _allowed_mitigation = ("trex+dd", "trex", "dd", "none")
+    _allowed_mitigation = ("trex+dd", "trex", "dd", "none", "zne")
     if mitigation not in _allowed_mitigation:
         raise ValueError(
             f"unknown mitigation {mitigation!r}; expected one of {_allowed_mitigation}"
@@ -318,6 +321,10 @@ def hw_run(
         options.dynamical_decoupling.sequence_type = "XY4"
     if mitigation in ("trex+dd", "trex"):
         options.twirling.enable_measure = True
+    if mitigation == "zne":
+        # resilience_level=2 enables zero-noise extrapolation. The runtime
+        # automatically configures TREX + DD as part of the ZNE pipeline.
+        options.resilience_level = 2
 
     Sampler = _sampler_v2_cls()
     sampler = Sampler(mode=backend, options=options)
