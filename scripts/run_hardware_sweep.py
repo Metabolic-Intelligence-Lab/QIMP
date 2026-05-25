@@ -185,9 +185,90 @@ def main(argv: list[str] | None = None) -> int:
                 metadata={**row, "status": "completed"},
             )
 
+    pass1_count = len(summary_rows)
+    print(
+        f"Pass 1 (Aer ideal) done. {pass1_count} rows"
+    )
+
+    # ---- Pass 2: Aer with backend's noise model ----
+    # Pass 2 needs a backend (real or fake) for NoiseModel.from_backend.
+    # Skip entirely when --skip-hw AND no explicit --backend was given —
+    # the user is signalling "local statevector only".
+    backend = None
+    if (not args.skip_hw) or args.backend is not None:
+        service = ibm.get_service()
+        # Pick the backend ONCE. Use the largest circuit's qubit count as
+        # the min_qubits filter so the same backend can host every recipe
+        # in the sweep (both as noise source and as the Pass 3 target).
+        max_qubits = max(
+            rec.qc.num_qubits
+            for n in args.sizes
+            for rec in build_recipes(raw, n=n, q=args.q, alpha=args.alpha)
+        )
+        backend = ibm.pick_backend(service, min_qubits=max_qubits, name=args.backend)
+        backend_info = {
+            "name": backend.name,
+            "num_qubits": backend.num_qubits,
+            "basis_gates": list(getattr(backend, "basis_gates", []) or []),
+        }
+        (outdir / "backend_info.json").write_text(
+            json.dumps(backend_info, indent=2, default=str)
+        )
+        print(f"Backend selected: {backend.name} ({backend.num_qubits} qubits)")
+
+        for n in args.sizes:
+            for rec in build_recipes(raw, n=n, q=args.q, alpha=args.alpha):
+                label = rec.label
+                if ibm.is_run_complete(outdir, label, "aer-noisy"):
+                    print(f"[skip] {label} aer-noisy already on disk")
+                    continue
+
+                try:
+                    counts = ibm.aer_noisy_run(
+                        rec.qc, backend=backend, shots=args.shots
+                    )
+                except Exception as exc:
+                    print(
+                        f"[warn] aer-noisy failed for {label}: {exc}",
+                        file=sys.stderr,
+                    )
+                    continue
+
+                decoded = rec.decoder(counts)
+                ref = rec.reference.astype(np.float64)
+                dec_f = np.asarray(decoded, dtype=np.float64)
+                max_i = _max_intensity_for_metric(ref)
+                row = {
+                    "label": label,
+                    "encoder": rec.encoder,
+                    "n": rec.n,
+                    "q": rec.q,
+                    "m": rec.m,
+                    "pass": "aer-noisy",
+                    "shots": args.shots,
+                    "backend": backend.name,
+                    "mse": float(_mse(ref, dec_f)),
+                    "psnr": float(_psnr(ref, dec_f, max_intensity=max_i)),
+                    "depth": int(rec.qc.depth()),
+                    "num_qubits": int(rec.qc.num_qubits),
+                }
+                summary_rows.append(row)
+                ibm.persist_run(
+                    outdir,
+                    label=label,
+                    pass_name="aer-noisy",
+                    circuit=rec.qc,
+                    transpiled=None,
+                    counts=counts,
+                    metadata={**row, "status": "completed"},
+                )
+        print("Pass 2 (Aer noisy) done.")
+    else:
+        print("Pass 2 skipped (--skip-hw and no --backend)")
+
     _write_summary(outdir / "summary.csv", summary_rows)
     print(
-        f"Pass 1 (Aer ideal) done. {len(summary_rows)} rows in "
+        f"Summary written: {len(summary_rows)} rows in "
         f"{outdir / 'summary.csv'}"
     )
     return 0
