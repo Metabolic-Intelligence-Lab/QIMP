@@ -33,3 +33,39 @@ def test_downsample_to_n_rejects_unsupported_shape():
     bad = np.zeros((5,), dtype=np.uint8)
     with pytest.raises(ValueError, match="unsupported image shape"):
         _downsample_to_n(bad, n=2)
+
+
+def _toy_grayscale(side: int) -> np.ndarray:
+    rng = np.random.default_rng(0)
+    return rng.integers(0, 256, size=(side, side), dtype=np.uint8)
+
+
+def _toy_rgb(side: int) -> np.ndarray:
+    rng = np.random.default_rng(0)
+    return rng.integers(0, 256, size=(side, side, 3), dtype=np.uint8)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+def test_recipe_frqi_single_channel(n):
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_grayscale(20)
+    recipes = build_recipes(img, n=n)
+    rec = next(r for r in recipes if r.encoder == "frqi")
+
+    assert rec.label == f"frqi_n{n}"
+    assert rec.qc.num_qubits == 2 * n + 1  # FRQI single-image
+    assert rec.reference.shape == (1 << n, 1 << n)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+def test_recipe_frqi_multi_two_channel(n):
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_rgb(20)
+    recipes = build_recipes(img, n=n)
+    rec = next(r for r in recipes if r.encoder == "frqi_multi")
+
+    assert rec.label == f"frqi_multi_n{n}"
+    assert rec.qc.num_qubits == 2 * n + 1 + 1  # m=1
+    assert rec.reference.shape == (1 << n, 1 << n)

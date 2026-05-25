@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image
 from qiskit import QuantumCircuit
 
-__all__ = ["CircuitRecipe"]
+__all__ = ["CircuitRecipe", "build_recipes"]
 
 
 @dataclass
@@ -44,3 +44,78 @@ def _downsample_to_n(img: np.ndarray, *, n: int) -> np.ndarray:
         pil = Image.fromarray(img[..., :3], mode="RGB").resize((side, side), Image.Resampling.LANCZOS)
         return np.asarray(pil, dtype=img.dtype)
     raise ValueError(f"unsupported image shape {img.shape}")
+
+
+def build_recipes(
+    image: np.ndarray, *, n: int, q: int = 2, alpha: float = 0.5
+) -> list[CircuitRecipe]:
+    """Build one CircuitRecipe per encoder.
+
+    Parameters
+    ----------
+    image
+        Source frame — 2D grayscale or 3D RGB. Downsampled to 2^n × 2^n.
+    n
+        Spatial qubits per axis.
+    q
+        Intensity qubits for NEQR / NCQI (default 2 = NISQ-friendly).
+    alpha
+        G-factor for the GP recipe.
+    """
+    from qimp.encoding.frqi import frqi_circuit, frqi_decode
+
+    if image.ndim == 2:
+        gray = _downsample_to_n(image, n=n)
+        rgb = np.stack([gray, gray, gray], axis=-1)
+    else:
+        rgb = _downsample_to_n(image, n=n)
+        gray = rgb[..., 1]  # green channel as grayscale source
+
+    recipes: list[CircuitRecipe] = []
+
+    # --- FRQI single-image ---
+    norm = float(gray.max()) or 1.0
+    qc = frqi_circuit(gray, normalization=norm)
+
+    def _decode_frqi(counts: dict[str, int], _n: int = n, _norm: float = norm) -> np.ndarray:
+        out = frqi_decode(counts, n=_n, m=0, normalization=_norm)
+        return out if isinstance(out, np.ndarray) else out[0]
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"frqi_n{n}",
+            encoder="frqi",
+            n=n,
+            q=0,
+            m=0,
+            qc=qc,
+            decoder=_decode_frqi,
+            reference=gray.astype(np.float64),
+        )
+    )
+
+    # --- FRQI multi-image (m=1, two channels = R, G) ---
+    red = rgb[..., 0]
+    green = rgb[..., 1]
+    stack = np.stack([red, green], axis=0).astype(np.float64)
+    norm_multi = float(stack.max()) or 1.0
+    qc_multi = frqi_circuit(stack, normalization=norm_multi)
+
+    def _decode_multi(counts: dict[str, int], _n: int = n, _norm: float = norm_multi) -> np.ndarray:
+        imgs = frqi_decode(counts, n=_n, m=1, normalization=_norm)
+        return imgs[1] if isinstance(imgs, list) else imgs
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"frqi_multi_n{n}",
+            encoder="frqi_multi",
+            n=n,
+            q=0,
+            m=1,
+            qc=qc_multi,
+            decoder=_decode_multi,
+            reference=green.astype(np.float64),
+        )
+    )
+
+    return recipes
