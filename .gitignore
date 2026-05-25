@@ -37,6 +37,11 @@ data/
 *.tiff
 *.tif.lock
 
+# …but the paper-companion data subset IS tracked (small numerical
+# artifacts that need to ship with the manuscript)
+!paper/data/
+!paper/data/**
+
 # Outputs
 output/
 runs/
