@@ -20,6 +20,7 @@ from qiskit import QuantumCircuit
 __all__ = [
     "aer_noisy_run",
     "get_service",
+    "hw_run",
     "is_run_complete",
     "list_backends",
     "persist_run",
@@ -211,3 +212,94 @@ def aer_noisy_run(
     transpiled = transpile(measured, sim)
     result = sim.run(transpiled, shots=shots).result()
     return dict(result.get_counts())
+
+
+def _sampler_v2_cls() -> Any:
+    """Indirection so tests can patch the SamplerV2 import without touching
+    the qiskit_ibm_runtime package."""
+    from qiskit_ibm_runtime import SamplerV2
+
+    return SamplerV2
+
+
+def _sampler_options_cls() -> Any:
+    """Indirection so tests can patch SamplerOptions without touching
+    the qiskit_ibm_runtime package."""
+    from qiskit_ibm_runtime.options import SamplerOptions
+
+    return SamplerOptions
+
+
+def _transpile_summary(qc: QuantumCircuit) -> dict[str, Any]:
+    """Return a small dict of transpile metrics for ``qc``."""
+    depth = qc.depth()
+    two_q = sum(1 for instr in qc.data if instr.operation.num_qubits >= 2)
+    return {
+        "depth": depth,
+        "two_q_gate_count": two_q,
+        "num_qubits": qc.num_qubits,
+    }
+
+
+def hw_run(
+    qc: QuantumCircuit,
+    *,
+    backend: Any,
+    shots: int = 4096,
+    mitigation: str = "trex+dd",
+    optimization_level: int = 3,
+) -> tuple[dict[str, int], QuantumCircuit, str, dict[str, Any]]:
+    """Submit ``qc`` to ``backend`` via SamplerV2 with TREX + DD mitigation.
+
+    Returns ``(counts, transpiled_qc, job_id, transpile_summary)``.
+
+    Parameters
+    ----------
+    qc:
+        The quantum circuit to run (measurements added automatically if absent).
+    backend:
+        An IBM backend object (real or fake).
+    shots:
+        Number of shots.
+    mitigation:
+        ``'trex+dd'`` enables twirled readout error extinction and XY4
+        dynamical decoupling. ``'none'`` disables all error mitigation.
+    optimization_level:
+        Transpiler optimisation level (0–3). Defaults to 3.
+    """
+    if mitigation not in ("trex+dd", "none"):
+        raise ValueError(
+            f"unknown mitigation {mitigation!r}; expected 'trex+dd' or 'none'"
+        )
+
+    from qiskit import transpile
+    from qiskit.transpiler import Target
+
+    from qimp.testing import _ensure_measured
+
+    measured = _ensure_measured(qc)
+    # Use the backend's Target object directly when available; this is the
+    # recommended path for newer Qiskit / qiskit-ibm-runtime and avoids
+    # issues with backend-supplied plugin name discovery during transpilation.
+    _target = backend.target if isinstance(backend.target, Target) else None
+    transpiled = transpile(
+        measured, target=_target, optimization_level=optimization_level
+    )
+    summary = _transpile_summary(transpiled)
+
+    Options = _sampler_options_cls()
+    options = Options()
+    if mitigation == "trex+dd":
+        options.dynamical_decoupling.enable = True
+        options.dynamical_decoupling.sequence_type = "XY4"
+        options.twirling.enable_measure = True
+
+    Sampler = _sampler_v2_cls()
+    sampler = Sampler(mode=backend, options=options)
+    job = sampler.run([transpiled], shots=shots)
+    job_id = job.job_id()
+    logger.info("Submitted job %s on %s", job_id, backend.name)
+
+    result = job.result()
+    counts = dict(result[0].data.meas.get_counts())
+    return counts, transpiled, job_id, summary
