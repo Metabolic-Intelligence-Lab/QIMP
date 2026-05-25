@@ -17,7 +17,14 @@ from typing import Any
 
 from qiskit import QuantumCircuit
 
-__all__ = ["get_service", "is_run_complete", "list_backends", "persist_run", "pick_backend"]
+__all__ = [
+    "aer_noisy_run",
+    "get_service",
+    "is_run_complete",
+    "list_backends",
+    "persist_run",
+    "pick_backend",
+]
 
 logger = logging.getLogger(__name__)
 
@@ -180,3 +187,27 @@ def is_run_complete(outdir: Path, label: str, pass_name: str) -> bool:
         return bool(json.loads(counts_path.read_text()))
     except json.JSONDecodeError:
         return False
+
+
+def aer_noisy_run(
+    qc: QuantumCircuit,
+    *,
+    backend: Any,
+    shots: int = 4096,
+) -> dict[str, int]:
+    """Run ``qc`` on an Aer simulator wired with ``backend``'s noise model.
+
+    Uses :func:`AerSimulator.from_backend` which inherits the device's
+    noise + coupling map + basis gates. Adds ``measure_all()`` if the
+    circuit has no measurements (reuses ``qimp.testing._ensure_measured``).
+    """
+    from qiskit import transpile
+    from qiskit_aer import AerSimulator
+
+    from qimp.testing import _ensure_measured
+
+    sim = AerSimulator.from_backend(backend)
+    measured = _ensure_measured(qc)
+    transpiled = transpile(measured, sim)
+    result = sim.run(transpiled, shots=shots).result()
+    return dict(result.get_counts())

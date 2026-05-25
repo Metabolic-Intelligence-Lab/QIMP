@@ -174,3 +174,22 @@ def test_is_run_complete_false_when_counts_empty(tmp_path):
         circuit=qc, transpiled=None, counts={}, metadata={"status": "submitted"},
     )
     assert not ibm.is_run_complete(tmp_path, "frqi_n1", "hw")
+
+
+def test_aer_noisy_run_returns_counts():
+    """End-to-end: encode a Bell state, run on Aer with the fake-backend
+    noise model, get counts. Even with depolarising noise, 00/11 stay
+    dominant."""
+    from qimp.runtime import ibm
+
+    pytest.importorskip("qiskit_ibm_runtime.fake_provider")
+    from qiskit_ibm_runtime.fake_provider import FakeManilaV2
+
+    backend = FakeManilaV2()
+    qc = _toy_circuit()
+    counts = ibm.aer_noisy_run(qc, backend=backend, shots=1024)
+
+    assert isinstance(counts, dict)
+    assert sum(counts.values()) == 1024
+    dominant = sorted(counts.items(), key=lambda kv: -kv[1])[:2]
+    assert {dominant[0][0], dominant[1][0]} == {"00", "11"}
