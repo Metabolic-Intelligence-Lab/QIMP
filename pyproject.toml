@@ -182,7 +182,7 @@ addopts = [
     "--strict-config",
     # Slow tests are deselected by default; opt in explicitly with `-m slow`
     # or `-m "slow or not slow"` to run everything. CI runs both.
-    "-m", "not slow",
+    "-m", "not slow and not hardware",
 ]
 testpaths = ["tests"]
 markers = [
