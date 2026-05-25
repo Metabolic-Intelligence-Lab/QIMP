@@ -45,3 +45,48 @@ def test_list_backends_returns_serialisable_rows():
     assert rows == [
         {"name": "ibm_brisbane", "num_qubits": 127, "pending_jobs": 17, "operational": True}
     ]
+
+
+def test_pick_backend_by_name():
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_brisbane"
+    fake_backend.num_qubits = 127
+    fake_service = MagicMock()
+    fake_service.backend.return_value = fake_backend
+
+    chosen = ibm.pick_backend(fake_service, min_qubits=8, name="ibm_brisbane")
+
+    fake_service.backend.assert_called_once_with("ibm_brisbane")
+    assert chosen is fake_backend
+
+
+def test_pick_backend_least_busy():
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_sherbrooke"
+    fake_backend.num_qubits = 127
+    fake_service = MagicMock()
+    fake_service.least_busy.return_value = fake_backend
+
+    chosen = ibm.pick_backend(fake_service, min_qubits=8)
+
+    fake_service.least_busy.assert_called_once_with(
+        operational=True, simulator=False, min_num_qubits=8
+    )
+    assert chosen is fake_backend
+
+
+def test_pick_backend_under_qubits_raises():
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_brisbane"
+    fake_backend.num_qubits = 5
+    fake_service = MagicMock()
+    fake_service.backend.return_value = fake_backend
+
+    with pytest.raises(ValueError, match="needs >= 8"):
+        ibm.pick_backend(fake_service, min_qubits=8, name="ibm_brisbane")

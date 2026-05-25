@@ -11,7 +11,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-__all__ = ["get_service", "list_backends"]
+__all__ = ["get_service", "list_backends", "pick_backend"]
 
 logger = logging.getLogger(__name__)
 
@@ -79,3 +79,32 @@ def list_backends() -> list[dict[str, Any]]:
             }
         )
     return rows
+
+
+def pick_backend(
+    service: Any,
+    *,
+    min_qubits: int,
+    name: str | None = None,
+) -> Any:
+    """Return a backend with at least `min_qubits` operational qubits.
+
+    If `name` is given, fetches that specific backend; otherwise asks the
+    service for ``least_busy(operational=True, simulator=False,
+    min_num_qubits=min_qubits)``. Raises ``ValueError`` if the chosen
+    backend doesn't meet the qubit budget.
+    """
+    if name is not None:
+        backend = service.backend(name)
+    else:
+        backend = service.least_busy(
+            operational=True, simulator=False, min_num_qubits=min_qubits
+        )
+
+    if backend.num_qubits < min_qubits:
+        raise ValueError(
+            f"Backend {backend.name} has {backend.num_qubits} qubits, "
+            f"needs >= {min_qubits}"
+        )
+    logger.info("Picked backend %s (%d qubits)", backend.name, backend.num_qubits)
+    return backend
