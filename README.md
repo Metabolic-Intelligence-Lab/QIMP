@@ -118,6 +118,47 @@ let you exercise every encoder + processing operation interactively, save
 outputs to `data/output/run_<timestamp>/`, and compare metrics side by side.
 See [`docs/ui.md`](docs/ui.md) for screenshots and tips.
 
+## Hardware execution
+
+A sweep script runs the encoder + GP suite on Aer (ideal + noisy via
+`NoiseModel.from_backend`) and, optionally, on IBM Quantum hardware.
+
+```bash
+# Local only — Aer ideal statevector for all 7 encoders, all sizes
+python scripts/run_hardware_sweep.py \
+  --image data/immagini/<file>.tif \
+  --sizes 1 2 \
+  --skip-hw
+
+# Add Aer + backend noise model (no real QPU time)
+python scripts/run_hardware_sweep.py \
+  --image data/immagini/<file>.tif \
+  --sizes 1 2 \
+  --skip-hw \
+  --backend ibm_kingston
+
+# Full sweep including real hardware on the whitelisted recipes
+# (default: gp@1, gp@2, frqi_multi@1)
+python scripts/run_hardware_sweep.py \
+  --image data/immagini/<file>.tif \
+  --sizes 1 2 \
+  --shots 4096
+
+# Diagnostic: list backends visible to your saved IBM Quantum account
+python scripts/run_hardware_sweep.py --list-backends
+```
+
+Outputs land in `data/output/ibm/<UTC-timestamp>/`:
+
+- `summary.csv` — one row per (encoder, n, pass); shots, depth, PSNR, MSE, job_id (when HW).
+- `figures/<label>.png` — classical reference + decoded panels + |diff| per pass.
+- `runs/<label>_<pass>/{circuit.qpy, transpiled.qpy?, counts.json, metadata.json}` — full reproducibility from disk.
+- `backend_info.json` — name, qubit count, basis gates of the chosen backend.
+
+Designed for the **IBM Quantum Open (free) plan** — hardware execution is restricted to a small whitelist by default to stay well within the monthly QPU budget. See `docs/superpowers/specs/2026-05-25-ibm-quantum-hardware-execution-design.md` for the full design and budget envelope.
+
+Requires the `[ibm]` extra (`pip install -e ".[ibm]"`) and an IBM Quantum API token saved via `QiskitRuntimeService.save_account(...)`.
+
 ## Citation
 
 If you use this library in academic work, please cite the underlying thesis:
