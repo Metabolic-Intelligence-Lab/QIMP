@@ -322,9 +322,17 @@ def hw_run(
     if mitigation in ("trex+dd", "trex"):
         options.twirling.enable_measure = True
     if mitigation == "zne":
-        # resilience_level=2 enables zero-noise extrapolation. The runtime
-        # automatically configures TREX + DD as part of the ZNE pipeline.
-        options.resilience_level = 2
+        # Zero-noise extrapolation is an expectation-value technique on
+        # EstimatorV2 and is not exposed on SamplerV2's options schema
+        # (qiskit-ibm-runtime >= 0.47 removed `resilience_level` from
+        # SamplerOptions). A counts-side ZNE for this pipeline would
+        # require manual gate folding (1x/3x/5x noise scales) + per-pixel
+        # extrapolation — implemented in scripts/, not in this helper.
+        raise NotImplementedError(
+            "mitigation='zne' is not available through SamplerV2's options "
+            "in qiskit-ibm-runtime >= 0.47. Implement counts-side ZNE in "
+            "the caller via manual gate folding + per-pixel extrapolation."
+        )
 
     Sampler = _sampler_v2_cls()
     sampler = Sampler(mode=backend, options=options)

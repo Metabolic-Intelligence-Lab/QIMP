@@ -379,38 +379,21 @@ def test_hw_run_mitigation_dd_only_enables_dd_only():
     assert options_obj.twirling.enable_measure is False
 
 
-def test_hw_run_mitigation_zne_sets_resilience_level():
-    """Mitigation mode 'zne' must set options.resilience_level = 2."""
-    from types import SimpleNamespace
-
+def test_hw_run_mitigation_zne_raises_not_implemented():
+    """Mitigation mode 'zne' is not available on SamplerV2 in
+    qiskit-ibm-runtime >= 0.47 (SamplerOptions no longer exposes
+    resilience_level). hw_run must raise NotImplementedError with a
+    clear message rather than crash deep in pydantic validation."""
     from qimp.runtime import ibm
 
     fake_backend = MagicMock()
     fake_backend.name = "ibm_fake"
     fake_backend.num_qubits = 5
 
-    fake_job = MagicMock()
-    fake_job.job_id.return_value = "zne_job"
-    fake_pub_result = MagicMock()
-    fake_pub_result.data.c.get_counts.return_value = {"00": 1024}
-    fake_job.result.return_value = [fake_pub_result]
-
-    fake_sampler_instance = MagicMock()
-    fake_sampler_instance.run.return_value = fake_job
-    fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
-
-    options_obj = SimpleNamespace(
-        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
-        twirling=SimpleNamespace(enable_measure=False),
-        resilience_level=0,
-    )
-    fake_options_cls = MagicMock(return_value=options_obj)
-
-    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
-         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
-        ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="zne")
-
-    assert options_obj.resilience_level == 2
+    with patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()), \
+         patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()), \
+         pytest.raises(NotImplementedError, match="zne"):
+        ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="zne")
 
 
 def test_hw_run_rejects_unknown_mitigation():
