@@ -33,13 +33,22 @@ logger = logging.getLogger(__name__)
 # this to None via the autouse `_reset_singleton` fixture.
 _SERVICE: Any = None
 
-# Indirection so tests can patch `ibm.QiskitRuntimeService` without the
-# qiskit_ibm_runtime import happening at module-load time (the test fixture
-# patches this attribute before `get_service` is called).
-try:
-    from qiskit_ibm_runtime import QiskitRuntimeService
-except ImportError:  # pragma: no cover - depends on optional `[ibm]` extra
-    QiskitRuntimeService = None
+# Cached QiskitRuntimeService class (or None if the optional [ibm]
+# extra is not installed). Resolved lazily on the first call to
+# get_service(); tests can override by patching the module attribute.
+QiskitRuntimeService: Any = None
+
+
+def _resolve_runtime_service_cls() -> Any:
+    global QiskitRuntimeService
+    if QiskitRuntimeService is not None:
+        return QiskitRuntimeService
+    try:
+        import qiskit_ibm_runtime as _ibm_rt
+    except ImportError:
+        return None
+    QiskitRuntimeService = _ibm_rt.QiskitRuntimeService
+    return QiskitRuntimeService
 
 
 def get_service(instance: str | None = None) -> Any:
@@ -53,18 +62,15 @@ def get_service(instance: str | None = None) -> Any:
     if _SERVICE is not None:
         return _SERVICE
 
-    if QiskitRuntimeService is None:
+    qrs_cls = _resolve_runtime_service_cls()
+    if qrs_cls is None:
         raise ImportError(
             "qimp.runtime.ibm requires `pip install qimp-mi[ibm]` "
             "(qiskit-ibm-runtime)"
         )
 
     try:
-        _SERVICE = (
-            QiskitRuntimeService(instance=instance)
-            if instance
-            else QiskitRuntimeService()
-        )
+        _SERVICE = qrs_cls(instance=instance) if instance else qrs_cls()
     except Exception as exc:
         raise RuntimeError(
             "Could not initialise QiskitRuntimeService — is "
@@ -75,12 +81,15 @@ def get_service(instance: str | None = None) -> Any:
     return _SERVICE
 
 
-def list_backends() -> list[dict[str, Any]]:
+def list_backends(service: Any | None = None) -> list[dict[str, Any]]:
     """Return one row per operational backend visible to the saved account.
 
     Each row: ``{name, num_qubits, pending_jobs, operational}``.
+
+    When ``service`` is None, resolves via :func:`get_service`.
     """
-    service = get_service() if _SERVICE is None else _SERVICE
+    if service is None:
+        service = get_service()
     rows: list[dict[str, Any]] = []
     for backend in service.backends(operational=True):
         status = backend.status()
@@ -248,6 +257,7 @@ def hw_run(
     shots: int = 4096,
     mitigation: str = "trex+dd",
     optimization_level: int = 3,
+    timeout_s: float = 1200.0,
 ) -> tuple[dict[str, int], QuantumCircuit, str, dict[str, Any]]:
     """Submit ``qc`` to ``backend`` via SamplerV2 with TREX + DD mitigation.
 
@@ -266,6 +276,10 @@ def hw_run(
         dynamical decoupling. ``'none'`` disables all error mitigation.
     optimization_level:
         Transpiler optimisation level (0–3). Defaults to 3.
+    timeout_s:
+        ``timeout_s`` is currently advisory; recovery of long-running jobs is
+        handled by the caller (the CLI sweep script in Task 15 persists
+        ``job_id`` before awaiting ``job.result()``).
     """
     if mitigation not in ("trex+dd", "none"):
         raise ValueError(
@@ -278,6 +292,12 @@ def hw_run(
     from qimp.testing import _ensure_measured
 
     measured = _ensure_measured(qc)
+    # Pull the classical register name from the measured circuit before
+    # submission. measure_all() creates a register named "meas", but circuits
+    # that already have measurements may use a different register name. Using
+    # the name from `measured.cregs` keeps this robust to both cases.
+    creg_name = measured.cregs[0].name if measured.cregs else "meas"
+
     # Use the backend's Target object directly when available; this is the
     # recommended path for newer Qiskit / qiskit-ibm-runtime and avoids
     # issues with backend-supplied plugin name discovery during transpilation.
@@ -301,5 +321,5 @@ def hw_run(
     logger.info("Submitted job %s on %s", job_id, backend.name)
 
     result = job.result()
-    counts = dict(result[0].data.meas.get_counts())
+    counts = dict(getattr(result[0].data, creg_name).get_counts())
     return counts, transpiled, job_id, summary

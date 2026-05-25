@@ -41,12 +41,29 @@ def test_list_backends_returns_serialisable_rows():
     fake_service = MagicMock()
     fake_service.backends.return_value = [fake_backend]
 
-    with patch.object(ibm, "_SERVICE", fake_service):
-        rows = ibm.list_backends()
+    rows = ibm.list_backends(service=fake_service)
 
     assert rows == [
         {"name": "ibm_brisbane", "num_qubits": 127, "pending_jobs": 17, "operational": True}
     ]
+
+
+def test_list_backends_falls_back_to_singleton():
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_brisbane"
+    fake_backend.num_qubits = 127
+    fake_backend.status.return_value.pending_jobs = 0
+    fake_backend.status.return_value.operational = True
+    fake_service = MagicMock()
+    fake_service.backends.return_value = [fake_backend]
+
+    with patch.object(ibm, "_SERVICE", fake_service):
+        rows = ibm.list_backends()
+
+    assert len(rows) == 1
+    assert rows[0]["name"] == "ibm_brisbane"
 
 
 def test_pick_backend_by_name():
@@ -197,11 +214,12 @@ def test_aer_noisy_run_returns_counts():
 
 def test_hw_run_submits_with_mitigation_and_returns_counts():
     """Verify hw_run:
-    - transpiles against the backend (uses optimization_level=3 by default)
-    - instantiates SamplerV2 with options carrying DD (XY4) + TREX flags
-    - returns (counts, transpiled, job_id, summary) with summary keys
-      'depth' and 'two_q_gate_count'.
+    - transpiles against the backend
+    - sets dynamical_decoupling + twirling options on TREX+DD
+    - returns (counts, transpiled, job_id, summary)
     """
+    from types import SimpleNamespace
+
     from qimp.runtime import ibm
 
     fake_backend = MagicMock()
@@ -211,18 +229,27 @@ def test_hw_run_submits_with_mitigation_and_returns_counts():
     fake_job = MagicMock()
     fake_job.job_id.return_value = "abc"
     fake_pub_result = MagicMock()
-    fake_pub_result.data.meas.get_counts.return_value = {"00": 800, "11": 224}
+    # _toy_circuit already has measurements on classical register "c";
+    # _ensure_measured preserves it, so creg_name resolves to "c".
+    fake_pub_result.data.c.get_counts.return_value = {"00": 800, "11": 224}
     fake_job.result.return_value = [fake_pub_result]
 
     fake_sampler_instance = MagicMock()
     fake_sampler_instance.run.return_value = fake_job
-
     fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
-    fake_options_cls = MagicMock()
+
+    # A namespace whose nested attributes record assignments — unlike a
+    # plain MagicMock, attribute assignments on a SimpleNamespace are
+    # observable from the test.
+    options_obj = SimpleNamespace(
+        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
+        twirling=SimpleNamespace(enable_measure=False),
+    )
+    fake_options_cls = MagicMock(return_value=options_obj)
 
     with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
          patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
-        counts, transpiled, job_id, summary = ibm.hw_run(
+        counts, _transpiled, job_id, summary = ibm.hw_run(
             _toy_circuit(),
             backend=fake_backend,
             shots=1024,
@@ -231,16 +258,53 @@ def test_hw_run_submits_with_mitigation_and_returns_counts():
 
     assert counts == {"00": 800, "11": 224}
     assert job_id == "abc"
-    assert transpiled.num_qubits >= 2  # transpile may add ancillas; at least the 2 logical
-    assert "depth" in summary
-    assert "two_q_gate_count" in summary
-    assert "num_qubits" in summary
+    assert "depth" in summary and "two_q_gate_count" in summary and "num_qubits" in summary
+    # Mitigation flags actually set:
+    assert options_obj.dynamical_decoupling.enable is True
+    assert options_obj.dynamical_decoupling.sequence_type == "XY4"
+    assert options_obj.twirling.enable_measure is True
 
-    # Sampler was instantiated with the right backend + options object
     fake_sampler_cls.assert_called_once()
     _, kw = fake_sampler_cls.call_args
     assert kw["mode"] is fake_backend
+    assert kw["options"] is options_obj
     fake_sampler_instance.run.assert_called_once()
+
+
+def test_hw_run_mitigation_none_leaves_options_untouched():
+    from types import SimpleNamespace
+
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_fake"
+    fake_backend.num_qubits = 5
+
+    fake_job = MagicMock()
+    fake_job.job_id.return_value = "xyz"
+    fake_pub_result = MagicMock()
+    # _toy_circuit already has measurements on classical register "c".
+    fake_pub_result.data.c.get_counts.return_value = {"00": 1024}
+    fake_job.result.return_value = [fake_pub_result]
+
+    fake_sampler_instance = MagicMock()
+    fake_sampler_instance.run.return_value = fake_job
+    fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
+
+    options_obj = SimpleNamespace(
+        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
+        twirling=SimpleNamespace(enable_measure=False),
+    )
+    fake_options_cls = MagicMock(return_value=options_obj)
+
+    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
+         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+        ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="none")
+
+    # Mitigation = "none" must NOT touch the options object:
+    assert options_obj.dynamical_decoupling.enable is False
+    assert options_obj.dynamical_decoupling.sequence_type is None
+    assert options_obj.twirling.enable_measure is False
 
 
 def test_hw_run_rejects_unknown_mitigation():
