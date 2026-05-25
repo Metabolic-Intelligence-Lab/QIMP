@@ -83,6 +83,15 @@ def _utc_stamp() -> str:
     return dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H-%M-%SZ")
 
 
+def _estimate_qpu_seconds(qc_depth: int, shots: int, avg_gate_ns: float = 100.0) -> float:
+    """Order-of-magnitude QPU time estimate per circuit.
+
+    Average single-/two-qubit gate time on Heron-class hardware is ~50-100 ns;
+    we use 100 ns as a conservative upper bound. Result is in seconds.
+    """
+    return qc_depth * shots * avg_gate_ns * 1e-9
+
+
 def _write_summary(path: Path, rows: list[dict]) -> None:
     if not rows:
         return
@@ -265,6 +274,97 @@ def main(argv: list[str] | None = None) -> int:
         print("Pass 2 (Aer noisy) done.")
     else:
         print("Pass 2 skipped (--skip-hw and no --backend)")
+
+    # ---- Pass 3: hardware (whitelist) ----
+    if backend is not None and not args.skip_hw:
+        whitelist = _parse_hw_whitelist(args.hw_circuits)
+        hw_recipes = [
+            rec
+            for n in args.sizes
+            for rec in build_recipes(raw, n=n, q=args.q, alpha=args.alpha)
+            if (rec.encoder, rec.n) in whitelist
+        ]
+        if not hw_recipes:
+            print("Pass 3: empty whitelist after filtering, nothing to do.")
+        else:
+            est = sum(
+                _estimate_qpu_seconds(r.qc.depth(), args.shots) for r in hw_recipes
+            )
+            print(
+                f"Pass 3 estimate: {est:.1f} s QPU across {len(hw_recipes)} "
+                f"circuits on {backend.name} ({args.shots} shots each)."
+            )
+            if est > 120.0:
+                ans = input(
+                    "Estimate exceeds 120 s. Proceed? [y/N] "
+                ).strip().lower()
+                if ans != "y":
+                    print("Aborted by user.")
+                    _write_summary(outdir / "summary.csv", summary_rows)
+                    return 0
+
+            for rec in hw_recipes:
+                label = rec.label
+                if ibm.is_run_complete(outdir, label, "hw"):
+                    print(f"[skip] {label} hw already on disk")
+                    continue
+
+                # Persist a stub metadata BEFORE submission so a crash
+                # mid-wait leaves a job_id on disk.
+                stub_dir = outdir / "runs" / f"{label}_hw"
+                stub_dir.mkdir(parents=True, exist_ok=True)
+                (stub_dir / "metadata.json").write_text(
+                    json.dumps(
+                        {"label": label, "status": "submitting"},
+                        default=str,
+                    )
+                )
+
+                try:
+                    counts, transpiled, job_id, tsummary = ibm.hw_run(
+                        rec.qc,
+                        backend=backend,
+                        shots=args.shots,
+                        mitigation="trex+dd",
+                    )
+                except Exception as exc:
+                    print(
+                        f"[warn] hw submission failed for {label}: {exc}",
+                        file=sys.stderr,
+                    )
+                    continue
+
+                decoded = rec.decoder(counts)
+                ref = rec.reference.astype(np.float64)
+                dec_f = np.asarray(decoded, dtype=np.float64)
+                max_i = _max_intensity_for_metric(ref)
+                row = {
+                    "label": label,
+                    "encoder": rec.encoder,
+                    "n": rec.n,
+                    "q": rec.q,
+                    "m": rec.m,
+                    "pass": "hw",
+                    "shots": args.shots,
+                    "backend": backend.name,
+                    "job_id": job_id,
+                    "mse": float(_mse(ref, dec_f)),
+                    "psnr": float(_psnr(ref, dec_f, max_intensity=max_i)),
+                    "depth": tsummary["depth"],
+                    "two_q_gate_count": tsummary["two_q_gate_count"],
+                    "num_qubits": tsummary["num_qubits"],
+                }
+                summary_rows.append(row)
+                ibm.persist_run(
+                    outdir,
+                    label=label,
+                    pass_name="hw",
+                    circuit=rec.qc,
+                    transpiled=transpiled,
+                    counts=counts,
+                    metadata={**row, "status": "completed"},
+                )
+            print("Pass 3 (hardware) done.")
 
     _write_summary(outdir / "summary.csv", summary_rows)
     print(
