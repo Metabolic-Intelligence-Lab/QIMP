@@ -40,12 +40,10 @@ from pathlib import Path
 
 import numpy as np
 from PIL import Image as PilImage
-from qiskit import QuantumCircuit, transpile
-from qiskit.transpiler import Target
+from qiskit import QuantumCircuit
 
 from qimp.metrics import mse as _mse
 from qimp.metrics import psnr as _psnr
-from qimp.processing.gp_ratio import decode_gp_counts
 from qimp.runtime import ibm
 from qimp.runtime.circuits import build_recipes
 
@@ -64,59 +62,27 @@ def _load_image(repo_root: Path, frame_name: str) -> np.ndarray:
 
 
 def _fold_global(qc: QuantumCircuit, scale_factor: int) -> QuantumCircuit:
-    """Global gate folding: replace qc with qc · (qc⁻¹ · qc)^k where
-    k = (scale_factor - 1) / 2. Preserves the device-native gate set
-    so no re-transpile is needed.
+    """Global gate folding on the LOGICAL circuit (pre-transpile).
+
+    Replaces qc with qc · (qc⁻¹ · qc)^k where k = (scale_factor - 1) / 2,
+    inserting barriers between segments to prevent the transpiler from
+    optimising U·U⁻¹·U → U.
     """
     if scale_factor < 1 or scale_factor % 2 == 0:
-        raise ValueError(f"scale_factor must be a positive odd integer, got {scale_factor}")
+        raise ValueError(
+            f"scale_factor must be a positive odd integer, got {scale_factor}"
+        )
     if scale_factor == 1:
         return qc.copy()
     inv = qc.inverse()
     folded = qc.copy()
     k = (scale_factor - 1) // 2
     for _ in range(k):
+        folded.barrier()
         folded = folded.compose(inv)
+        folded.barrier()
         folded = folded.compose(qc)
     return folded
-
-
-def _submit_folded(
-    transpiled_unmeasured: QuantumCircuit,
-    *,
-    scale_factor: int,
-    backend,
-    shots: int,
-):
-    """Build the folded circuit, append measurements, submit via SamplerV2
-    with TREX + DD. Returns (counts, transpiled_with_meas, job_id, summary).
-    """
-    folded = _fold_global(transpiled_unmeasured, scale_factor)
-    folded.measure_all()
-
-    Options = ibm._sampler_options_cls()
-    options = Options()
-    options.dynamical_decoupling.enable = True
-    options.dynamical_decoupling.sequence_type = "XY4"
-    options.twirling.enable_measure = True
-
-    Sampler = ibm._sampler_v2_cls()
-    sampler = Sampler(mode=backend, options=options)
-    job = sampler.run([folded], shots=shots)
-    job_id = job.job_id()
-    print(f"  submitted scale={scale_factor}x  job_id={job_id}", flush=True)
-    result = job.result()
-    # measure_all() creates a register named "meas"
-    counts = dict(result[0].data.meas.get_counts())
-    summary = {
-        "depth": folded.depth(),
-        "two_q_gate_count": sum(
-            1 for instr in folded.data if instr.operation.num_qubits >= 2
-        ),
-        "num_qubits": folded.num_qubits,
-        "scale_factor": scale_factor,
-    }
-    return counts, folded, job_id, summary
 
 
 def _extrapolate_per_pixel(
@@ -154,7 +120,7 @@ def main(argv: list[str] | None = None) -> int:
     print(f"Backend: {args.backend}")
     print(f"Noise scales: {NOISE_SCALES}")
 
-    # Build the gp@n=2 recipe (unmeasured) + transpile once
+    # Build the gp@n=2 recipe (unmeasured)
     img = _load_image(repo_root, CANONICAL_FRAME)
     rec = next(r for r in build_recipes(img, n=2, alpha=0.5) if r.encoder == "gp")
     print(f"Recipe: {rec.label}  qubits={rec.qc.num_qubits}")
@@ -162,36 +128,31 @@ def main(argv: list[str] | None = None) -> int:
     service = ibm.get_service()
     backend = ibm.pick_backend(service, min_qubits=6, name=args.backend)
 
-    print(f"Transpiling at optimization_level=3 vs {backend.name}...", flush=True)
-    target = backend.target if isinstance(backend.target, Target) else None
-    transpiled_base = transpile(rec.qc, target=target, optimization_level=3)
-    base_summary = {
-        "base_depth": transpiled_base.depth(),
-        "base_two_q": sum(
-            1 for instr in transpiled_base.data if instr.operation.num_qubits >= 2
-        ),
-    }
-    print(f"  base depth={base_summary['base_depth']}  base 2q={base_summary['base_two_q']}")
-
-    # Submit each noise scale
+    # Submit each noise scale by folding the LOGICAL circuit, then letting
+    # hw_run do measure + transpile + submit + decode. Barriers in the fold
+    # prevent the transpiler from optimising U·U⁻¹·U → U.
     decodes: dict[int, np.ndarray] = {}
     for s in NOISE_SCALES:
         key = f"K_zne_scale{s}_gp_n2"
         if ibm.is_run_complete(outdir, key, "hw"):
             print(f"[{key}] already on disk, skipping submission")
-            # we still need to load decoded for extrapolation — skip for now
             continue
+
+        folded_logical = _fold_global(rec.qc, s)
+        print(f"\n[scale={s}x] logical depth={folded_logical.depth()}, "
+              f"2q={sum(1 for instr in folded_logical.data if instr.operation.num_qubits >= 2)}", flush=True)
         try:
-            counts, folded, job_id, summary = _submit_folded(
-                transpiled_base, scale_factor=s, backend=backend, shots=args.shots,
+            counts, transpiled, job_id, summary = ibm.hw_run(
+                folded_logical, backend=backend, shots=args.shots,
+                mitigation="trex+dd",
             )
         except Exception as exc:
             print(f"[{key}] FAILED: {exc}", file=sys.stderr)
             traceback.print_exc()
             rows.append({"key": key, "status": "failed", "error": str(exc),
-                         "scale": s})
+                         "scale_factor": s})
             continue
-        decoded = decode_gp_counts(counts, n=2, m=1)
+        decoded = rec.decoder(counts)
         decodes[s] = decoded
         ref = rec.reference.astype(np.float64)
         max_i = 2.0 if ref.min() < 0 else max(float(ref.max()), 1.0)
@@ -201,13 +162,16 @@ def main(argv: list[str] | None = None) -> int:
             "job_id": job_id,
             "mse": float(_mse(ref, decoded)),
             "psnr": float(_psnr(ref, decoded, max_intensity=max_i)),
-            **summary, **base_summary,
+            "depth_transpiled": summary["depth"],
+            "two_q_gate_count": summary["two_q_gate_count"],
+            "num_qubits": summary["num_qubits"],
         }
         rows.append(row)
         ibm.persist_run(outdir, label=key, pass_name="hw",
-                        circuit=rec.qc, transpiled=folded,
+                        circuit=folded_logical, transpiled=transpiled,
                         counts=counts, metadata={**row})
-        print(f"  decoded PSNR (raw, scale={s}x) = {row['psnr']:.2f} dB")
+        print(f"  -> PSNR(scale={s}x) = {row['psnr']:.2f} dB  "
+              f"job_id={job_id}  transpiled depth={summary['depth']}")
 
     # Per-pixel extrapolation
     if len(decodes) == len(NOISE_SCALES):
