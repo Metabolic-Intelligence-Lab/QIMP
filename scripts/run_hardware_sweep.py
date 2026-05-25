@@ -230,7 +230,11 @@ def main(argv: list[str] | None = None) -> int:
     from qimp.runtime.circuits import build_recipes
     from qimp.testing import exact_counts
 
-    raw = np.asarray(PilImage.open(args.image))
+    try:
+        raw = np.asarray(PilImage.open(args.image))
+    except (FileNotFoundError, PilImage.UnidentifiedImageError) as exc:
+        print(f"--image: cannot open {args.image}: {exc}", file=sys.stderr)
+        return 2
 
     timestamp = _utc_stamp()
     outdir = args.outdir / timestamp
@@ -381,11 +385,14 @@ def main(argv: list[str] | None = None) -> int:
                 f"circuits on {backend.name} ({args.shots} shots each)."
             )
             if est > 120.0:
-                ans = input(
-                    "Estimate exceeds 120 s. Proceed? [y/N] "
-                ).strip().lower()
+                try:
+                    ans = input(
+                        "Estimate exceeds 120 s. Proceed? [y/N] "
+                    ).strip().lower()
+                except EOFError:
+                    ans = "n"  # no tty -> safe abort
                 if ans != "y":
-                    print("Aborted by user.")
+                    print("Aborted by user (or non-interactive stdin).")
                     _write_summary(outdir / "summary.csv", summary_rows)
                     return 0
 
@@ -401,7 +408,7 @@ def main(argv: list[str] | None = None) -> int:
                 stub_dir.mkdir(parents=True, exist_ok=True)
                 (stub_dir / "metadata.json").write_text(
                     json.dumps(
-                        {"label": label, "status": "submitting"},
+                        {"label": label, "status": "submitted"},
                         default=str,
                     )
                 )
