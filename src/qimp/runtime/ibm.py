@@ -273,7 +273,10 @@ def hw_run(
         Number of shots.
     mitigation:
         ``'trex+dd'`` enables twirled readout error extinction and XY4
-        dynamical decoupling. ``'none'`` disables all error mitigation.
+        dynamical decoupling (default). ``'trex'`` enables only TREX,
+        ``'dd'`` enables only DD, ``'none'`` disables all mitigation. The
+        four modes together support ablation studies of which layer
+        contributes the recovered signal.
     optimization_level:
         Transpiler optimisation level (0–3). Defaults to 3.
     timeout_s:
@@ -281,9 +284,10 @@ def hw_run(
         handled by the caller (the CLI sweep script in Task 15 persists
         ``job_id`` before awaiting ``job.result()``).
     """
-    if mitigation not in ("trex+dd", "none"):
+    _allowed_mitigation = ("trex+dd", "trex", "dd", "none")
+    if mitigation not in _allowed_mitigation:
         raise ValueError(
-            f"unknown mitigation {mitigation!r}; expected 'trex+dd' or 'none'"
+            f"unknown mitigation {mitigation!r}; expected one of {_allowed_mitigation}"
         )
 
     from qiskit import transpile
@@ -309,9 +313,10 @@ def hw_run(
 
     Options = _sampler_options_cls()
     options = Options()
-    if mitigation == "trex+dd":
+    if mitigation in ("trex+dd", "dd"):
         options.dynamical_decoupling.enable = True
         options.dynamical_decoupling.sequence_type = "XY4"
+    if mitigation in ("trex+dd", "trex"):
         options.twirling.enable_measure = True
 
     Sampler = _sampler_v2_cls()

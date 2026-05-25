@@ -307,6 +307,78 @@ def test_hw_run_mitigation_none_leaves_options_untouched():
     assert options_obj.twirling.enable_measure is False
 
 
+def test_hw_run_mitigation_trex_only_enables_twirling_only():
+    """Ablation mode 'trex' must enable twirling.enable_measure but leave
+    dynamical_decoupling untouched."""
+    from types import SimpleNamespace
+
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_fake"
+    fake_backend.num_qubits = 5
+
+    fake_job = MagicMock()
+    fake_job.job_id.return_value = "trex"
+    fake_pub_result = MagicMock()
+    fake_pub_result.data.c.get_counts.return_value = {"00": 1024}
+    fake_job.result.return_value = [fake_pub_result]
+
+    fake_sampler_instance = MagicMock()
+    fake_sampler_instance.run.return_value = fake_job
+    fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
+
+    options_obj = SimpleNamespace(
+        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
+        twirling=SimpleNamespace(enable_measure=False),
+    )
+    fake_options_cls = MagicMock(return_value=options_obj)
+
+    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
+         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+        ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="trex")
+
+    assert options_obj.twirling.enable_measure is True
+    assert options_obj.dynamical_decoupling.enable is False
+    assert options_obj.dynamical_decoupling.sequence_type is None
+
+
+def test_hw_run_mitigation_dd_only_enables_dd_only():
+    """Ablation mode 'dd' must enable XY4 dynamical decoupling but leave
+    twirling untouched."""
+    from types import SimpleNamespace
+
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_fake"
+    fake_backend.num_qubits = 5
+
+    fake_job = MagicMock()
+    fake_job.job_id.return_value = "dd"
+    fake_pub_result = MagicMock()
+    fake_pub_result.data.c.get_counts.return_value = {"00": 1024}
+    fake_job.result.return_value = [fake_pub_result]
+
+    fake_sampler_instance = MagicMock()
+    fake_sampler_instance.run.return_value = fake_job
+    fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
+
+    options_obj = SimpleNamespace(
+        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
+        twirling=SimpleNamespace(enable_measure=False),
+    )
+    fake_options_cls = MagicMock(return_value=options_obj)
+
+    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
+         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+        ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="dd")
+
+    assert options_obj.dynamical_decoupling.enable is True
+    assert options_obj.dynamical_decoupling.sequence_type == "XY4"
+    assert options_obj.twirling.enable_measure is False
+
+
 def test_hw_run_rejects_unknown_mitigation():
     from qimp.runtime import ibm
 
