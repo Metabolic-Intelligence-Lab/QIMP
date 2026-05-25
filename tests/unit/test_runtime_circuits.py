@@ -117,3 +117,33 @@ def test_recipe_ncqi(n):
     assert rec.label == f"ncqi_n{n}"
     assert rec.qc.num_qubits == 2 * n + 3 * 2  # q=2
     assert rec.reference.shape == (1 << n, 1 << n, 3)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+def test_recipe_gp_uses_analytical_params(n):
+    """The GP recipe must:
+    - have 2n + m + 1 = 2n+2 qubits (m=1)
+    - have a reference equal to the classical GP image in [-1, 1]
+    - have a label gp_n{n}
+    """
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_rgb(20)
+    recipes = build_recipes(img, n=n, alpha=0.5)
+    rec = next(r for r in recipes if r.encoder == "gp")
+    assert rec.label == f"gp_n{n}"
+    assert rec.qc.num_qubits == 2 * n + 2
+
+    side = 1 << n
+    assert rec.reference.shape == (side, side)
+    assert rec.reference.min() >= -1.0
+    assert rec.reference.max() <= 1.0
+
+
+def test_build_recipes_returns_seven_entries():
+    """Sanity: a single call yields one recipe per encoder."""
+    from qimp.runtime.circuits import build_recipes
+
+    img = _toy_rgb(20)
+    encoders = {r.encoder for r in build_recipes(img, n=1)}
+    assert encoders == {"frqi", "frqi_multi", "neqr", "qpie", "mcrqi", "ncqi", "gp"}

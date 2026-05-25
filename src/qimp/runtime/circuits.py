@@ -217,4 +217,39 @@ def build_recipes(
         )
     )
 
+    # --- GP corrected (paper centre-piece) ---
+    from qimp.processing.gp_ratio import (
+        analytical_gp_params,
+        apply_gp_function,
+        classical_gp_image,
+        decode_gp_counts,
+    )
+
+    g_chan = rgb[..., 1].astype(np.float64)
+    r_chan = rgb[..., 0].astype(np.float64)
+    rg_stack = np.stack([r_chan, g_chan], axis=0)
+    norm_gp = float(rg_stack.max()) or 1.0
+
+    qc_gp = frqi_circuit(rg_stack, normalization=norm_gp)
+    gp_params = analytical_gp_params(
+        g_chan, r_chan, alpha=alpha, normalization=norm_gp
+    )
+    apply_gp_function(qc_gp, n=n, m=1, params=list(gp_params))
+
+    def _decode_gp(counts: dict[str, int], _n: int = n) -> np.ndarray:
+        return decode_gp_counts(counts, n=_n, m=1)
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"gp_n{n}",
+            encoder="gp",
+            n=n,
+            q=0,
+            m=1,
+            qc=qc_gp,
+            decoder=_decode_gp,
+            reference=classical_gp_image(g_chan, r_chan, alpha=alpha),
+        )
+    )
+
     return recipes
