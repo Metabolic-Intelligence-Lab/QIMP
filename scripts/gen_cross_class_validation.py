@@ -200,18 +200,23 @@ def validate_class_b() -> dict[str, float]:
 def synthesise_rogfp(side: int = 16, seed: int = 0) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Synthetic roGFP2 dual-excitation image with a known redox gradient.
 
-    roGFP2 has two excitation peaks (lambda_ox ~ 405 nm, lambda_red ~ 488 nm)
-    whose ratio R = F405/F488 reports the fraction of oxidised dimer. The
-    calibration constants R_min (fully reduced) and R_max (fully oxidised)
-    are dye- and instrument-specific; we use the published values of
-    Schwarzlaender et al. (2008) for roGFP2 imaging in HEK293:
+    roGFP2 has two excitation peaks (~405 nm and ~488 nm) whose ratio
+    R = F405/F488 reports the fraction of oxidised dimer. The calibration
+    constants R_red (fully reduced state ratio) and R_ox (fully oxidised
+    state ratio) are dye- and instrument-specific; we use the published
+    values of Schwarzlaender et al. (2008) for roGFP2 imaging:
 
-        R_min = 0.20,   R_max = 4.50
+        R_red = 0.20  (fully-reduced reference, low F405/F488)
+        R_ox  = 4.50  (fully-oxidised reference, high F405/F488)
 
     and the spectral coefficients I405red/I405ox, I488red/I488ox = 0.85 / 5.0
-    and 1.0 / 0.20 respectively (normalised). The oxidation fraction
-    OxD(p) = (R - R_min) / (R_max - R_min) in [0, 1] is then the per-pixel
-    target of the closed-form solver (after rescaling to [-1, +1]).
+    and 1.0 / 0.20 respectively (normalised). The oxidation degree
+
+        OxD(p) = (R(p) - R_red) / (R_ox - R_red)  in [0, 1]
+
+    is the per-pixel target of the closed-form solver (after rescaling to
+    [-1, +1]). The convention OxD(R = R_red) = 0, OxD(R = R_ox) = 1 is the
+    standard biophysics convention for roGFP / HyPer / SNARF.
     """
     rng = np.random.default_rng(seed)
     yy, xx = np.mgrid[0:side, 0:side].astype(np.float64)
@@ -233,14 +238,14 @@ def synthesise_rogfp(side: int = 16, seed: int = 0) -> tuple[np.ndarray, np.ndar
 
 
 def validate_class_c() -> dict[str, float]:
-    """Class C (calibrated ratio): f = (R - R_min)/(R_max - R_min), in [0,1]."""
+    """Class C (calibrated ratio): OxD = (R - R_red)/(R_ox - R_red), in [0,1]."""
     f405, f488, oxd_true = synthesise_rogfp(side=16, seed=2)
     eps = 1e-9
     R = f405 / np.maximum(f488, eps)
-    R_min, R_max = 0.20, 4.50
-    f_cal = (R - R_min) / (R_max - R_min)
+    R_red, R_ox = 0.20, 4.50  # Schwarzlander 2008 roGFP2 calibration
+    oxd = (R - R_red) / (R_ox - R_red)  # oxidation degree in [0, 1]
     # Affine rescale to [-1, +1] (Lemma 2 of the main paper)
-    u = 2.0 * np.clip(f_cal, 0.0, 1.0) - 1.0
+    u = 2.0 * np.clip(oxd, 0.0, 1.0) - 1.0
 
     norm = float(max(f405.max(), f488.max()))
     alpha, beta = closed_form_params(f405, f488, u, normalization=norm)
@@ -254,7 +259,7 @@ def validate_class_c() -> dict[str, float]:
         "F405 (intensity AU)",
         "F488 (intensity AU)",
         r"$R = F_{405}/F_{488}$",
-        r"$u = 2 \cdot (R - R_{\mathrm{min}})/(R_{\mathrm{max}} - R_{\mathrm{min}}) - 1$",
+        r"$u = 2 \cdot (R - R_{\mathrm{red}})/(R_{\mathrm{ox}} - R_{\mathrm{red}}) - 1$",
         "decoded - u  (closed-form)",
     ]
     images = [f405, f488, R, u, decoded - u]
