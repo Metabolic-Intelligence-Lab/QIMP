@@ -8,10 +8,16 @@ library imports only the typed helpers exposed here.
 
 from __future__ import annotations
 
+import json
 import logging
+import os
+import tempfile
+from pathlib import Path
 from typing import Any
 
-__all__ = ["get_service", "list_backends", "pick_backend"]
+from qiskit import QuantumCircuit
+
+__all__ = ["get_service", "is_run_complete", "list_backends", "persist_run", "pick_backend"]
 
 logger = logging.getLogger(__name__)
 
@@ -108,3 +114,69 @@ def pick_backend(
         )
     logger.info("Picked backend %s (%d qubits)", backend.name, backend.num_qubits)
     return backend
+
+
+def _atomic_write_bytes(path: Path, payload: bytes) -> None:
+    fd, tmp_name = tempfile.mkstemp(dir=str(path.parent), prefix=".tmp_", suffix=path.suffix)
+    try:
+        with os.fdopen(fd, "wb") as f:
+            f.write(payload)
+        os.replace(tmp_name, path)
+    except Exception:
+        if os.path.exists(tmp_name):
+            os.unlink(tmp_name)
+        raise
+
+
+def _atomic_write_text(path: Path, text: str) -> None:
+    _atomic_write_bytes(path, text.encode("utf-8"))
+
+
+def persist_run(
+    outdir: Path,
+    *,
+    label: str,
+    pass_name: str,
+    circuit: QuantumCircuit,
+    transpiled: QuantumCircuit | None,
+    counts: dict[str, int],
+    metadata: dict[str, Any],
+) -> Path:
+    """Persist a single run's artifacts under ``outdir/runs/<label>_<pass>/``.
+
+    Writes (atomically):
+      - ``circuit.qpy`` — the un-transpiled circuit
+      - ``transpiled.qpy`` — only when ``transpiled is not None`` (HW runs)
+      - ``counts.json`` — ``dict[str, int]``
+      - ``metadata.json`` — caller-supplied dict (job_id, status, depths, ...)
+    """
+    import io
+
+    from qiskit import qpy
+
+    run_dir = Path(outdir) / "runs" / f"{label}_{pass_name}"
+    run_dir.mkdir(parents=True, exist_ok=True)
+
+    buf = io.BytesIO()
+    qpy.dump(circuit, buf)
+    _atomic_write_bytes(run_dir / "circuit.qpy", buf.getvalue())
+
+    if transpiled is not None:
+        buf = io.BytesIO()
+        qpy.dump(transpiled, buf)
+        _atomic_write_bytes(run_dir / "transpiled.qpy", buf.getvalue())
+
+    _atomic_write_text(run_dir / "counts.json", json.dumps(counts))
+    _atomic_write_text(run_dir / "metadata.json", json.dumps(metadata, default=str))
+    return run_dir
+
+
+def is_run_complete(outdir: Path, label: str, pass_name: str) -> bool:
+    """True iff the run dir has a non-empty ``counts.json`` on disk."""
+    counts_path = Path(outdir) / "runs" / f"{label}_{pass_name}" / "counts.json"
+    if not counts_path.exists():
+        return False
+    try:
+        return bool(json.loads(counts_path.read_text()))
+    except json.JSONDecodeError:
+        return False
