@@ -118,4 +118,54 @@ def build_recipes(
         )
     )
 
+    # --- NEQR ---
+    from qimp.encoding.neqr import neqr_circuit, neqr_decode
+
+    max_q_val = (1 << q) - 1
+    gray_max = max(int(gray.max()), 1)
+    neqr_img = (gray.astype(np.float64) / gray_max * max_q_val).round().astype(np.uint8)
+    qc_neqr = neqr_circuit(neqr_img, q=q)
+
+    def _decode_neqr(
+        counts: dict[str, int], _n: int = n, _q: int = q
+    ) -> np.ndarray:
+        return neqr_decode(counts, n=_n, q=_q)
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"neqr_n{n}",
+            encoder="neqr",
+            n=n,
+            q=q,
+            m=0,
+            qc=qc_neqr,
+            decoder=_decode_neqr,
+            reference=neqr_img.astype(np.float64),
+        )
+    )
+
+    # --- QPIE ---
+    from qimp.encoding.qpie import normalize_amplitudes, qpie_circuit, qpie_decode
+
+    _, _, rms = normalize_amplitudes(gray.astype(np.float64))
+    qc_qpie = qpie_circuit(gray.astype(np.float64))
+
+    def _decode_qpie(
+        counts: dict[str, int], _n: int = n, _rms: float = float(rms)
+    ) -> np.ndarray:
+        return qpie_decode(counts, n=_n, rms=_rms)
+
+    recipes.append(
+        CircuitRecipe(
+            label=f"qpie_n{n}",
+            encoder="qpie",
+            n=n,
+            q=0,
+            m=0,
+            qc=qc_qpie,
+            decoder=_decode_qpie,
+            reference=gray.astype(np.float64),
+        )
+    )
+
     return recipes
