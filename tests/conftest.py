@@ -13,6 +13,13 @@ import pytest
 N_QUBITS_RANGE = [1, 2, 3, 4]
 Q_QUBITS_RANGE = [1, 2, 3]
 
+# Narrower ranges for the heavier reversible-arithmetic tests
+# (controlled adder, multiplier, divider). q < 3 collapses corner
+# cases away; q > 4 is statevector-impractical with the full ancilla
+# budget.
+N_QUBITS_ARITH_RANGE = [1, 2]
+Q_QUBITS_ARITH_RANGE = [3, 4]
+
 
 @pytest.fixture(params=N_QUBITS_RANGE, ids=lambda n: f"n={n}")
 def n_qubits(request: pytest.FixtureRequest) -> int:
@@ -23,4 +30,16 @@ def n_qubits(request: pytest.FixtureRequest) -> int:
 @pytest.fixture(params=Q_QUBITS_RANGE, ids=lambda q: f"q={q}")
 def q_qubits(request: pytest.FixtureRequest) -> int:
     """Intensity qubits (for NEQR / NCQI)."""
+    return request.param
+
+
+@pytest.fixture(params=N_QUBITS_ARITH_RANGE, ids=lambda n: f"n={n}")
+def n_qubits_arith(request: pytest.FixtureRequest) -> int:
+    """Position-qubit count for the arithmetic-circuit tests."""
+    return request.param
+
+
+@pytest.fixture(params=Q_QUBITS_ARITH_RANGE, ids=lambda q: f"q={q}")
+def q_qubits_arith(request: pytest.FixtureRequest) -> int:
+    """Intensity-qubit count for the arithmetic-circuit tests."""
     return request.param
