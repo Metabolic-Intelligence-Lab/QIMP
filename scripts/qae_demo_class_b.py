@@ -56,28 +56,46 @@ def build_A(
     q: int,
     threshold: int,
 ) -> tuple[QuantumCircuit, dict, dict]:
-    """Build the QAE state-prep A = class_b_ratio + mark_good_oracle.
+    """Build the QAE state-prep A = class_b_ratio + mark_good_oracle +
+    divzero-aware correction.
 
-    Returns (qc_full, b_layout, extra_layout) — b_layout has the Class-B
-    register indices, extra_layout has the mark-good-oracle ancilla
-    indices added on top.
+    For real microscopy data, some pixels naturally have I_b = 0 after
+    quantisation. The divider's behaviour at divisor = 0 is well-defined
+    (the quotient register fills with 1's, see q_div_restoring) but the
+    resulting "good" qubit, computed by mark_good_oracle on the
+    garbage quotient, will then be set to 1 for any positive threshold.
+    To preserve the QAE semantics, we apply a final correction:
+
+        good_corrected := good AND NOT div_zero_flag
+
+    implemented as an X-CCX-X sandwich on (div_zero_flag, good, good_corrected)
+    with good_corrected as a fresh |0⟩ ancilla. The whole pipeline
+    (class_b_ratio → mark_good_oracle → correction) is self-inverse
+    modulo the divzero handling, which the inverse function mirrors.
+
+    Returns (qc_full, b_layout, extra_layout). The QAE algorithm should
+    measure ``extra_layout["good_corrected"]`` rather than the raw
+    "good" qubit.
     """
     qc, b_layout = class_b_ratio(image_a, image_b, q=q)
     start = qc.num_qubits
     q_w = q + 1
-    # Allocate mark-good ancillae
+    # Allocate mark-good ancillae + correction ancilla
     good_reg = QuantumRegister(1, "good")
     thr_reg = QuantumRegister(q_w, "thr")
     sub_c_reg = QuantumRegister(q_w + 1, "sub_c")
     val_pad_reg = QuantumRegister(1, "val_pad")
-    qc.add_register(good_reg, thr_reg, sub_c_reg, val_pad_reg)
+    good_corr_reg = QuantumRegister(1, "good_corrected")
+    qc.add_register(good_reg, thr_reg, sub_c_reg, val_pad_reg, good_corr_reg)
     extra_layout = {
         "good": start,
         "thr": list(range(start + 1, start + 1 + q_w)),
         "sub_c": list(range(start + 1 + q_w, start + 1 + q_w + q_w + 1)),
         "val_pad": start + 1 + q_w + q_w + 1,
+        "good_corrected": start + 1 + q_w + q_w + 2,
     }
-    # Apply mark_good_oracle on the quotient register
+    # 1. mark_good_oracle sets good = (quotient > threshold)
+    #    (possibly garbage when div_zero_flag = 1).
     mark_good_oracle(
         qc,
         value_qubits=b_layout["quotient"],
@@ -87,6 +105,10 @@ def build_A(
         sub_carry_qubits=extra_layout["sub_c"],
         value_pad_qubit=extra_layout["val_pad"],
     )
+    # 2. divzero-aware correction: good_corrected = good AND NOT div_zero
+    qc.x(b_layout["flag"])
+    qc.ccx(b_layout["flag"], extra_layout["good"], extra_layout["good_corrected"])
+    qc.x(b_layout["flag"])
     return qc, b_layout, extra_layout
 
 
@@ -99,7 +121,17 @@ def apply_A_inv(
     b_layout: dict,
     extra_layout: dict,
 ) -> None:
-    """Apply A^†: mark_good is self-inverse, then class_b_ratio_inv."""
+    """Apply A^†: reverse of build_A's body in reverse order.
+
+    Forward order (in build_A):
+      class_b_ratio → mark_good_oracle → X-CCX-X correction
+    Inverse order:
+      X-CCX-X correction (self-inverse) → mark_good_oracle (self-inverse)
+      → class_b_ratio_inv.
+    """
+    qc.x(b_layout["flag"])
+    qc.ccx(b_layout["flag"], extra_layout["good"], extra_layout["good_corrected"])
+    qc.x(b_layout["flag"])
     mark_good_oracle(
         qc,
         value_qubits=b_layout["quotient"],
@@ -141,7 +173,7 @@ def apply_S_0(qc: QuantumCircuit, all_qubits: list[int]) -> None:
         qc.x(q)
 
 
-def apply_Q_once(
+def apply_A_forward(
     qc: QuantumCircuit,
     image_a: np.ndarray,
     image_b: np.ndarray,
@@ -150,17 +182,11 @@ def apply_Q_once(
     b_layout: dict,
     extra_layout: dict,
 ) -> None:
-    """Apply one Grover iteration Q = A · S_0 · A^† · S_good in place."""
-    apply_S_good(qc, extra_layout["good"])
-    apply_A_inv(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
-    apply_S_0(qc, list(range(qc.num_qubits)))
-    # Re-apply A
-    # Note: we need to rebuild A inside the same qc; but build_A allocates
-    # fresh qubits. Workaround: call build_A's content inline. For the POC,
-    # cheat by extracting the inverse pattern: A = (class_b_ratio) (mark_good).
-    # We just apply the gates again.
-    from qimp.processing.ratiometric_circuit import dual_neqr_load
+    """Re-apply A in place (the same gates as build_A, but on an existing
+    circuit with the qubits already allocated). Used by the Grover
+    operator's last step."""
     from qimp.processing.arithmetic import q_div_restoring
+    from qimp.processing.ratiometric_circuit import dual_neqr_load
     dual_neqr_load(
         qc, image_a, image_b, q,
         position_qubits=b_layout["position"],
@@ -186,6 +212,29 @@ def apply_Q_once(
         sub_carry_qubits=extra_layout["sub_c"],
         value_pad_qubit=extra_layout["val_pad"],
     )
+    qc.x(b_layout["flag"])
+    qc.ccx(b_layout["flag"], extra_layout["good"], extra_layout["good_corrected"])
+    qc.x(b_layout["flag"])
+
+
+def apply_Q_once(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    threshold: int,
+    b_layout: dict,
+    extra_layout: dict,
+) -> None:
+    """Apply one Grover iteration Q = A · S_0 · A^† · S_good in place.
+
+    The phase oracle ``S_good`` reflects about |good_corrected = 1⟩;
+    the zero-state reflection acts on every qubit.
+    """
+    apply_S_good(qc, extra_layout["good_corrected"])
+    apply_A_inv(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
+    apply_S_0(qc, list(range(qc.num_qubits)))
+    apply_A_forward(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
 
 
 # ---------------------------------------------------------------------------
@@ -205,11 +254,11 @@ def measure_good_probability(
     qc, b_layout, extra_layout = build_A(image_a, image_b, q, threshold)
     for _ in range(grover_k):
         apply_Q_once(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
-    # Add a classical bit and measure good
+    # Add a classical bit and measure the divzero-corrected good qubit.
     from qiskit import ClassicalRegister
     creg = ClassicalRegister(1, "c_good")
     qc.add_register(creg)
-    qc.measure(extra_layout["good"], creg[0])
+    qc.measure(extra_layout["good_corrected"], creg[0])
 
     sim = AerSimulator(method="matrix_product_state")
     # Transpile to MPS-supported gate set (mcx etc. need decomposition).
@@ -262,27 +311,48 @@ def mlqae_estimate(
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="qae_demo_class_b", description=__doc__)
     parser.add_argument("--shots", type=int, default=256)
-    parser.add_argument("--threshold", type=int, default=1,
+    parser.add_argument("--threshold", type=int, default=0,
                         help="Classical threshold τ. Pixels with R = I_a // I_b > τ are 'good'.")
     parser.add_argument("--max-k", type=int, default=2,
                         help="Largest Grover power. Total circuits run: max_k + 1.")
+    parser.add_argument("--dataset", type=str, default="canonical",
+                        choices=["canonical", "fura2", "rogfp2", "synthetic"],
+                        help="Which prepared dataset to use.")
     args = parser.parse_args(argv)
 
-    # Tiny 2×2 image at q=2 (intensities 0..3).
-    image_a = np.array([[3, 2], [3, 1]], dtype=np.int64)
-    image_b = np.array([[1, 1], [3, 1]], dtype=np.int64)
+    DATA_DIR = Path(__file__).resolve().parents[1] / "paper" / "data_autonomous"
+    if args.dataset == "canonical":
+        d = np.load(DATA_DIR / "canonical_2x2.npz")
+        image_a = d["I_a"].astype(np.int64)
+        image_b = d["I_b"].astype(np.int64)
+        print(f"Dataset: canonical microscopy frame (membraneStack…rbc3DM2.tif), "
+              f"2×2 q=2 from signal-rich patch (8, 4) + 32×32.")
+    elif args.dataset == "fura2":
+        d = np.load(DATA_DIR / "fura2_2x2.npz")
+        image_a = d["I_a"].astype(np.int64)
+        image_b = d["I_b"].astype(np.int64)
+        print(f"Dataset: synthetic Fura-2 (Grynkiewicz 1985), 2×2 q=2.")
+    elif args.dataset == "rogfp2":
+        d = np.load(DATA_DIR / "rogfp2_2x2.npz")
+        image_a = d["I_a"].astype(np.int64)
+        image_b = d["I_b"].astype(np.int64)
+        print(f"Dataset: synthetic roGFP2 (Schwarzländer 2008), 2×2 q=2.")
+    else:
+        # Backwards-compat: original hand-tuned synthetic.
+        image_a = np.array([[3, 2], [3, 1]], dtype=np.int64)
+        image_b = np.array([[1, 1], [3, 1]], dtype=np.int64)
+        print("Dataset: hand-tuned synthetic 2×2 q=2 (original demo).")
     q = 2
 
-    # Classical reference: how many pixels have I_a // I_b > threshold?
-    R = image_a.astype(np.int64) // np.maximum(image_b.astype(np.int64), 1)
+    # Classical reference: how many pixels have I_a // I_b > threshold AND I_b > 0?
+    R = np.where(image_b > 0, image_a.astype(np.int64) // np.maximum(image_b.astype(np.int64), 1), 0)
     valid_mask = image_b > 0
     good_mask = (R > args.threshold) & valid_mask
-    # The state-prep places equal weight on each pixel; div-by-zero
-    # pixels contribute an indeterminate good qubit value. For the demo
-    # we just count good_pixels / total_pixels including the div-zero
-    # branches (their good_qubit is computed but on garbage R).
     n_pixels = image_a.size
     a_true = float(good_mask.sum()) / float(n_pixels)
+    print(f"I_a = {image_a.tolist()}")
+    print(f"I_b = {image_b.tolist()}")
+    print(f"R = {R.tolist()}  (divzero pixels masked to 0)")
     print(f"Classical reference: fraction of pixels with R > {args.threshold} = "
           f"{a_true:.4f} ({int(good_mask.sum())} / {n_pixels})")
 
