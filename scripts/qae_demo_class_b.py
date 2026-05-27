@@ -1,104 +1,312 @@
-"""Quantum Amplitude Estimation demo on Class-B autonomous ratio circuit.
+"""Quantum Amplitude Estimation demo on the Class-B autonomous ratio circuit.
 
-This is a skeleton / outline of the Stage-E quantum-advantage
-demonstration: layer Iterative Amplitude Estimation (IAE) on top of
-the Class-B autonomous ratio state-prep, then estimate the fraction
-of pixels in the image whose I_a/I_b ratio exceeds a chosen threshold.
+The state-prep ``A`` is the composition
 
-The theoretical claim
----------------------
-Classical Monte Carlo over N pixels needs O(1/ε²) samples to estimate
-the fraction f = (# pixels with R(p) > τ) / N_pixels to additive
-error ε. QAE with the state-prep ``A`` as oracle needs O(1/ε) queries
-to ``A`` (and the same to ``A†``) for the same error. The quadratic
-speed-up in sample complexity is provable for any expectation value
-``E[f(R)]`` whose state-prep is a known unitary.
+    A = mark_good_oracle ∘ class_b_ratio
 
-The state-prep
---------------
-``A`` is the composition
+so that after applying A to |0⟩^⊗N the marginal probability of measuring
+the good_qubit in state |1⟩ equals the fraction of pixels in the image
+whose I_a/I_b ratio strictly exceeds a classical threshold τ.
 
-    A = (mark-good oracle) ∘ class_b_ratio
+The script demonstrates a manual Maximum-Likelihood QAE (Suzuki et al.,
+2020): sample at Grover-power k ∈ {0, 1, 2}, fit the underlying
+amplitude θ from the per-k empirical good-qubit probabilities. We then
+contrast the QAE estimate against a classical Monte Carlo baseline of
+the same total query budget.
 
-The mark-good oracle is a multi-controlled X gate that flips a single
-ancilla qubit (call it ``good_qubit``) when the quotient register
-holds a value > τ (a classical threshold). Implementing the
-"quotient > τ" predicate as a controlled X on ``good_qubit`` is
-straightforward via the standard NEQR comparator pattern (see
-``neqr_comparator`` in ``qimp.processing.arithmetic``).
+Runs on ``AerSimulator(method='mps')`` since the full state-prep has
+~30 qubits (out of statevector range on a 16 GB laptop). Expected
+runtime: 10–30 minutes per IQAE pass at n=1, q=2 on this laptop class;
+the heavy depth (Grover iterations multiply the already-deep state-prep)
+is why we cap k at 2 for this POC.
 
-The amplitude
--------------
-After A applied to |0⟩^⊗N, the state is
-
-    |Ψ⟩ = (1/√P) Σ_p |p⟩ |I_a(p)⟩ |I_b(p)⟩ |R(p)⟩ ⊗ (|0⟩ if R(p) ≤ τ else |1⟩)_good
-
-The marginal probability of measuring good_qubit = 1 is
-
-    a = f := |{p : R(p) > τ}| / N_pixels
-
-QAE applies the Grover operator Q = A · S_0 · A^† · S_good a varying
-number of times (powers-of-2 in IAE) and extracts ``a`` from the
-interference pattern. Requires ``class_b_ratio_inv`` (the cleaned-up
-inverse via the Stage-E inverses) so that ``A^†`` is well-defined as a
-unitary on the same qubit space.
-
-Practical concerns
-------------------
-- ``class_b_ratio`` at n=1, q=2 already takes ~24 qubits. Adding the
-  mark-good oracle costs 1 qubit. Adding the ``q_div_restoring_inv``
-  ancilla budget is "free" (same carries are reused).
-- The Grover operator's depth is ~2x the state-prep depth, and IAE
-  applies Q powers up to k = O(log(1/ε)) — for ε=1%, k ≈ 7, so up
-  to 128 applications of Q. Compiled depth quickly hits 10⁴–10⁵.
-- Statevector simulation is feasible at ~24 qubits but slow given
-  the depth. The recommended simulator is AerSimulator(method='mps').
-  Real-hardware execution is NOT in scope (the depth would put it
-  far past the gate-noise floor of current Heron-r2 devices).
-
-Status
-------
-**SKELETON / NOT YET IMPLEMENTED.** This file documents the architecture
-and dependencies. Concrete next steps:
-
-  1. Implement ``class_b_ratio_inv`` in ``qimp.processing.ratiometric_circuit``
-     (depends on ``q_div_restoring_inv``, already provided by Stage E.a).
-  2. Implement ``mark_good_oracle`` (NEQR-comparator-style: flip
-     ``good_qubit`` iff ``quotient > τ``). Mirror it with
-     ``mark_good_oracle_inv`` for QAE composability.
-  3. Wire up Qiskit's ``IterativeAmplitudeEstimation`` with the
-     state-prep above (or implement IAE manually if the qiskit-algorithms
-     API is unstable).
-  4. Run on AerSimulator(method='mps') at n=1, q=2 with several
-     ε levels; compare against classical Monte Carlo on the same image.
-     Plot estimate error vs query budget on a log-log scale; the
-     QAE curve should show the O(1/ε) slope.
-
-Anticipated runtime: full sweep ~hours on Aer-MPS at n=1, q=2.
-This is a multi-session effort and should probably be tracked as its
-own paper line.
+USAGE
+    python scripts/qae_demo_class_b.py [--shots N] [--threshold T]
 """
 
 from __future__ import annotations
 
+import argparse
 import sys
+from pathlib import Path
 
-sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+import numpy as np
+from qiskit import QuantumCircuit, QuantumRegister, transpile
+from qiskit_aer import AerSimulator
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from qimp.processing.ratiometric_circuit import (  # noqa: E402
+    class_b_ratio,
+    class_b_ratio_inv,
+    mark_good_oracle,
+)
+
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
 
 
-def main() -> int:
-    print(__doc__)
-    print()
-    print("This script is a skeleton — not yet runnable.")
-    print()
-    print("Required follow-up primitives:")
-    print("  - qimp.processing.ratiometric_circuit.class_b_ratio_inv")
-    print("  - qimp.processing.ratiometric_circuit.mark_good_oracle")
-    print("  - qimp.processing.ratiometric_circuit.mark_good_oracle_inv")
-    print()
-    print("Required Qiskit dependency:")
-    print("  - qiskit_algorithms (for IterativeAmplitudeEstimation)")
-    print("  - qiskit_aer with MPS support")
+# ---------------------------------------------------------------------------
+# State-prep A and its inverse
+# ---------------------------------------------------------------------------
+
+
+def build_A(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    threshold: int,
+) -> tuple[QuantumCircuit, dict, dict]:
+    """Build the QAE state-prep A = class_b_ratio + mark_good_oracle.
+
+    Returns (qc_full, b_layout, extra_layout) — b_layout has the Class-B
+    register indices, extra_layout has the mark-good-oracle ancilla
+    indices added on top.
+    """
+    qc, b_layout = class_b_ratio(image_a, image_b, q=q)
+    start = qc.num_qubits
+    q_w = q + 1
+    # Allocate mark-good ancillae
+    good_reg = QuantumRegister(1, "good")
+    thr_reg = QuantumRegister(q_w, "thr")
+    sub_c_reg = QuantumRegister(q_w + 1, "sub_c")
+    val_pad_reg = QuantumRegister(1, "val_pad")
+    qc.add_register(good_reg, thr_reg, sub_c_reg, val_pad_reg)
+    extra_layout = {
+        "good": start,
+        "thr": list(range(start + 1, start + 1 + q_w)),
+        "sub_c": list(range(start + 1 + q_w, start + 1 + q_w + q_w + 1)),
+        "val_pad": start + 1 + q_w + q_w + 1,
+    }
+    # Apply mark_good_oracle on the quotient register
+    mark_good_oracle(
+        qc,
+        value_qubits=b_layout["quotient"],
+        threshold=threshold,
+        good_qubit=extra_layout["good"],
+        threshold_reg_qubits=extra_layout["thr"],
+        sub_carry_qubits=extra_layout["sub_c"],
+        value_pad_qubit=extra_layout["val_pad"],
+    )
+    return qc, b_layout, extra_layout
+
+
+def apply_A_inv(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    threshold: int,
+    b_layout: dict,
+    extra_layout: dict,
+) -> None:
+    """Apply A^†: mark_good is self-inverse, then class_b_ratio_inv."""
+    mark_good_oracle(
+        qc,
+        value_qubits=b_layout["quotient"],
+        threshold=threshold,
+        good_qubit=extra_layout["good"],
+        threshold_reg_qubits=extra_layout["thr"],
+        sub_carry_qubits=extra_layout["sub_c"],
+        value_pad_qubit=extra_layout["val_pad"],
+    )
+    class_b_ratio_inv(qc, image_a, image_b, q=q, layout=b_layout)
+
+
+# ---------------------------------------------------------------------------
+# Grover operator Q = A · S_0 · A^† · S_good
+# ---------------------------------------------------------------------------
+
+
+def apply_S_good(qc: QuantumCircuit, good_qubit: int) -> None:
+    """Oracle phase flip: |good⟩ → -|good⟩."""
+    qc.z(good_qubit)
+
+
+def apply_S_0(qc: QuantumCircuit, all_qubits: list[int]) -> None:
+    """Zero-state reflection: flip phase of |0…0⟩.
+
+    Implementation: X on every qubit, multi-controlled Z on one of them
+    (with the others as controls), X back.
+    """
+    for q in all_qubits:
+        qc.x(q)
+    # Multi-controlled Z on the last qubit, controlled by all others.
+    # MCZ ≡ H · MCX · H on the target.
+    target = all_qubits[-1]
+    controls = all_qubits[:-1]
+    qc.h(target)
+    qc.mcx(controls, target)
+    qc.h(target)
+    for q in all_qubits:
+        qc.x(q)
+
+
+def apply_Q_once(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    threshold: int,
+    b_layout: dict,
+    extra_layout: dict,
+) -> None:
+    """Apply one Grover iteration Q = A · S_0 · A^† · S_good in place."""
+    apply_S_good(qc, extra_layout["good"])
+    apply_A_inv(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
+    apply_S_0(qc, list(range(qc.num_qubits)))
+    # Re-apply A
+    # Note: we need to rebuild A inside the same qc; but build_A allocates
+    # fresh qubits. Workaround: call build_A's content inline. For the POC,
+    # cheat by extracting the inverse pattern: A = (class_b_ratio) (mark_good).
+    # We just apply the gates again.
+    from qimp.processing.ratiometric_circuit import dual_neqr_load
+    from qimp.processing.arithmetic import q_div_restoring
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=b_layout["position"],
+        intensity_a_qubits=b_layout["I_a"],
+        intensity_b_qubits=b_layout["I_b"],
+    )
+    q_div_restoring(
+        qc,
+        dividend_qubits=b_layout["I_a"],
+        divisor_qubits=b_layout["I_b"],
+        quotient_qubits=b_layout["quotient"],
+        work_qubits=b_layout["work"],
+        divisor_pad_qubit=b_layout["pad"],
+        c_qubits=b_layout["c"],
+        div_zero_flag=b_layout["flag"],
+    )
+    mark_good_oracle(
+        qc,
+        value_qubits=b_layout["quotient"],
+        threshold=threshold,
+        good_qubit=extra_layout["good"],
+        threshold_reg_qubits=extra_layout["thr"],
+        sub_carry_qubits=extra_layout["sub_c"],
+        value_pad_qubit=extra_layout["val_pad"],
+    )
+
+
+# ---------------------------------------------------------------------------
+# Sampler: build (A · Q^k) circuit, run on MPS, return P(good = 1)
+# ---------------------------------------------------------------------------
+
+
+def measure_good_probability(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    threshold: int,
+    grover_k: int,
+    shots: int,
+) -> float:
+    """Build A · Q^k, measure good_qubit, return empirical P(good=1)."""
+    qc, b_layout, extra_layout = build_A(image_a, image_b, q, threshold)
+    for _ in range(grover_k):
+        apply_Q_once(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
+    # Add a classical bit and measure good
+    from qiskit import ClassicalRegister
+    creg = ClassicalRegister(1, "c_good")
+    qc.add_register(creg)
+    qc.measure(extra_layout["good"], creg[0])
+
+    sim = AerSimulator(method="matrix_product_state")
+    # Transpile to MPS-supported gate set (mcx etc. need decomposition).
+    qc_t = transpile(qc, sim, basis_gates=["id", "u", "cx"], optimization_level=0)
+    result = sim.run(qc_t, shots=shots).result()
+    counts = result.get_counts()
+    n_good = counts.get("1", 0)
+    return n_good / float(shots)
+
+
+# ---------------------------------------------------------------------------
+# Maximum-likelihood QAE postprocessing
+# ---------------------------------------------------------------------------
+
+
+def mlqae_estimate(
+    probs: dict[int, float],
+    shots_per_k: int,
+) -> float:
+    """Given empirical P(good=1) at each Grover power k, fit the
+    underlying amplitude a = sin²(θ) by maximum likelihood.
+
+    For a single Grover iteration, P(good=1 | k) = sin²((2k+1)·θ).
+    The likelihood for ``shots`` independent Bernoulli trials at each
+    k is a product; the log-likelihood is concave in θ over [0, π/2]
+    so we maximise via grid search.
+    """
+    best_ll = -np.inf
+    best_theta = 0.0
+    for theta in np.linspace(0, np.pi / 2, 1001):
+        ll = 0.0
+        for k, p_emp in probs.items():
+            p_th = np.sin((2 * k + 1) * theta) ** 2
+            # Bernoulli log-likelihood; clip to avoid log(0).
+            p_th = max(min(p_th, 1 - 1e-12), 1e-12)
+            n_good = int(round(p_emp * shots_per_k))
+            n_bad = shots_per_k - n_good
+            ll += n_good * np.log(p_th) + n_bad * np.log(1 - p_th)
+        if ll > best_ll:
+            best_ll = ll
+            best_theta = theta
+    return float(np.sin(best_theta) ** 2)
+
+
+# ---------------------------------------------------------------------------
+# Driver
+# ---------------------------------------------------------------------------
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(prog="qae_demo_class_b", description=__doc__)
+    parser.add_argument("--shots", type=int, default=256)
+    parser.add_argument("--threshold", type=int, default=1,
+                        help="Classical threshold τ. Pixels with R = I_a // I_b > τ are 'good'.")
+    parser.add_argument("--max-k", type=int, default=2,
+                        help="Largest Grover power. Total circuits run: max_k + 1.")
+    args = parser.parse_args(argv)
+
+    # Tiny 2×2 image at q=2 (intensities 0..3).
+    image_a = np.array([[3, 2], [3, 1]], dtype=np.int64)
+    image_b = np.array([[1, 1], [3, 1]], dtype=np.int64)
+    q = 2
+
+    # Classical reference: how many pixels have I_a // I_b > threshold?
+    R = image_a.astype(np.int64) // np.maximum(image_b.astype(np.int64), 1)
+    valid_mask = image_b > 0
+    good_mask = (R > args.threshold) & valid_mask
+    # The state-prep places equal weight on each pixel; div-by-zero
+    # pixels contribute an indeterminate good qubit value. For the demo
+    # we just count good_pixels / total_pixels including the div-zero
+    # branches (their good_qubit is computed but on garbage R).
+    n_pixels = image_a.size
+    a_true = float(good_mask.sum()) / float(n_pixels)
+    print(f"Classical reference: fraction of pixels with R > {args.threshold} = "
+          f"{a_true:.4f} ({int(good_mask.sum())} / {n_pixels})")
+
+    print(f"\nRunning QAE with shots={args.shots} per k, max_k={args.max_k}")
+    print(f"  (AerSimulator(method='mps'); each k may take minutes)")
+
+    probs: dict[int, float] = {}
+    for k in range(args.max_k + 1):
+        print(f"  k={k}: building circuit and sampling...", flush=True)
+        p = measure_good_probability(
+            image_a, image_b, q, args.threshold, grover_k=k, shots=args.shots
+        )
+        probs[k] = p
+        print(f"    P(good=1 | k={k}) = {p:.4f}   "
+              f"(expected sin²((2k+1)·θ) where θ = arcsin(√{a_true:.3f}) = "
+              f"{np.arcsin(np.sqrt(a_true)):.3f})")
+
+    a_est = mlqae_estimate(probs, args.shots)
+    print(f"\nMaximum-likelihood QAE estimate: â = {a_est:.4f}")
+    print(f"Classical truth:                  a = {a_true:.4f}")
+    print(f"Absolute error:                   |â - a| = {abs(a_est - a_true):.4f}")
+    print(f"Total queries to A: {(args.max_k + 1) * args.shots}")
+    print(f"For reference, classical MC with {(args.max_k + 1) * args.shots} samples "
+          f"would have stderr ~ {np.sqrt(a_true * (1 - a_true) / ((args.max_k + 1) * args.shots)):.4f}")
     return 0
 
 

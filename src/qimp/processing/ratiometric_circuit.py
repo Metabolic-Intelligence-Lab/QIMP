@@ -45,6 +45,8 @@ from qiskit import QuantumCircuit
 
 from qimp.processing.arithmetic import (
     q_add,
+    q_add_ctrl,
+    q_div_general,
     q_div_restoring,
     q_div_restoring_inv,
     q_sub,
@@ -52,9 +54,11 @@ from qimp.processing.arithmetic import (
 
 __all__ = [
     "affine_subtract_constant",
+    "class_a_gp_full",
     "class_a_gp_prefix",
     "class_b_ratio",
     "class_b_ratio_inv",
+    "decode_class_a_full",
     "decode_class_a_prefix",
     "decode_class_b_ratio",
     "dual_neqr_load",
@@ -888,3 +892,205 @@ def affine_subtract_constant(
 # `test_affine_subtract_constant` for an isolated bit-exact check;
 # the chained composition is straightforward and not separately tested
 # under statevector.
+
+
+def class_a_gp_full(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    q_frac: int = 2,
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+    """Full autonomous Class A GP circuit with G = 1 (Möbius normalised
+    difference).
+
+    For each pixel in superposition, the circuit computes:
+
+        magnitude(p) = floor(|I_a(p) − I_b(p)| · 2^q_frac / (I_a(p) + I_b(p)))
+        sign(p)      = 1  iff  I_b(p) > I_a(p)
+
+    The classical GP is reconstructed by the decoder as
+    ``gp(p) = (-1)^sign(p) · magnitude(p) / 2^q_frac``.
+
+    Pipeline (composition of already-tested primitives):
+      1. ``dual_neqr_load(I_a, I_b)``
+      2. ``den ← I_a + I_b``  (q_w = q+1 bits)
+      3. ``num ← I_a − I_b``  (signed q_w bits, two's complement)
+      4. Copy num's MSB into a dedicated sign qubit.
+      5. Conditional two's-complement negate of num: flip all bits
+         (CNOT(sign, num[i])) then conditional ``+1`` via
+         ``q_add_ctrl`` against a 1-valued constant register. Result:
+         num holds |I_a − I_b| as an unsigned q_w-bit integer.
+      6. Bit-shift num up by ``q_frac`` into a wider ``num_scaled``
+         register (width q_w + q_frac).
+      7. ``q_div_general(num_scaled, den)`` → quotient holds the
+         fractional GP magnitude.
+
+    Resource budget at n=1, q=2, q_frac=2: ~70 qubits — past laptop
+    statevector. Use ``AerSimulator(method='mps')`` for execution.
+    Each underlying primitive is bit-exact verified at small width;
+    end-to-end correctness relies on the composition (every primitive
+    is position-independent so the action lifts uniformly across the
+    NEQR position superposition).
+
+    Returns
+    -------
+    (qc, layout) with keys: ``position``, ``I_a``, ``I_b``, ``num``,
+    ``den``, ``add_c``, ``sub_c``, ``sign``, ``ones_reg``,
+    ``inc_carry``, ``num_scaled``, ``quotient``, ``div_work``,
+    ``div_pad``, ``div_c``, ``div_flag``.
+    """
+    n = _validate_dual_images(image_a, image_b, q)
+    if q_frac < 0:
+        raise ValueError(f"q_frac must be >= 0, got {q_frac}")
+    n_pos = 2 * n
+    q_w = q + 1
+    q_dividend = q_w + q_frac
+    needed_div_c = (q_dividend + 1) * (q_w + 2)
+
+    layout: dict[str, list[int] | int] = {}
+    cursor = 0
+    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
+    layout["num"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["den"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["add_c"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["sub_c"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["sign"] = cursor; cursor += 1
+    layout["ones_reg"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["inc_carry"] = list(range(cursor, cursor + q_w + 1)); cursor += q_w + 1
+    layout["num_scaled"] = list(range(cursor, cursor + q_dividend)); cursor += q_dividend
+    layout["quotient"] = list(range(cursor, cursor + q_dividend)); cursor += q_dividend
+    layout["div_work"] = list(range(cursor, cursor + q_w)); cursor += q_w
+    layout["div_pad"] = cursor; cursor += 1
+    layout["div_c"] = list(range(cursor, cursor + needed_div_c)); cursor += needed_div_c
+    layout["div_flag"] = cursor; cursor += 1
+
+    total = cursor
+    qc = QuantumCircuit(total)
+
+    # Helper refs (typed)
+    Ia = layout["I_a"]; Ib = layout["I_b"]
+    num = layout["num"]; den = layout["den"]
+    add_c = layout["add_c"]; sub_c = layout["sub_c"]
+    sign = layout["sign"]
+    ones_reg = layout["ones_reg"]; inc_carry = layout["inc_carry"]
+    num_scaled = layout["num_scaled"]
+    quotient = layout["quotient"]
+    div_work = layout["div_work"]; div_pad = layout["div_pad"]
+    div_c = layout["div_c"]; div_flag = layout["div_flag"]
+    assert isinstance(Ia, list) and isinstance(Ib, list)
+    assert isinstance(num, list) and isinstance(den, list)
+    assert isinstance(add_c, list) and isinstance(sub_c, list)
+    assert isinstance(sign, int)
+    assert isinstance(ones_reg, list) and isinstance(inc_carry, list)
+    assert isinstance(num_scaled, list)
+    assert isinstance(quotient, list)
+    assert isinstance(div_work, list) and isinstance(div_pad, int)
+    assert isinstance(div_c, list) and isinstance(div_flag, int)
+
+    # 1. NEQR-encode both images.
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=layout["position"],            # type: ignore[arg-type]
+        intensity_a_qubits=Ia, intensity_b_qubits=Ib,
+    )
+
+    # 2. den ← I_a + I_b (q+1 bits, carry into den[q]).
+    _copy_register(qc, Ia, den[:q])
+    q_add(qc, Ib, list(den[:q]), add_c)
+    qc.cx(add_c[-1], den[q])
+
+    # 3. num ← I_a − I_b (two's complement, q+1 bits; MSB = sign bit).
+    _copy_register(qc, Ia, num[:q])
+    q_sub(qc, Ib, list(num[:q]), sub_c)
+    qc.cx(sub_c[-1], num[q])
+    qc.x(num[q])
+
+    # 4. Copy sign bit out.
+    qc.cx(num[q], sign)
+
+    # 5. Conditional two's-complement negate: |num|.
+    for i in range(q_w):
+        qc.cx(sign, num[i])
+    qc.x(ones_reg[0])  # ones_reg = 1
+    q_add_ctrl(qc, sign, ones_reg, num, inc_carry)
+    # ones_reg stays at 1 throughout the rest of the circuit; will be
+    # uncomputed only by a full-pipeline inverse if needed.
+
+    # 6. Bit-shift num up by q_frac → num_scaled (CNOT copy).
+    for i in range(q_w):
+        qc.cx(num[i], num_scaled[i + q_frac])
+
+    # 7. Divide: quotient = num_scaled // den using non-square divider.
+    q_div_general(
+        qc,
+        dividend_qubits=num_scaled,
+        divisor_qubits=den,
+        quotient_qubits=quotient,
+        work_qubits=div_work,
+        divisor_pad_qubit=div_pad,
+        c_qubits=div_c,
+        div_zero_flag=div_flag,
+    )
+    return qc, layout
+
+
+def decode_class_a_full(
+    counts: dict[str, int],
+    n: int,
+    q: int,
+    q_frac: int,
+    layout: dict[str, list[int] | int],
+    total_qubits: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Decode Class A full counts into (gp_signed_image, divzero_mask).
+
+    Reads the ``sign`` qubit, the low q_frac bits of the ``quotient``
+    register (the fractional magnitude), and the ``div_flag``.
+
+    Returns
+    -------
+    (gp_image, divzero_mask)
+        ``gp_image[r, c] = (-1)^sign * magnitude / 2^q_frac``,
+        floating-point in [−1, 1]. ``divzero_mask[r, c]`` is True for
+        pixels where the denominator (I_a + I_b) was 0.
+    """
+    side = 1 << n
+    gp_img = np.zeros((side, side), dtype=np.float64)
+    divzero_mask = np.zeros((side, side), dtype=bool)
+    pos_qubits = layout["position"]
+    sign_q = layout["sign"]
+    quo_qubits = layout["quotient"]
+    flag_qubit = layout["div_flag"]
+    assert isinstance(pos_qubits, list)
+    assert isinstance(quo_qubits, list)
+    assert isinstance(sign_q, int)
+    assert isinstance(flag_qubit, int)
+
+    histograms: dict[tuple[int, int], dict[float, int]] = {}
+    flag_counts: dict[tuple[int, int], dict[int, int]] = {}
+
+    def bit_at(flat: str, qubit_idx: int) -> int:
+        return int(flat[total_qubits - 1 - qubit_idx])
+
+    for state, count in counts.items():
+        flat = state.replace(" ", "")
+        col = sum(bit_at(flat, pos_qubits[i]) << i for i in range(n))
+        row = sum(bit_at(flat, pos_qubits[n + i]) << i for i in range(n))
+        mag = sum(bit_at(flat, quo_qubits[i]) << i for i in range(q_frac))
+        s = bit_at(flat, sign_q)
+        f = bit_at(flat, flag_qubit)
+        gp_val = (-1.0 if s else 1.0) * mag / float(1 << q_frac)
+        histograms.setdefault((row, col), {})
+        histograms[(row, col)][gp_val] = (
+            histograms[(row, col)].get(gp_val, 0) + count
+        )
+        flag_counts.setdefault((row, col), {})
+        flag_counts[(row, col)][f] = flag_counts[(row, col)].get(f, 0) + count
+
+    for (row, col), votes in histograms.items():
+        gp_img[row, col] = max(votes, key=votes.__getitem__)
+    for (row, col), votes in flag_counts.items():
+        divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
+    return gp_img, divzero_mask

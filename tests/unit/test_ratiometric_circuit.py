@@ -17,6 +17,7 @@ from qiskit import QuantumCircuit, QuantumRegister
 
 from qimp.processing.ratiometric_circuit import (
     affine_subtract_constant,
+    class_a_gp_full,
     class_a_gp_prefix,
     class_b_ratio,
     class_b_ratio_inv,
@@ -315,6 +316,56 @@ def test_mark_good_oracle_self_inverse(
 # Stage F.1 — class_b_ratio_inv round-trip
 # (Heavy: 24 qubits, same cost as forward class_b_ratio — ~20 min)
 # ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# Stage F.3 — class_a_gp_full smoke test (build only; ~70-qubit circuit is
+# past laptop statevector capacity, so we only verify the construction does
+# not raise and the resulting circuit has the expected register cardinality)
+# ---------------------------------------------------------------------------
+
+
+def test_class_a_gp_full_builds() -> None:
+    """class_a_gp_full at n=1, q=2, q_frac=2 builds without raising,
+    and the layout has all the documented keys with consistent widths.
+    A full statevector or MPS validation is out of scope here — each
+    primitive (q_add, q_sub, q_add_ctrl, q_div_general, NEQR encode,
+    bit-shift via CNOT, sign-bit copy) is bit-exact verified at small
+    width in test_arithmetic.py; the composition's correctness follows
+    from the position-independence invariant of all sub-primitives.
+    """
+    q = 2
+    q_frac = 2
+    image_a = np.array([[3, 2], [1, 0]], dtype=np.int64)
+    image_b = np.array([[1, 3], [2, 1]], dtype=np.int64)
+    qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
+    # Sanity check: layout has every expected key.
+    expected_keys = {
+        "position", "I_a", "I_b", "num", "den", "add_c", "sub_c",
+        "sign", "ones_reg", "inc_carry", "num_scaled", "quotient",
+        "div_work", "div_pad", "div_c", "div_flag",
+    }
+    assert set(layout.keys()) == expected_keys
+    # Widths
+    q_w = q + 1
+    q_dividend = q_w + q_frac
+    assert len(layout["position"]) == 2  # type: ignore[arg-type]
+    assert len(layout["I_a"]) == q       # type: ignore[arg-type]
+    assert len(layout["I_b"]) == q       # type: ignore[arg-type]
+    assert len(layout["num"]) == q_w     # type: ignore[arg-type]
+    assert len(layout["den"]) == q_w     # type: ignore[arg-type]
+    assert len(layout["num_scaled"]) == q_dividend   # type: ignore[arg-type]
+    assert len(layout["quotient"]) == q_dividend     # type: ignore[arg-type]
+    assert len(layout["div_work"]) == q_w            # type: ignore[arg-type]
+    # Total qubit count check.
+    expected_total = (
+        2 + q + q + q_w + q_w + q_w + q_w + 1 + q_w + (q_w + 1)
+        + q_dividend + q_dividend + q_w + 1 + (q_dividend + 1) * (q_w + 2) + 1
+    )
+    assert qc.num_qubits == expected_total
+    # Sanity: circuit has at least the per-pixel encoding gates plus
+    # all the arithmetic ops — should be a few hundred ops.
+    assert qc.size() > 100
 
 
 @pytest.mark.parametrize(
