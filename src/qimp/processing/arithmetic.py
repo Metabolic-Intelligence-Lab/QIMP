@@ -46,16 +46,21 @@ __all__ = [
     "neqr_comparator",
     "q_add",
     "q_add_ctrl",
+    "q_add_ctrl_inv",
     "q_add_inv",
     "q_div",
+    "q_div_general",
     "q_div_restoring",
+    "q_div_restoring_inv",
     "q_mul_const",
     "q_mul_const_inv",
     "q_sub",
     "q_sub_ctrl",
+    "q_sub_ctrl_inv",
     "q_sub_inv",
     "qc_add_1",
     "qc_add_1_ctrl",
+    "qc_add_1_ctrl_inv",
     "qc_add_1_inv",
 ]
 
@@ -255,6 +260,44 @@ def q_add_ctrl(
     return qc
 
 
+def qc_add_1_ctrl_inv(
+    qc: QuantumCircuit,
+    ctrl: int,
+    a: int,
+    b: int,
+    c_in: int,
+    c_out: int,
+) -> QuantumCircuit:
+    """Inverse of :func:`qc_add_1_ctrl`: same gates in reverse order
+    (every gate is self-inverse)."""
+    qc.ccx(ctrl, c_in, b)
+    qc.mcx([ctrl, b, c_in], c_out)
+    qc.ccx(ctrl, a, b)
+    qc.mcx([ctrl, a, b], c_out)
+    return qc
+
+
+def q_add_ctrl_inv(
+    qc: QuantumCircuit,
+    ctrl: int,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+) -> QuantumCircuit:
+    """Inverse of :func:`q_add_ctrl`: iterates in reverse order and
+    applies :func:`qc_add_1_ctrl_inv` per bit.
+
+    Restores ``b`` to its pre-call value when ``ctrl == 1`` (was
+    ``b + a``, now back to ``b``) and the carry register to its
+    pre-call state (assumed ``|0⟩`` originally).
+    """
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    n = len(a_qubits)
+    for i in range(n - 1, -1, -1):
+        qc_add_1_ctrl_inv(qc, ctrl, a_qubits[i], b_qubits[i], c_qubits[i], c_qubits[i + 1])
+    return qc
+
+
 def q_mul_const(
     qc: QuantumCircuit,
     b_qubits: Sequence[int],
@@ -382,6 +425,32 @@ def q_sub_ctrl(
     return qc
 
 
+def q_sub_ctrl_inv(
+    qc: QuantumCircuit,
+    ctrl: int,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+) -> QuantumCircuit:
+    """Inverse of :func:`q_sub_ctrl`: reverses the gate order. All
+    constituent CNOTs are self-inverse; the embedded :func:`q_add_ctrl`
+    is undone by :func:`q_add_ctrl_inv`.
+
+    When ``ctrl == 1`` on entry, restores ``b`` from ``b − a`` to ``b``,
+    and the carry register to ``|0⟩`` (assumed ``|0⟩`` originally).
+    Identity when ``ctrl == 0``.
+    """
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    qc.cx(ctrl, c_qubits[0])
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    q_add_ctrl_inv(qc, ctrl, a_qubits, b_qubits, c_qubits)
+    qc.cx(ctrl, c_qubits[0])
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    return qc
+
+
 def q_div_restoring(
     qc: QuantumCircuit,
     dividend_qubits: Sequence[int],
@@ -503,3 +572,169 @@ def q_div_restoring(
 # repointed; downstream callers that want a specific algorithm should
 # import it by its full name instead.
 q_div = q_div_restoring
+
+
+def q_div_general(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    work_qubits: Sequence[int],
+    divisor_pad_qubit: int,
+    c_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Generalised restoring divider supporting non-square widths.
+
+    Computes ``quotient = dividend // divisor`` for an ``n``-bit
+    unsigned dividend and ``m``-bit unsigned divisor (with ``m ≤ n``),
+    producing an ``n``-bit unsigned quotient. The dividend register is
+    overwritten with the remainder on exit.
+
+    Layout (all little-endian):
+      - ``dividend_qubits`` (n bits)   → on exit: low ``m`` bits hold
+        the remainder; high ``n - m`` bits return to ``|0⟩``.
+      - ``divisor_qubits``  (m bits)   → preserved.
+      - ``quotient_qubits`` (n bits)   → ``|0⟩`` on entry; quotient on exit.
+      - ``work_qubits``     (m bits)   → ``|0⟩`` on entry and exit
+                                          (high zero-pad of R).
+      - ``divisor_pad_qubit`` (1 bit)  → ancilla, ``|0⟩`` on entry and exit.
+      - ``c_qubits``                    → carry-scratch, width
+                                          ``≥ (n + 1) (m + 2)``: first
+                                          ``(m + 2)`` qubits are the shared
+                                          clean comparator slice; remaining
+                                          ``n × (m + 2)`` are dirty
+                                          per-iteration slices for the
+                                          conditional subtracts.
+      - ``div_zero_flag`` (1 bit)       → set to 1 iff divisor == 0.
+
+    For the square case ``n = m = q`` this reduces exactly to
+    :func:`q_div_restoring`; the square version is kept as a convenience
+    name and points to its own dedicated implementation rather than
+    delegating, to avoid spurious widening of the ``q_div`` alias.
+
+    Cost: ``n`` iterations × (q_sub + q_sub_inv + q_sub_ctrl) each of
+    width ``m + 1`` ⇒ O(n m) Toffolis. Ancilla: ``(n + 1)(m + 2)`` carry
+    + ``m`` work + 1 divisor-pad + 1 div-zero-flag.
+
+    Use this for Class A (|num| / den at GP fractional precision) and
+    Class C (post-affine /(R_ox − R_red)) where the dividend has been
+    pre-scaled (bit-shifted left by ``q_frac``) to give fractional output.
+    """
+    n = len(dividend_qubits)
+    m = len(divisor_qubits)
+    if m > n:
+        raise ValueError(f"divisor width m={m} must not exceed dividend width n={n}")
+    if len(quotient_qubits) != n:
+        raise ValueError(f"quotient width must equal n={n}, got {len(quotient_qubits)}")
+    if len(work_qubits) != m:
+        raise ValueError(f"work width must equal m={m}, got {len(work_qubits)}")
+    needed_c = (n + 1) * (m + 2)
+    if len(c_qubits) < needed_c:
+        raise ValueError(
+            f"c_qubits must have ≥ (n+1)(m+2) = {needed_c} bits, got {len(c_qubits)}"
+        )
+
+    # Div-by-zero detect (self-inverse).
+    for d in divisor_qubits:
+        qc.x(d)
+    qc.mcx(list(divisor_qubits), div_zero_flag)
+    for d in divisor_qubits:
+        qc.x(d)
+
+    # R = dividend (low n) || work (high m). Width n + m.
+    R = list(dividend_qubits) + list(work_qubits)
+    # D = divisor || pad. Width m + 1.
+    D = list(divisor_qubits) + [divisor_pad_qubit]
+
+    c_cmp = list(c_qubits[: m + 2])
+    c_act_base = m + 2
+    for i in range(n - 1, -1, -1):
+        window = R[i : i + m + 1]
+        slot = (n - 1) - i
+        c_act = list(c_qubits[c_act_base + slot * (m + 2) : c_act_base + (slot + 1) * (m + 2)])
+        q_sub(qc, D, window, c_cmp)
+        qc.cx(c_cmp[-1], quotient_qubits[i])
+        q_sub_inv(qc, D, window, c_cmp)
+        q_sub_ctrl(qc, quotient_qubits[i], D, window, c_act)
+    return qc
+
+
+def q_div_restoring_inv(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    work_qubits: Sequence[int],
+    divisor_pad_qubit: int,
+    c_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Exact inverse of :func:`q_div_restoring`.
+
+    Restores all registers to their state immediately before the
+    matching :func:`q_div_restoring` call:
+      - ``dividend_qubits`` returns from holding the remainder back to
+        the original dividend value.
+      - ``quotient_qubits`` returns to ``|0⟩``.
+      - ``work_qubits`` was already ``|0⟩`` after the forward call;
+        it stays ``|0⟩``.
+      - ``c_qubits`` all returns to ``|0⟩`` (both the comparator slice,
+        which was clean already, and the q dirty per-iteration slices).
+      - ``divisor_pad_qubit`` returns to ``|0⟩``.
+      - ``div_zero_flag`` returns to its pre-call value (``|0⟩`` if the
+        forward call set it; the div-by-zero detection is self-inverse).
+      - ``divisor_qubits`` unchanged throughout.
+
+    This is the prerequisite for QAE-style oracle composition: with the
+    forward+inverse pair, the divider acts as a clean unitary on
+    (dividend, divisor, quotient) with all ancilla returned to ``|0⟩``,
+    making it composable inside controlled-power-of-Q reflections.
+    """
+    q = len(dividend_qubits)
+    if len(divisor_qubits) != q:
+        raise ValueError(
+            f"divisor must have q={q} bits, got {len(divisor_qubits)}"
+        )
+    if len(quotient_qubits) != q:
+        raise ValueError(
+            f"quotient must have q={q} bits, got {len(quotient_qubits)}"
+        )
+    if len(work_qubits) != q:
+        raise ValueError(
+            f"work_qubits must have q={q} bits, got {len(work_qubits)}"
+        )
+    needed_c = (q + 1) * (q + 2)
+    if len(c_qubits) < needed_c:
+        raise ValueError(
+            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
+            f"got {len(c_qubits)}"
+        )
+
+    R = list(dividend_qubits) + list(work_qubits)
+    D = list(divisor_qubits) + [divisor_pad_qubit]
+    c_cmp = list(c_qubits[: q + 2])
+    c_act_base = q + 2
+
+    # Reverse iteration order (forward goes q-1 → 0; inverse goes 0 → q-1).
+    for i in range(0, q):
+        window = R[i : i + q + 1]
+        slot = (q - 1) - i  # matches the forward's c_act slicing
+        c_act = list(c_qubits[c_act_base + slot * (q + 2) : c_act_base + (slot + 1) * (q + 2)])
+        # Reverse the per-iteration sequence: undo q_sub_ctrl first, then
+        # the GTE-comparator triple (q_sub_inv ; CNOT ; q_sub).
+        q_sub_ctrl_inv(qc, quotient_qubits[i], D, window, c_act)
+        # Forward did: q_sub → CNOT(c_cmp[-1], quotient[i]) → q_sub_inv.
+        # Inverse: q_sub (undo of q_sub_inv) → CNOT (self-inverse) → q_sub_inv (undo of q_sub).
+        q_sub(qc, D, window, c_cmp)
+        qc.cx(c_cmp[-1], quotient_qubits[i])
+        q_sub_inv(qc, D, window, c_cmp)
+
+    # Reverse the div-by-zero detection (the X-mcx-X sequence is its own
+    # inverse, so we apply the same gates).
+    for d in divisor_qubits:
+        qc.x(d)
+    qc.mcx(list(divisor_qubits), div_zero_flag)
+    for d in divisor_qubits:
+        qc.x(d)
+    return qc

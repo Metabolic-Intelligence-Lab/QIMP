@@ -10,12 +10,16 @@ from qimp.processing.arithmetic import (
     neqr_comparator,
     q_add,
     q_add_ctrl,
+    q_add_ctrl_inv,
     q_add_inv,
+    q_div_general,
     q_div_restoring,
+    q_div_restoring_inv,
     q_mul_const,
     q_mul_const_inv,
     q_sub,
     q_sub_ctrl,
+    q_sub_ctrl_inv,
     q_sub_inv,
     qc_add_1,
 )
@@ -412,25 +416,184 @@ def test_q_div_restoring_zero_divisor_flag_q2(dividend: int) -> None:
     assert _read_register(sv, [idx["flag"]]) == 1
 
 
-@pytest.mark.skip(reason="q_div_restoring_inv not yet implemented — see Stage E TODO")
-def test_q_div_restoring_inv_round_trip() -> None:
-    """Placeholder for the future ``q_div_restoring_inv`` round-trip test.
+@pytest.mark.parametrize(
+    "n, a_val, b_val, ctrl_val",
+    [
+        (3, 5, 3, 0),
+        (3, 5, 3, 1),
+        (3, 7, 7, 1),
+        (4, 9, 6, 1),
+    ],
+)
+def test_q_add_ctrl_inv_round_trip(
+    n: int, a_val: int, b_val: int, ctrl_val: int
+) -> None:
+    """q_add_ctrl followed by q_add_ctrl_inv restores b, a, ctrl, and the
+    carry register regardless of ctrl_val."""
+    a = QuantumRegister(n, "a")
+    b = QuantumRegister(n, "b")
+    c = QuantumRegister(n + 1, "c")
+    ctrl = QuantumRegister(1, "ctrl")
+    qc = QuantumCircuit(a, b, c, ctrl)
+    a_idx = list(range(n))
+    b_idx = list(range(n, 2 * n))
+    c_idx = list(range(2 * n, 3 * n + 1))
+    ctrl_idx = 3 * n + 1
+    _set_register_to_int(qc, a_idx, a_val)
+    _set_register_to_int(qc, b_idx, b_val)
+    if ctrl_val:
+        qc.x(ctrl_idx)
+    q_add_ctrl(qc, ctrl_idx, a_idx, b_idx, c_idx)
+    q_add_ctrl_inv(qc, ctrl_idx, a_idx, b_idx, c_idx)
+    sv = Statevector.from_instruction(qc)
+    assert _read_register(sv, a_idx) == a_val
+    assert _read_register(sv, b_idx) == b_val
+    for q in c_idx:
+        assert _read_register(sv, [q]) == 0
+    assert _read_register(sv, [ctrl_idx]) == ctrl_val
 
-    When QAE-style composition becomes necessary (Stage E of the
-    project plan), the inverse divider must restore the dividend
-    register, work register, quotient register, and all carry slices
-    to their pre-call states. The cascade of inverses it requires:
 
-      - ``q_add_ctrl_inv``  (reverse of ``q_add_ctrl``)
-      - ``q_sub_ctrl_inv``  (reverse of ``q_sub_ctrl``)
-      - ``q_div_restoring_inv``  (reverse iteration order; flips q_sub↔q_sub_inv
-        and q_sub_ctrl↔q_sub_ctrl_inv in each step)
+@pytest.mark.parametrize(
+    "n, a_val, b_val, ctrl_val",
+    [
+        (3, 5, 3, 0),
+        (3, 5, 3, 1),
+        (3, 7, 7, 1),
+        (3, 1, 5, 1),
+    ],
+)
+def test_q_sub_ctrl_inv_round_trip(
+    n: int, a_val: int, b_val: int, ctrl_val: int
+) -> None:
+    """q_sub_ctrl followed by q_sub_ctrl_inv restores everything."""
+    a = QuantumRegister(n, "a")
+    b = QuantumRegister(n, "b")
+    c = QuantumRegister(n + 1, "c")
+    ctrl = QuantumRegister(1, "ctrl")
+    qc = QuantumCircuit(a, b, c, ctrl)
+    a_idx = list(range(n))
+    b_idx = list(range(n, 2 * n))
+    c_idx = list(range(2 * n, 3 * n + 1))
+    ctrl_idx = 3 * n + 1
+    _set_register_to_int(qc, a_idx, a_val)
+    _set_register_to_int(qc, b_idx, b_val)
+    if ctrl_val:
+        qc.x(ctrl_idx)
+    q_sub_ctrl(qc, ctrl_idx, a_idx, b_idx, c_idx)
+    q_sub_ctrl_inv(qc, ctrl_idx, a_idx, b_idx, c_idx)
+    sv = Statevector.from_instruction(qc)
+    assert _read_register(sv, a_idx) == a_val
+    assert _read_register(sv, b_idx) == b_val
+    for q in c_idx:
+        assert _read_register(sv, [q]) == 0
+    assert _read_register(sv, [ctrl_idx]) == ctrl_val
 
-    This test should:
-      1. Set dividend, divisor to known values.
-      2. Run q_div_restoring, then q_div_restoring_inv.
-      3. Verify dividend restored, work restored, quotient back to |0⟩,
-         all carry qubits back to |0⟩, div_zero_flag back to |0⟩,
-         divisor preserved throughout.
+
+def _make_div_general_circuit(n: int, m: int, dividend_val: int, divisor_val: int):
+    """Build a circuit that runs q_div_general at (n, m, quotient=n)."""
+    needed_c = (n + 1) * (m + 2)
+    div = QuantumRegister(n, "div")
+    ds = QuantumRegister(m, "ds")
+    quo = QuantumRegister(n, "quo")
+    work = QuantumRegister(m, "work")
+    pad = QuantumRegister(1, "pad")
+    c = QuantumRegister(needed_c, "c")
+    flag = QuantumRegister(1, "flag")
+    qc = QuantumCircuit(div, ds, quo, work, pad, c, flag)
+    div_idx = list(range(n))
+    ds_idx = list(range(n, n + m))
+    quo_idx = list(range(n + m, 2 * n + m))
+    work_idx = list(range(2 * n + m, 2 * n + 2 * m))
+    pad_idx = 2 * n + 2 * m
+    c_idx = list(range(2 * n + 2 * m + 1, 2 * n + 2 * m + 1 + needed_c))
+    flag_idx = 2 * n + 2 * m + 1 + needed_c
+    _set_register_to_int(qc, div_idx, dividend_val)
+    _set_register_to_int(qc, ds_idx, divisor_val)
+    q_div_general(qc, div_idx, ds_idx, quo_idx, work_idx, pad_idx, c_idx, flag_idx)
+    return qc, dict(div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx,
+                    pad=pad_idx, c=c_idx, flag=flag_idx)
+
+
+@pytest.mark.parametrize(
+    "n, m, dividend, divisor",
+    [
+        # Square case n=m=2 (statevector-tractable at 22 qubits):
+        # should match q_div_restoring exactly.
+        (2, 2, 3, 1), (2, 2, 3, 2), (2, 2, 2, 3),
+        # Smallest non-square (n=3, m=1): 17 qubits, only divisor=1
+        # is non-trivial (m=1 means divisor ∈ {0, 1}, the 0 case is
+        # the div-by-zero flag path).
+        (3, 1, 0, 1), (3, 1, 1, 1), (3, 1, 5, 1), (3, 1, 7, 1),
+    ],
+)
+def test_q_div_general_correctness(
+    n: int, m: int, dividend: int, divisor: int
+) -> None:
+    """Verify q_div_general at (n, m, quotient=n): dividend // divisor in
+    the quotient register, dividend mod divisor in the dividend register.
+
+    Note: larger non-square configurations like (n=3, m=2) push the
+    statevector past 28 qubits (~10 GB with Qiskit's transpilation
+    overhead) and are statevector-infeasible on the development laptop;
+    they are exercised via the AerSimulator(method='mps') path in the
+    Stage E QAE demo (out of scope here).
     """
-    raise NotImplementedError("see docstring")
+    qc, idx = _make_div_general_circuit(n, m, dividend, divisor)
+    sv = Statevector.from_instruction(qc)
+    got_quo = _read_register(sv, idx["quo"])
+    got_rem = _read_register(sv, idx["div"])
+    exp_quo = dividend // divisor
+    exp_rem = dividend % divisor
+    assert got_quo == exp_quo, (
+        f"q_div_general({n},{m}) {dividend}/{divisor}: quotient got {got_quo}, expected {exp_quo}"
+    )
+    assert got_rem == exp_rem, (
+        f"q_div_general({n},{m}) {dividend}/{divisor}: remainder got {got_rem}, expected {exp_rem}"
+    )
+    # Divisor preserved, work restored, pad restored.
+    assert _read_register(sv, idx["ds"]) == divisor
+    assert _read_register(sv, idx["work"]) == 0
+    assert _read_register(sv, [idx["pad"]]) == 0
+
+
+@pytest.mark.parametrize(
+    "dividend, divisor",
+    [(a, b) for a in range(4) for b in range(0, 4)],  # q=2, include b=0
+)
+def test_q_div_restoring_inv_round_trip(
+    dividend: int, divisor: int
+) -> None:
+    """q_div_restoring followed by q_div_restoring_inv restores every
+    register to its pre-call state (including the div_zero_flag for the
+    divisor=0 case)."""
+    q = 2
+    qc, idx = _make_div_circuit(q, dividend, divisor)
+    q_div_restoring_inv(
+        qc,
+        dividend_qubits=idx["div"],
+        divisor_qubits=idx["ds"],
+        quotient_qubits=idx["quo"],
+        work_qubits=idx["work"],
+        divisor_pad_qubit=idx["pad"],
+        c_qubits=idx["c"],
+        div_zero_flag=idx["flag"],
+    )
+    sv = Statevector.from_instruction(qc)
+    # Dividend restored
+    assert _read_register(sv, idx["div"]) == dividend, (
+        f"dividend not restored: got {_read_register(sv, idx['div'])} "
+        f"expected {dividend}"
+    )
+    # Divisor preserved
+    assert _read_register(sv, idx["ds"]) == divisor
+    # Quotient back to 0
+    assert _read_register(sv, idx["quo"]) == 0
+    # Work back to 0
+    assert _read_register(sv, idx["work"]) == 0
+    # Pad back to 0
+    assert _read_register(sv, [idx["pad"]]) == 0
+    # Flag back to 0 (self-inverse div-zero detection)
+    assert _read_register(sv, [idx["flag"]]) == 0
+    # All carry qubits back to 0
+    for q_idx in idx["c"]:
+        assert _read_register(sv, [q_idx]) == 0, f"c[{q_idx}] not clean"
