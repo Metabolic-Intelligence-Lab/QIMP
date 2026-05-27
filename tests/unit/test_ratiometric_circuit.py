@@ -19,8 +19,12 @@ from qimp.processing.ratiometric_circuit import (
     affine_subtract_constant,
     class_a_gp_prefix,
     class_b_ratio,
+    class_b_ratio_inv,
     decode_class_a_prefix,
     decode_class_b_ratio,
+    dual_neqr_load,
+    dual_neqr_load_inv,
+    mark_good_oracle,
 )
 
 
@@ -159,6 +163,180 @@ def test_class_a_prefix_2x2(
         (3, 0, 7),  # 0 - 7 = -7
     ],
 )
+def _flat_amp_index(sv: Statevector) -> int:
+    return int(abs(sv.data).argmax())
+
+
+def _state_is_all_zero(sv: Statevector, n_qubits: int) -> bool:
+    """Check that the high-probability state is |0…0⟩ (all qubits zero)."""
+    idx = _flat_amp_index(sv)
+    return idx == 0
+
+
+# ---------------------------------------------------------------------------
+# Stage F.1 — dual_neqr_load_inv and class_b_ratio_inv round-trips
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "image_a, image_b",
+    [
+        (np.array([[3, 2], [1, 0]]), np.array([[1, 3], [2, 1]])),
+        (np.array([[0, 0], [3, 3]]), np.array([[1, 2], [0, 3]])),
+    ],
+)
+def test_dual_neqr_load_inv_round_trip(
+    image_a: np.ndarray, image_b: np.ndarray
+) -> None:
+    """dual_neqr_load followed by dual_neqr_load_inv returns the
+    position + intensity registers to |0…0⟩."""
+    q = 2
+    n = 1
+    pos = QuantumRegister(2 * n, "pos")
+    Ia = QuantumRegister(q, "Ia")
+    Ib = QuantumRegister(q, "Ib")
+    qc = QuantumCircuit(pos, Ia, Ib)
+    pos_idx = list(range(2 * n))
+    Ia_idx = list(range(2 * n, 2 * n + q))
+    Ib_idx = list(range(2 * n + q, 2 * n + 2 * q))
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=pos_idx,
+        intensity_a_qubits=Ia_idx,
+        intensity_b_qubits=Ib_idx,
+    )
+    dual_neqr_load_inv(
+        qc, image_a, image_b, q,
+        position_qubits=pos_idx,
+        intensity_a_qubits=Ia_idx,
+        intensity_b_qubits=Ib_idx,
+    )
+    sv = Statevector.from_instruction(qc)
+    assert _state_is_all_zero(sv, qc.num_qubits), (
+        "dual_neqr_load round-trip did not return to |0…0⟩"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Stage F.2 — mark_good_oracle truth table
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "q, value, threshold, expected_good",
+    [
+        (2, 0, 0, 0),  # 0 > 0 → False
+        (2, 1, 0, 1),  # 1 > 0 → True
+        (2, 2, 1, 1),  # 2 > 1 → True
+        (2, 1, 2, 0),  # 1 > 2 → False
+        (2, 3, 3, 0),  # 3 > 3 → False
+        (3, 5, 4, 1),  # 5 > 4 → True
+        (3, 4, 5, 0),  # 4 > 5 → False
+        (3, 7, 0, 1),  # 7 > 0 → True
+    ],
+)
+def test_mark_good_oracle_truth_table(
+    q: int, value: int, threshold: int, expected_good: int
+) -> None:
+    """At small q, verify the oracle flips good_qubit iff value > threshold,
+    and leaves value + ancilla registers untouched."""
+    q_w = q + 1
+    value_reg = QuantumRegister(q, "value")
+    good = QuantumRegister(1, "good")
+    thr_reg = QuantumRegister(q_w, "thr")
+    sub_c = QuantumRegister(q_w + 1, "sub_c")
+    val_pad = QuantumRegister(1, "val_pad")
+    qc = QuantumCircuit(value_reg, good, thr_reg, sub_c, val_pad)
+    value_idx = list(range(q))
+    good_idx = q
+    thr_idx = list(range(q + 1, q + 1 + q_w))
+    sub_c_idx = list(range(q + 1 + q_w, q + 1 + q_w + q_w + 1))
+    val_pad_idx = q + 1 + q_w + q_w + 1
+    _set_register_to_int(qc, value_idx, value)
+    mark_good_oracle(
+        qc,
+        value_qubits=value_idx,
+        threshold=threshold,
+        good_qubit=good_idx,
+        threshold_reg_qubits=thr_idx,
+        sub_carry_qubits=sub_c_idx,
+        value_pad_qubit=val_pad_idx,
+    )
+    sv = Statevector.from_instruction(qc)
+    assert _read_register(sv, [good_idx]) == expected_good, (
+        f"q={q} value={value} thr={threshold}: good got "
+        f"{_read_register(sv, [good_idx])}, expected {expected_good}"
+    )
+    # value preserved
+    assert _read_register(sv, value_idx) == value
+    # threshold register restored to |0⟩
+    assert _read_register(sv, thr_idx) == 0
+    # sub_carry restored to |0⟩
+    for q_idx in sub_c_idx:
+        assert _read_register(sv, [q_idx]) == 0
+    # value_pad restored to |0⟩
+    assert _read_register(sv, [val_pad_idx]) == 0
+
+
+@pytest.mark.parametrize(
+    "q, value, threshold",
+    [(2, 1, 1), (2, 2, 1), (3, 5, 4)],
+)
+def test_mark_good_oracle_self_inverse(
+    q: int, value: int, threshold: int
+) -> None:
+    """Calling mark_good_oracle twice cancels: good_qubit returns to |0⟩,
+    everything else stays preserved."""
+    q_w = q + 1
+    value_reg = QuantumRegister(q, "value")
+    good = QuantumRegister(1, "good")
+    thr_reg = QuantumRegister(q_w, "thr")
+    sub_c = QuantumRegister(q_w + 1, "sub_c")
+    val_pad = QuantumRegister(1, "val_pad")
+    qc = QuantumCircuit(value_reg, good, thr_reg, sub_c, val_pad)
+    value_idx = list(range(q))
+    good_idx = q
+    thr_idx = list(range(q + 1, q + 1 + q_w))
+    sub_c_idx = list(range(q + 1 + q_w, q + 1 + q_w + q_w + 1))
+    val_pad_idx = q + 1 + q_w + q_w + 1
+    _set_register_to_int(qc, value_idx, value)
+    mark_good_oracle(qc, value_idx, threshold, good_idx, thr_idx, sub_c_idx, val_pad_idx)
+    mark_good_oracle(qc, value_idx, threshold, good_idx, thr_idx, sub_c_idx, val_pad_idx)
+    sv = Statevector.from_instruction(qc)
+    assert _read_register(sv, [good_idx]) == 0
+    assert _read_register(sv, value_idx) == value
+    assert _read_register(sv, thr_idx) == 0
+    for q_idx in sub_c_idx:
+        assert _read_register(sv, [q_idx]) == 0
+    assert _read_register(sv, [val_pad_idx]) == 0
+
+
+# ---------------------------------------------------------------------------
+# Stage F.1 — class_b_ratio_inv round-trip
+# (Heavy: 24 qubits, same cost as forward class_b_ratio — ~20 min)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "image_a, image_b",
+    [
+        (np.array([[3, 2], [3, 1]]), np.array([[1, 1], [3, 1]])),
+    ],
+)
+def test_class_b_ratio_round_trip(
+    image_a: np.ndarray, image_b: np.ndarray
+) -> None:
+    """class_b_ratio followed by class_b_ratio_inv returns the entire
+    circuit to |0…0⟩ — the prerequisite for QAE oracle composability."""
+    q = 2
+    qc, layout = class_b_ratio(image_a, image_b, q=q)
+    class_b_ratio_inv(qc, image_a, image_b, q=q, layout=layout)
+    sv = Statevector.from_instruction(qc)
+    assert _state_is_all_zero(sv, qc.num_qubits), (
+        "class_b_ratio round-trip did not return to |0…0⟩"
+    )
+
+
 def test_affine_subtract_constant_truth_table(
     q: int, R_val: int, c_value: int
 ) -> None:

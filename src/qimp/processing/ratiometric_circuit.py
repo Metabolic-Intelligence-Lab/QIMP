@@ -46,6 +46,7 @@ from qiskit import QuantumCircuit
 from qimp.processing.arithmetic import (
     q_add,
     q_div_restoring,
+    q_div_restoring_inv,
     q_sub,
 )
 
@@ -53,9 +54,13 @@ __all__ = [
     "affine_subtract_constant",
     "class_a_gp_prefix",
     "class_b_ratio",
+    "class_b_ratio_inv",
     "decode_class_a_prefix",
     "decode_class_b_ratio",
     "dual_neqr_load",
+    "dual_neqr_load_inv",
+    "mark_good_oracle",
+    "mark_good_oracle_inv",
 ]
 
 
@@ -175,6 +180,62 @@ def dual_neqr_load(
                     qc, position_qubits, intensity_b_qubits, n, ib, row, col
                 )
             qc.barrier()
+
+
+def dual_neqr_load_inv(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    position_qubits: list[int],
+    intensity_a_qubits: list[int],
+    intensity_b_qubits: list[int],
+) -> None:
+    """Inverse of :func:`dual_neqr_load`.
+
+    Each per-pixel ``X-MCX-X`` block in the forward call is self-inverse,
+    so re-applying it cancels the original encoding. The final Hadamard
+    on the position register is also self-inverse. To match the
+    forward's gate ORDER reversed:
+
+      forward:  H(position) → encode pixel 0 → encode pixel 1 → … → encode pixel N
+      inverse:  encode pixel N → encode pixel N-1 → … → encode pixel 0 → H(position)
+
+    Since per-pixel encodings commute (they leave the position register
+    invariant between pixels and act on disjoint intensity-bit
+    combinations), the iteration order can match the forward's exactly;
+    we still walk it in the same row-major order for stylistic
+    consistency. The H is moved to the END of the body.
+    """
+    n = _validate_dual_images(image_a, image_b, q)
+    if len(position_qubits) != 2 * n:
+        raise ValueError(
+            f"position_qubits must have 2n={2 * n} bits, got {len(position_qubits)}"
+        )
+    if len(intensity_a_qubits) != q or len(intensity_b_qubits) != q:
+        raise ValueError(
+            f"intensity registers must have q={q} bits, got "
+            f"{len(intensity_a_qubits)} and {len(intensity_b_qubits)}"
+        )
+
+    img_a = image_a.astype(np.int64)
+    img_b = image_b.astype(np.int64)
+    for row in range(1 << n):
+        for col in range(1 << n):
+            ia = int(img_a[row, col])
+            ib = int(img_b[row, col])
+            if ia == 0 and ib == 0:
+                continue
+            if ia != 0:
+                _encode_intensity_at_pixel(
+                    qc, position_qubits, intensity_a_qubits, n, ia, row, col
+                )
+            if ib != 0:
+                _encode_intensity_at_pixel(
+                    qc, position_qubits, intensity_b_qubits, n, ib, row, col
+                )
+            qc.barrier()
+    qc.h(position_qubits)
 
 
 def class_b_ratio(image_a: np.ndarray, image_b: np.ndarray, q: int) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
@@ -309,6 +370,175 @@ def decode_class_b_ratio(
     for (row, col), votes in flag_counts.items():
         divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
     return quotient_img, divzero_mask
+
+
+def class_b_ratio_inv(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    layout: dict[str, list[int] | int],
+) -> None:
+    """Exact inverse of :func:`class_b_ratio`.
+
+    Reverses the divider+load composition in the standard order:
+    forward = ``dual_neqr_load → q_div_restoring``, so the inverse is
+    ``q_div_restoring_inv → dual_neqr_load_inv``.
+
+    After applying this on top of a circuit that previously had
+    :func:`class_b_ratio` applied, every register returns to ``|0⟩``:
+    position, both intensity registers, the quotient, work, pad, carry,
+    and div-zero flag.
+
+    This is the building block for QAE-style oracle composition where
+    the state-prep ``A`` and its conjugate ``A†`` are applied
+    alternately inside the Grover operator.
+
+    Parameters
+    ----------
+    qc
+        The circuit to which the inverse is appended.
+    image_a, image_b, q
+        Must match the inputs that were used to build the forward
+        ``class_b_ratio`` circuit (the inverse re-uses the same
+        per-pixel encoding gates).
+    layout
+        The layout dict returned by :func:`class_b_ratio` — its qubit
+        indices direct the inverse onto the right registers.
+    """
+    # First undo the divider step.
+    q_div_restoring_inv(
+        qc,
+        dividend_qubits=layout["I_a"],         # type: ignore[arg-type]
+        divisor_qubits=layout["I_b"],          # type: ignore[arg-type]
+        quotient_qubits=layout["quotient"],    # type: ignore[arg-type]
+        work_qubits=layout["work"],            # type: ignore[arg-type]
+        divisor_pad_qubit=layout["pad"],       # type: ignore[arg-type]
+        c_qubits=layout["c"],                  # type: ignore[arg-type]
+        div_zero_flag=layout["flag"],          # type: ignore[arg-type]
+    )
+    # Then undo the dual-NEQR load.
+    dual_neqr_load_inv(
+        qc, image_a, image_b, q,
+        position_qubits=layout["position"],            # type: ignore[arg-type]
+        intensity_a_qubits=layout["I_a"],              # type: ignore[arg-type]
+        intensity_b_qubits=layout["I_b"],              # type: ignore[arg-type]
+    )
+
+
+def mark_good_oracle(
+    qc: QuantumCircuit,
+    value_qubits: list[int],
+    threshold: int,
+    good_qubit: int,
+    threshold_reg_qubits: list[int],
+    sub_carry_qubits: list[int],
+    value_pad_qubit: int,
+) -> None:
+    """Flip ``good_qubit`` iff ``value > threshold``.
+
+    Implementation: build a (q+1)-bit ``value_padded`` register by
+    appending a zero-pad ancilla to the q-bit value, materialise
+    ``threshold + 1`` into a (q+1)-bit constant register, and subtract
+    ``threshold_reg ← threshold_reg − value_padded``. The no-borrow bit
+    of the result is 1 iff ``threshold + 1 ≥ value``, i.e.
+    ``value ≤ threshold``; CNOT that into ``good_qubit`` and then
+    X-flip it so ``good_qubit ^= (value > threshold)``. Uncompute the
+    subtract and the constant materialisation so all ancilla return to
+    ``|0⟩``.
+
+    Parameters
+    ----------
+    value_qubits
+        ``q``-bit unsigned register holding the value to test. Preserved.
+    threshold
+        Classical integer in ``[0, 2^q − 1]``. The predicate
+        ``value > threshold`` is checked.
+    good_qubit
+        Single qubit; XORed with the predicate's truth value.
+    threshold_reg_qubits
+        ``q + 1``-bit ancilla, ``|0⟩`` on entry and exit. Holds
+        ``threshold + 1`` during the test.
+    sub_carry_qubits
+        ``q + 2``-bit carry register for the (q+1)-wide subtract,
+        ``|0⟩`` on entry and exit.
+    value_pad_qubit
+        Single ancilla, ``|0⟩`` on entry and exit. Used as the high
+        zero-pad of ``value`` to widen it from q to q+1 bits for the
+        subtract.
+
+    The construction is its own inverse: applying it twice on the same
+    inputs returns ``good_qubit`` to its initial state (two XORs cancel),
+    and all ancillas are restored each call. See
+    :func:`mark_good_oracle_inv` for the symmetric API.
+    """
+    q = len(value_qubits)
+    q_w = q + 1
+    if len(threshold_reg_qubits) != q_w:
+        raise ValueError(
+            f"threshold_reg_qubits must have q+1={q_w} bits, got "
+            f"{len(threshold_reg_qubits)}"
+        )
+    if len(sub_carry_qubits) != q_w + 1:
+        raise ValueError(
+            f"sub_carry_qubits must have q+2={q_w + 1} bits, got "
+            f"{len(sub_carry_qubits)}"
+        )
+    target = threshold + 1
+    if target < 0 or target >= (1 << q_w):
+        raise ValueError(
+            f"threshold + 1 = {target} out of representable range "
+            f"[0, 2^(q+1) - 1] = [0, {(1 << q_w) - 1}]"
+        )
+
+    # Materialise (threshold + 1) into threshold_reg_qubits.
+    for i in range(q_w):
+        if (target >> i) & 1:
+            qc.x(threshold_reg_qubits[i])
+    # Build value_padded by appending the dedicated value_pad_qubit
+    # (guaranteed |0⟩) as the MSB of value.
+    value_padded = list(value_qubits) + [value_pad_qubit]
+    # Subtract: value_padded ← value_padded − threshold_reg.
+    # The no-borrow bit is 1 iff value_padded ≥ threshold_reg, i.e.
+    # value ≥ threshold + 1, i.e. value > threshold. That is exactly
+    # the predicate we want. q_sub(a, b, c) computes b ← b − a, so
+    # a = threshold_reg, b = value_padded.
+    from qimp.processing.arithmetic import q_sub as _q_sub
+    from qimp.processing.arithmetic import q_sub_inv as _q_sub_inv
+    _q_sub(qc, threshold_reg_qubits, value_padded, sub_carry_qubits)
+    qc.cx(sub_carry_qubits[-1], good_qubit)
+    # Uncompute the subtract to restore value_padded (and hence
+    # value_qubits + value_pad_qubit) to their pre-call state.
+    _q_sub_inv(qc, threshold_reg_qubits, value_padded, sub_carry_qubits)
+    # X-unset threshold_reg.
+    for i in range(q_w):
+        if (target >> i) & 1:
+            qc.x(threshold_reg_qubits[i])
+
+
+def mark_good_oracle_inv(
+    qc: QuantumCircuit,
+    value_qubits: list[int],
+    threshold: int,
+    good_qubit: int,
+    threshold_reg_qubits: list[int],
+    sub_carry_qubits: list[int],
+    value_pad_qubit: int,
+) -> None:
+    """Inverse of :func:`mark_good_oracle`. Since the forward construction
+    is self-inverse (the two XORs into ``good_qubit`` cancel; all ancilla
+    sub-procedures are themselves uncomputed), the inverse is simply the
+    forward function applied again.
+    """
+    mark_good_oracle(
+        qc,
+        value_qubits=value_qubits,
+        threshold=threshold,
+        good_qubit=good_qubit,
+        threshold_reg_qubits=threshold_reg_qubits,
+        sub_carry_qubits=sub_carry_qubits,
+        value_pad_qubit=value_pad_qubit,
+    )
 
 
 # ============================================================================
