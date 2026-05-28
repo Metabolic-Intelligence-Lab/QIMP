@@ -316,7 +316,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--max-k", type=int, default=2,
                         help="Largest Grover power. Total circuits run: max_k + 1.")
     parser.add_argument("--dataset", type=str, default="canonical",
-                        choices=["canonical", "fura2", "rogfp2", "synthetic"],
+                        choices=["canonical", "canonical_4x4", "fura2", "rogfp2", "synthetic"],
                         help="Which prepared dataset to use.")
     args = parser.parse_args(argv)
 
@@ -327,6 +327,12 @@ def main(argv: list[str] | None = None) -> int:
         image_b = d["I_b"].astype(np.int64)
         print(f"Dataset: canonical microscopy frame (membraneStack…rbc3DM2.tif), "
               f"2×2 q=2 from signal-rich patch (8, 4) + 32×32.")
+    elif args.dataset == "canonical_4x4":
+        d = np.load(DATA_DIR / "canonical_4x4.npz")
+        image_a = d["I_a"].astype(np.int64)
+        image_b = d["I_b"].astype(np.int64)
+        print(f"Dataset: canonical microscopy frame, 4×4 q=2 (n=2) — MPS oracle "
+              f"~33 qubits, expected runtime is in the hours.")
     elif args.dataset == "fura2":
         d = np.load(DATA_DIR / "fura2_2x2.npz")
         image_a = d["I_a"].astype(np.int64)
