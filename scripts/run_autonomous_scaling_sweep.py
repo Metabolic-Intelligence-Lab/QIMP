@@ -25,6 +25,9 @@ from qimp.processing.ratiometric_circuit import (  # noqa: E402
     class_b_ratio,
     decode_class_b_ratio,
 )
+from prepare_autonomous_datasets import (  # noqa: E402
+    synthesise_fura2, synthesise_rogfp, quantise_to_q,
+)
 from run_autonomous_n3_laurdan import prepare_canonical  # noqa: E402
 
 sys.stdout.reconfigure(encoding="utf-8", errors="replace")  # type: ignore[attr-defined]
@@ -34,11 +37,30 @@ DATA_OUT = REPO / "paper" / "data_autonomous"
 SHOTS = 4096
 
 
-def run_one(n: int) -> dict:
+def _prepare_dataset(name: str, n: int) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     side = 1 << n
-    print(f"\n=== n={n}  ({side}×{side}) =================================")
+    if name == "canonical":
+        return prepare_canonical(target_n=n)
+    if name == "fura2":
+        f340, f380, _ = synthesise_fura2(side=side, seed=1)
+        I_a = quantise_to_q(f340, 2)
+        I_b = quantise_to_q(f380, 2)
+    elif name == "rogfp2":
+        f405, f488, _ = synthesise_rogfp(side=side, seed=2)
+        I_a = quantise_to_q(f405, 2)
+        I_b = quantise_to_q(f488, 2)
+    else:
+        raise ValueError(f"unknown dataset {name}")
+    R_classical = np.where(I_b > 0, I_a // np.maximum(I_b, 1), 0)
+    divzero = (I_b == 0)
+    return I_a.astype(np.int64), I_b.astype(np.int64), R_classical, divzero
+
+
+def run_one(n: int, dataset: str = "canonical") -> dict:
+    side = 1 << n
+    print(f"\n=== {dataset} n={n}  ({side}×{side}) =================================")
     t0 = time.time()
-    I_a, I_b, R_classical, divzero = prepare_canonical(target_n=n)
+    I_a, I_b, R_classical, divzero = _prepare_dataset(dataset, n)
     print(f"  data prep: {time.time() - t0:.2f} s  "
           f"({int(divzero.sum())} divzero / {side * side})")
 
@@ -73,7 +95,7 @@ def run_one(n: int) -> dict:
     pct = match_count / (side * side) * 100.0
     print(f"  match: {match_count} / {side * side}  ({pct:.1f}%)")
 
-    out_file = DATA_OUT / f"canonical_{side}x{side}.npz"
+    out_file = DATA_OUT / f"{dataset}_{side}x{side}.npz"
     np.savez(
         out_file,
         I_a=I_a, I_b=I_b,
@@ -87,6 +109,7 @@ def run_one(n: int) -> dict:
     print(f"  saved {out_file.name}")
 
     return {
+        "dataset": dataset,
         "n": n,
         "side": side,
         "n_pixels": side * side,
@@ -104,12 +127,18 @@ def run_one(n: int) -> dict:
 def main() -> int:
     DATA_OUT.mkdir(parents=True, exist_ok=True)
     rows = []
-    for n in (2, 3, 4, 5):
-        try:
-            rows.append(run_one(n))
-        except Exception as e:
-            print(f"  *** n={n} FAILED: {e}")
-            rows.append({"n": n, "side": 1 << n, "error": str(e)[:100]})
+    datasets = ["canonical", "fura2", "rogfp2"]
+    # n_max=5 for canonical, 4 for the synthetic ones (smaller patches OK
+    # but the QAE oracle at that scale stays comfortable on MPS).
+    plan = {"canonical": (2, 5), "fura2": (2, 5), "rogfp2": (2, 5)}
+    for ds in datasets:
+        n_lo, n_hi = plan[ds]
+        for n in range(n_lo, n_hi + 1):
+            try:
+                rows.append(run_one(n, dataset=ds))
+            except Exception as e:
+                print(f"  *** {ds} n={n} FAILED: {e}")
+                rows.append({"dataset": ds, "n": n, "side": 1 << n, "error": str(e)[:100]})
 
     # CSV report
     csv_path = DATA_OUT / "scaling_sweep.csv"
@@ -125,7 +154,7 @@ def main() -> int:
     print(f"\n\n=== Sweep summary written to {csv_path} ===")
     for r in rows:
         print(
-            f"  n={r.get('n'):>2}: "
+            f"  {r.get('dataset', '?'):>10} n={r.get('n'):>2}: "
             f"{r.get('n_qubits', '?'):>3} qubits, "
             f"{r.get('mps_seconds', '?'):>7} s MPS, "
             f"{r.get('match_count', '?')}/{r.get('n_pixels', '?')} match"
