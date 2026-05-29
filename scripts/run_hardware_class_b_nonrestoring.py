@@ -62,6 +62,11 @@ def load_dataset(dataset: str, n: int, q: int) -> tuple[np.ndarray, np.ndarray]:
         base_b = np.array([[1, 1], [3, 1]], dtype=np.int64)
         return (np.tile(base_a, (side // 2, side // 2)),
                 np.tile(base_b, (side // 2, side // 2)))
+    if dataset == "canonical_nd":
+        # Non-degenerate Laurdan 2x2 patch (I_a != I_b, R spans {0,1,2});
+        # offset (94,60) of the canonical frame, q=2. See §6.5.9.
+        d = np.load(REPO / "paper" / "data_autonomous" / "canonical_2x2_nd.npz")
+        return d["I_a"].astype(np.int64), d["I_b"].astype(np.int64)
     if dataset == "fura2":
         f340, f380, _ = synthesise_fura2(side=side, seed=1)
         return (quantise_to_q(f340, q).astype(np.int64),
@@ -77,7 +82,7 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="run_hardware_class_b_nonrestoring",
                                  description=__doc__)
     ap.add_argument("--dataset", type=str, default="canonical",
-                    choices=["canonical", "synthetic", "fura2", "rogfp2"])
+                    choices=["canonical", "canonical_nd", "synthetic", "fura2", "rogfp2"])
     ap.add_argument("--n", type=int, default=1)
     ap.add_argument("--q", type=int, default=2)
     ap.add_argument("--divider", type=str, default="nonrestoring",
