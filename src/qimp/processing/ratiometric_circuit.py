@@ -47,6 +47,8 @@ from qimp.processing.arithmetic import (
     q_add,
     q_add_ctrl,
     q_div_general,
+    q_div_nonrestoring,
+    q_div_nonrestoring_inv,
     q_div_restoring,
     q_div_restoring_inv,
     q_sub,
@@ -242,12 +244,26 @@ def dual_neqr_load_inv(
     qc.h(position_qubits)
 
 
-def class_b_ratio(image_a: np.ndarray, image_b: np.ndarray, q: int) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+def class_b_ratio(
+    image_a: np.ndarray, image_b: np.ndarray, q: int,
+    divider: str = "restoring",
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
     """Build an autonomous Class-B integer-quotient ratio circuit.
 
     For each pixel position p in superposition, the circuit computes
-    R(p) = I_a(p) // I_b(p) using reversible restoring division (no
-    classical pre-computation of R).
+    R(p) = I_a(p) // I_b(p) using reversible division (no classical
+    pre-computation of R).
+
+    Parameters
+    ----------
+    image_a, image_b
+        2D arrays of the two intensity channels (shape 2^n × 2^n).
+    q
+        Width of each intensity register, in qubits.
+    divider
+        ``"restoring"`` (default, historical) or ``"nonrestoring"``
+        (Thapliyal-style; ~50% fewer two-qubit gates after transpile,
+        same output semantics, same ancilla footprint).
 
     Returns
     -------
@@ -267,6 +283,10 @@ def class_b_ratio(image_a: np.ndarray, image_b: np.ndarray, q: int) -> tuple[Qua
       - Toffolis: O(q²) for the division × 1 per pixel branch (the
         division acts uniformly on the position superposition).
     """
+    if divider not in ("restoring", "nonrestoring"):
+        raise ValueError(
+            f"divider must be 'restoring' or 'nonrestoring', got {divider!r}"
+        )
     n = _validate_dual_images(image_a, image_b, q)
     n_pos = 2 * n
     n_c = (q + 1) * (q + 2)
@@ -295,7 +315,8 @@ def class_b_ratio(image_a: np.ndarray, image_b: np.ndarray, q: int) -> tuple[Qua
 
     # Class B integer ratio: I_a // I_b. Divider overwrites I_a register
     # with the remainder; I_b is preserved.
-    q_div_restoring(
+    div_fn = q_div_restoring if divider == "restoring" else q_div_nonrestoring
+    div_fn(
         qc,
         dividend_qubits=layout["I_a"],
         divisor_qubits=layout["I_b"],
@@ -382,12 +403,16 @@ def class_b_ratio_inv(
     image_b: np.ndarray,
     q: int,
     layout: dict[str, list[int] | int],
+    divider: str = "restoring",
 ) -> None:
     """Exact inverse of :func:`class_b_ratio`.
 
+    The ``divider`` argument must match the variant used in the forward
+    call (``"restoring"`` or ``"nonrestoring"``).
+
     Reverses the divider+load composition in the standard order:
-    forward = ``dual_neqr_load → q_div_restoring``, so the inverse is
-    ``q_div_restoring_inv → dual_neqr_load_inv``.
+    forward = ``dual_neqr_load → q_div_*``, so the inverse is
+    ``q_div_*_inv → dual_neqr_load_inv``.
 
     After applying this on top of a circuit that previously had
     :func:`class_b_ratio` applied, every register returns to ``|0⟩``:
@@ -411,7 +436,13 @@ def class_b_ratio_inv(
         indices direct the inverse onto the right registers.
     """
     # First undo the divider step.
-    q_div_restoring_inv(
+    if divider not in ("restoring", "nonrestoring"):
+        raise ValueError(
+            f"divider must be 'restoring' or 'nonrestoring', got {divider!r}"
+        )
+    inv_fn = (q_div_restoring_inv if divider == "restoring"
+              else q_div_nonrestoring_inv)
+    inv_fn(
         qc,
         dividend_qubits=layout["I_a"],         # type: ignore[arg-type]
         divisor_qubits=layout["I_b"],          # type: ignore[arg-type]

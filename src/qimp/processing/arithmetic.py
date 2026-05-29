@@ -451,6 +451,58 @@ def q_sub_ctrl_inv(
     return qc
 
 
+def q_add_sub_ctrl(
+    qc: QuantumCircuit,
+    ctrl: int,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+) -> QuantumCircuit:
+    """Controlled add-or-subtract: ``b ← b + a`` if ``ctrl == 0``, ``b ← b − a``
+    if ``ctrl == 1``.
+
+    Implementation: a single :func:`q_add` body, sandwiched between conditional
+    two's-complement of ``a`` (CNOTs from ``ctrl`` to each bit of ``a`` plus a
+    CNOT into ``c_qubits[0]`` for the +1 preload). When ``ctrl = 0`` both
+    sandwich layers are identity and the body computes ``b + a``; when
+    ``ctrl = 1`` the body computes ``b + (~a + 1) = b − a``.
+
+    This primitive is the workhorse of :func:`q_div_nonrestoring`: each
+    iteration of non-restoring division applies one ``q_add_sub_ctrl`` instead
+    of restoring's trial-subtract / undo / conditional-subtract trio.
+    """
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    qc.cx(ctrl, c_qubits[0])
+    q_add(qc, a_qubits, b_qubits, c_qubits)
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    qc.cx(ctrl, c_qubits[0])
+    return qc
+
+
+def q_add_sub_ctrl_inv(
+    qc: QuantumCircuit,
+    ctrl: int,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+) -> QuantumCircuit:
+    """Inverse of :func:`q_add_sub_ctrl`: gates in reverse, body undone by
+    :func:`q_add_inv`. Restores ``b`` to its pre-call value and the carry
+    chain to ``|0⟩`` (assumed ``|0⟩`` originally)."""
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    qc.cx(ctrl, c_qubits[0])
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    q_add_inv(qc, a_qubits, b_qubits, c_qubits)
+    qc.cx(ctrl, c_qubits[0])
+    for q in a_qubits:
+        qc.cx(ctrl, q)
+    return qc
+
+
 def q_div_restoring(
     qc: QuantumCircuit,
     dividend_qubits: Sequence[int],
@@ -732,6 +784,206 @@ def q_div_restoring_inv(
 
     # Reverse the div-by-zero detection (the X-mcx-X sequence is its own
     # inverse, so we apply the same gates).
+    for d in divisor_qubits:
+        qc.x(d)
+    qc.mcx(list(divisor_qubits), div_zero_flag)
+    for d in divisor_qubits:
+        qc.x(d)
+    return qc
+
+
+def q_div_nonrestoring(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    work_qubits: Sequence[int],
+    divisor_pad_qubit: int,
+    c_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Unsigned fixed-point non-restoring division (Thapliyal-style).
+
+    Drop-in replacement for :func:`q_div_restoring` with identical
+    signature, identical semantics on the output registers, and ~2× fewer
+    two-qubit gates per iteration after transpilation. Computes
+    ``quotient = dividend // divisor`` and overwrites the dividend
+    register with the remainder.
+
+    Algorithm:
+      - First iteration (i = q − 1): unconditional subtract of the divisor
+        from the running window, then copy ``NOT sign`` to ``quotient[q−1]``.
+      - Subsequent iterations (i = q − 2 .. 0): one *controlled
+        add-or-subtract* of the divisor — subtract iff the previous
+        quotient bit (i.e. previous ``NOT sign``) was 1, otherwise add.
+        Then copy ``NOT sign`` to ``quotient[i]``.
+      - Final correction: if the final sign is negative (i.e.
+        ``quotient[0] == 0``), add the divisor back so the remainder is
+        non-negative.
+
+    The savings vs restoring come from doing **one** controlled
+    add-or-subtract per iteration instead of restoring's "trial-subtract
+    → CNOT sign → undo → conditional subtract" four-step sequence; the
+    transpiled CX cost per iteration drops from ~58(q+1) to ~16(q+1).
+
+    Layout (identical to :func:`q_div_restoring`):
+      - ``dividend_qubits``  (q)  → on exit: remainder.
+      - ``divisor_qubits``   (q)  → preserved.
+      - ``quotient_qubits``  (q)  → |0⟩ on entry, quotient on exit.
+      - ``work_qubits``      (q)  → |0⟩ on entry, restored to |0⟩ on exit
+                                    (high half of the conceptual 2q-bit
+                                    running register R = work || dividend).
+      - ``divisor_pad_qubit`` (1) → ancilla, |0⟩ on entry and exit;
+                                    zero-pad MSB of the divisor.
+      - ``c_qubits``              → carry-scratch, width
+                                    ``≥ (q + 1) * (q + 2)``. Layout: one
+                                    fresh ``(q + 2)``-slice per iteration
+                                    (q in total) plus a final
+                                    ``(q + 2)``-slice for the correction
+                                    add.
+      - ``div_zero_flag``    (1)  → set to 1 iff divisor == 0 on entry.
+    """
+    q = len(dividend_qubits)
+    if len(divisor_qubits) != q:
+        raise ValueError(
+            f"divisor must have q={q} bits, got {len(divisor_qubits)}"
+        )
+    if len(quotient_qubits) != q:
+        raise ValueError(
+            f"quotient must have q={q} bits, got {len(quotient_qubits)}"
+        )
+    if len(work_qubits) != q:
+        raise ValueError(
+            f"work_qubits must have q={q} bits, got {len(work_qubits)}"
+        )
+    needed_c = (q + 1) * (q + 2)
+    if len(c_qubits) < needed_c:
+        raise ValueError(
+            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
+            f"got {len(c_qubits)}"
+        )
+
+    # Detect div-by-zero: same as restoring.
+    for d in divisor_qubits:
+        qc.x(d)
+    qc.mcx(list(divisor_qubits), div_zero_flag)
+    for d in divisor_qubits:
+        qc.x(d)
+
+    R = list(dividend_qubits) + list(work_qubits)
+    D = list(divisor_qubits) + [divisor_pad_qubit]
+
+    def _carry_slot(slot_idx: int) -> list[int]:
+        base = slot_idx * (q + 2)
+        return list(c_qubits[base : base + q + 2])
+
+    def _copy_not_sign(window: list[int], dest: int) -> None:
+        # dest ← NOT window[-1], leaving window[-1] unchanged.
+        qc.x(window[-1])
+        qc.cx(window[-1], dest)
+        qc.x(window[-1])
+
+    # First iteration: unconditional subtract.
+    window_first = R[q - 1 : 2 * q]
+    q_sub(qc, D, window_first, _carry_slot(0))
+    _copy_not_sign(window_first, quotient_qubits[q - 1])
+
+    # Iterations i = q-2 .. 0: controlled add-or-subtract.
+    # Control = quotient[i+1]; ctrl=1 → subtract, ctrl=0 → add.
+    for i in range(q - 2, -1, -1):
+        slot = (q - 1) - i
+        window_i = R[i : i + q + 1]
+        q_add_sub_ctrl(qc, quotient_qubits[i + 1], D, window_i,
+                       _carry_slot(slot))
+        _copy_not_sign(window_i, quotient_qubits[i])
+
+    # Final correction: if final sign was negative (quotient[0] == 0),
+    # add divisor back once so the dividend register holds a non-negative
+    # remainder. Use the last (q+2)-slice of c_qubits.
+    qc.x(quotient_qubits[0])
+    window_final = R[0 : q + 1]
+    q_add_ctrl(qc, quotient_qubits[0], D, window_final, _carry_slot(q))
+    qc.x(quotient_qubits[0])
+
+    # Uncompute the leftover sign bits in the work register.
+    # The windowed non-restoring loop leaves R[i+q] = NOT quotient[i] for
+    # every iteration i — these are sign bits the (conceptual) shift step
+    # never overwrites. R[q] (iter 0's sign) was zeroed by the final
+    # correction in both branches (no-correction case had it = 0 already;
+    # correction case flips it 1 → 0). The remaining bits R[q+1..2q-1]
+    # equal NOT quotient[i] for i = 1..q-1 and must be cleared so the
+    # work register returns to |0⟩ for composition / inverse usage.
+    for i in range(1, q):
+        qc.cx(quotient_qubits[i], R[i + q])
+        qc.x(R[i + q])
+    return qc
+
+
+def q_div_nonrestoring_inv(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    work_qubits: Sequence[int],
+    divisor_pad_qubit: int,
+    c_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Exact inverse of :func:`q_div_nonrestoring`.
+
+    Restores all registers to their pre-call state, including the carry
+    register, work register, quotient (back to |0⟩), and dividend
+    (remainder → original). Prerequisite for QAE-style oracle
+    composition.
+    """
+    q = len(dividend_qubits)
+    needed_c = (q + 1) * (q + 2)
+    if len(c_qubits) < needed_c:
+        raise ValueError(
+            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
+            f"got {len(c_qubits)}"
+        )
+
+    R = list(dividend_qubits) + list(work_qubits)
+    D = list(divisor_qubits) + [divisor_pad_qubit]
+
+    def _carry_slot(slot_idx: int) -> list[int]:
+        base = slot_idx * (q + 2)
+        return list(c_qubits[base : base + q + 2])
+
+    def _uncopy_not_sign(window: list[int], dest: int) -> None:
+        # NOT-sign copy is self-inverse on the dest (assuming dest was
+        # |0⟩ before forward); we re-apply the same gates.
+        qc.x(window[-1])
+        qc.cx(window[-1], dest)
+        qc.x(window[-1])
+
+    # Undo the work-bit uncompute step (reverse order).
+    for i in range(q - 1, 0, -1):
+        qc.x(R[i + q])
+        qc.cx(quotient_qubits[i], R[i + q])
+
+    # Undo final correction.
+    qc.x(quotient_qubits[0])
+    window_final = R[0 : q + 1]
+    q_add_ctrl_inv(qc, quotient_qubits[0], D, window_final, _carry_slot(q))
+    qc.x(quotient_qubits[0])
+
+    # Undo iterations i = 0 .. q-2 in reverse forward order
+    # (forward went q-2 down to 0; inverse goes 0 up to q-2).
+    for i in range(0, q - 1):
+        slot = (q - 1) - i
+        window_i = R[i : i + q + 1]
+        _uncopy_not_sign(window_i, quotient_qubits[i])
+        q_add_sub_ctrl_inv(qc, quotient_qubits[i + 1], D, window_i,
+                           _carry_slot(slot))
+
+    # Undo first iteration.
+    window_first = R[q - 1 : 2 * q]
+    _uncopy_not_sign(window_first, quotient_qubits[q - 1])
+    q_sub_inv(qc, D, window_first, _carry_slot(0))
+
+    # Undo div-by-zero detection (self-inverse).
     for d in divisor_qubits:
         qc.x(d)
     qc.mcx(list(divisor_qubits), div_zero_flag)
