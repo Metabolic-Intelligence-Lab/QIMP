@@ -16,6 +16,11 @@ import numpy as np
 
 REPO = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO / "src"))
+sys.path.insert(0, str(REPO / "scripts"))
+
+# Reuse the exact sampling / MLE / log-log-fit helpers from the scaling study,
+# so the point estimate is guaranteed to match it (single source of truth).
+from qae_scaling_study import mlqae_mle, p_k, slope  # noqa: E402
 
 # Match qae_scaling_study.py exactly for reproducibility of the point estimate.
 RNG = np.random.default_rng(20260529)
@@ -26,22 +31,6 @@ SCHEDULES = [EIS[:j] for j in range(1, len(EIS) + 1)]
 GRID = np.linspace(1e-6, np.pi / 2 - 1e-6, 4000)
 N_BOOT = 2000
 BOOT_RNG = np.random.default_rng(7)
-
-
-def p_k(theta, k):
-    return np.sin((2 * k + 1) * theta) ** 2
-
-
-def mlqae_mle(hits, shots, ks, grid):
-    ll = np.zeros_like(grid)
-    for h, n, k in zip(hits, shots, ks):
-        p = np.clip(np.sin((2 * k + 1) * grid) ** 2, 1e-12, 1 - 1e-12)
-        ll += h * np.log(p) + (n - h) * np.log(1 - p)
-    return np.sin(grid[np.argmax(ll)]) ** 2
-
-
-def slope(xs, ys):
-    return float(np.polyfit(np.log10(xs), np.log10(ys), 1)[0])
 
 
 def collect_errors(a_true):
