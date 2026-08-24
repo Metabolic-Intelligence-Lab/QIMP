@@ -1,10 +1,14 @@
 """Tests for qimp.processing.ratiometric_circuit (autonomous ratiometric
 quantum circuits).
 
-These tests are statevector-bounded: the Class-B ratio circuit at
-n=1, q=2 uses ~24 qubits which is statevector-feasible on a 16 GB
-laptop. Larger (n, q) configurations need an MPS simulator and are
-out of scope for the unit-test suite.
+Most of these tests are statevector-bounded: the Class-B ratio circuit
+at n=1, q=2 uses ~24 qubits which is statevector-feasible on a 16 GB
+laptop. The full Class-A and Class-C pipelines are past that budget even
+at their smallest meaningful size (71 and 54 qubits at n=1, q=2,
+q_frac=2), so they are verified on `AerSimulator(method='matrix_product_
+state')` instead — the n=1 position register superposes only four pixel
+branches, so the bond dimension stays small and the runs take seconds.
+Larger (n, q) configurations are out of scope for the unit-test suite.
 """
 
 from __future__ import annotations
@@ -12,8 +16,9 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from qiskit.quantum_info import Statevector
+from qiskit_aer import AerSimulator
 
-from qiskit import QuantumCircuit, QuantumRegister
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 
 from qimp.processing.ratiometric_circuit import (
     affine_subtract_constant,
@@ -21,8 +26,11 @@ from qimp.processing.ratiometric_circuit import (
     class_a_gp_prefix,
     class_b_ratio,
     class_b_ratio_inv,
+    class_c_rogfp_full,
+    decode_class_a_full,
     decode_class_a_prefix,
     decode_class_b_ratio,
+    decode_class_c_rogfp,
     dual_neqr_load,
     dual_neqr_load_inv,
     mark_good_oracle,
@@ -388,6 +396,17 @@ def test_class_b_ratio_round_trip(
     )
 
 
+@pytest.mark.parametrize(
+    "q, R_val, c_value",
+    # q=2: the exhaustive truth table. `c_value` ranges over the full
+    # q+1-bit constant register, not just [0, 2^q): the roGFP reduced
+    # reference R_red_fp = round(R_red * 2^q_frac) routinely exceeds 2^q,
+    # and c_value > R_val is exactly the negative (sign-bit set) branch.
+    [(2, r, c) for r in range(4) for c in range(8)]
+    # q=3: endpoints and sign-flip boundary; the full 128-case sweep adds
+    # statevector runs without adding coverage.
+    + [(3, r, c) for r in (0, 1, 7) for c in (0, 1, 7, 8, 15)],
+)
 def test_affine_subtract_constant_truth_table(
     q: int, R_val: int, c_value: int
 ) -> None:
@@ -426,3 +445,136 @@ def test_affine_subtract_constant_truth_table(
     assert _read_register(sv, c_const_idx) == 0
     # R is preserved
     assert _read_register(sv, R_idx) == R_val
+
+
+# ---------------------------------------------------------------------------
+# Stage F.4 — end-to-end Class-A GP and Class-C roGFP on MPS
+#
+# These are the manuscript §5.3 claims in miniature, and the only tests that
+# exercise (a) `q_div_general` in its non-square configuration, (b) the
+# composed full-pipeline decoders, and (c) the MPS execution path. They run
+# at n=1, q=2, q_frac=2 (71 and 54 qubits) rather than the paper's q=4
+# (137 and 114 qubits) to keep the suite fast; the composition is identical.
+# ---------------------------------------------------------------------------
+
+
+def _run_mps(qc: QuantumCircuit, shots: int = 512) -> dict[str, int]:
+    """Measure every qubit and sample `qc` on the MPS backend.
+
+    Both pipelines are basis-state circuits per pixel branch, so the
+    per-pixel majority vote in the decoders is exact for any shot count
+    that covers the 4^n branches; 512 leaves ~128 shots per pixel.
+    """
+    qc = qc.copy()
+    qc.add_register(ClassicalRegister(qc.num_qubits))
+    qc.measure(range(qc.num_qubits), range(qc.num_qubits))
+    # Transpile to the MPS basis only — no backend, so no coupling-map
+    # width cap (this mirrors scripts/run_autonomous_class_{a,c}_*_mps.py).
+    qc_t = transpile(qc, basis_gates=["id", "u", "cx"], optimization_level=0)
+    sim = AerSimulator(method="matrix_product_state", seed_simulator=20260610)
+    counts: dict[str, int] = sim.run(qc_t, shots=shots).result().get_counts()
+    return counts
+
+
+def test_class_a_gp_full_end_to_end_mps() -> None:
+    """Class A at n=1, q=2, q_frac=2 recovers the signed GP bit-exactly.
+
+    The patch is chosen to span both saturating endpoints (GP = ±1, where
+    one channel quantises to 0), a proper fraction, and zero. The ±1
+    pixels are the regression guard on `decode_class_a_full`: there the
+    quotient magnitude is exactly 2**q_frac, so it sets bit q_frac and a
+    decoder reading only the low q_frac bits would report 0.0 instead.
+    """
+    n, q, q_frac = 1, 2, 2
+    image_a = np.array([[3, 3], [0, 3]], dtype=np.int64)
+    image_b = np.array([[0, 1], [1, 3]], dtype=np.int64)
+    # den = I_a + I_b, num = |I_a - I_b|, sign = (I_b > I_a);
+    # GP = (-1)^sign * ((num << q_frac) // den) / 2^q_frac
+    expected_gp = np.array([[1.0, 0.5], [-1.0, 0.0]])
+
+    qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
+    assert qc.num_qubits == 71
+    counts = _run_mps(qc)
+    gp, divzero = decode_class_a_full(
+        counts, n, q, q_frac, layout, qc.num_qubits
+    )
+    # den = I_a + I_b > 0 at every pixel here, so no div-zero.
+    assert not divzero.any(), f"unexpected div-zero flag: {divzero}"
+    np.testing.assert_array_equal(gp, expected_gp)
+
+
+def test_class_a_gp_full_divzero_flag_mps() -> None:
+    """Class A sets the div-zero flag exactly where I_a + I_b == 0."""
+    n, q, q_frac = 1, 2, 2
+    image_a = np.array([[3, 0], [1, 2]], dtype=np.int64)
+    image_b = np.array([[1, 0], [3, 2]], dtype=np.int64)  # den == 0 at (0, 1)
+
+    qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
+    counts = _run_mps(qc)
+    gp, divzero = decode_class_a_full(
+        counts, n, q, q_frac, layout, qc.num_qubits
+    )
+    assert divzero[0, 1], "div-zero flag not set on the I_a + I_b == 0 pixel"
+    # The other three decode exactly; GP is undefined on the flagged pixel.
+    expected_valid = {(0, 0): 0.5, (1, 0): -0.5, (1, 1): 0.0}
+    for (r, c), want in expected_valid.items():
+        assert not divzero[r, c], f"unexpected div-zero at ({r}, {c})"
+        assert gp[r, c] == want, f"GP at ({r}, {c}): got {gp[r, c]}, want {want}"
+
+
+def test_class_c_rogfp_full_end_to_end_mps() -> None:
+    """Class C at n=1, q=2, q_frac=2 recovers the calibrated redox index.
+
+    The fractional ratio (shift by q_frac, then non-square divide) is what
+    lifts the Class-B integer-quotient degeneracy, and the affine subtract
+    runs in-circuit; only the calibration scalar is classical. One pixel is
+    below R_red so `rc_signed` goes negative — the two's-complement
+    sign-extension branch of the decoder.
+    """
+    n, q, q_frac = 1, 2, 2
+    R_red, R_ox = 0.75, 3.0
+    R_red_fp = round(R_red * (1 << q_frac))  # 3
+    image_a = np.array([[3, 2], [0, 3]], dtype=np.int64)
+    image_b = np.array([[2, 1], [3, 3]], dtype=np.int64)
+    # ratio_fp = (I_a << q_frac) // I_b = [[6, 8], [0, 4]]
+    # rc_signed = ratio_fp - R_red_fp = [[3, 5], [-3, 1]]
+    # R_C = rc_signed / ((R_ox - R_red) * 2^q_frac) = rc_signed / 9
+    expected_rc = np.array([[3.0, 5.0], [-3.0, 1.0]]) / 9.0
+
+    qc, layout = class_c_rogfp_full(
+        image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp
+    )
+    assert qc.num_qubits == 54
+    counts = _run_mps(qc)
+    rc, divzero = decode_class_c_rogfp(
+        counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits
+    )
+    assert not divzero.any(), f"unexpected div-zero flag: {divzero}"
+    np.testing.assert_allclose(rc, expected_rc)
+
+
+def test_class_c_rogfp_full_divzero_flag_mps() -> None:
+    """Class C sets the div-zero flag exactly where I_b == 0."""
+    n, q, q_frac = 1, 2, 2
+    R_red, R_ox = 0.75, 3.0
+    R_red_fp = round(R_red * (1 << q_frac))  # 3
+    image_a = np.array([[3, 2], [1, 3]], dtype=np.int64)
+    image_b = np.array([[2, 0], [1, 3]], dtype=np.int64)  # divzero at (0, 1)
+
+    qc, layout = class_c_rogfp_full(
+        image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp
+    )
+    counts = _run_mps(qc)
+    rc, divzero = decode_class_c_rogfp(
+        counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits
+    )
+    assert divzero[0, 1], "div-zero flag not set on the I_b == 0 pixel"
+    denom = (R_ox - R_red) * (1 << q_frac)
+    for r, c in [(0, 0), (1, 0), (1, 1)]:
+        assert not divzero[r, c], f"unexpected div-zero at ({r}, {c})"
+        want = (
+            (int(image_a[r, c]) << q_frac) // int(image_b[r, c]) - R_red_fp
+        ) / denom
+        assert rc[r, c] == pytest.approx(want), (
+            f"R_C at ({r}, {c}): got {rc[r, c]}, want {want}"
+        )

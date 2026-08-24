@@ -21,7 +21,8 @@ The three classes supported (in order of implementation):
     multiplier and signed numerator).
   - **Class C** — roGFP calibrated ratio
     R_C = (R − R_red)/(R_ox − R_red) with classical R_red, R_ox.
-    Planned: :func:`class_c_rogfp`.
+    Implemented end-to-end in :func:`class_c_rogfp_full` (fractional
+    ratio via shift + non-square divide, then affine subtract).
 
 All builders share the convention that intensities are q-bit unsigned
 fixed point, position is 2n-bit, and the output register is a separate
@@ -60,9 +61,11 @@ __all__ = [
     "class_a_gp_prefix",
     "class_b_ratio",
     "class_b_ratio_inv",
+    "class_c_rogfp_full",
     "decode_class_a_full",
     "decode_class_a_prefix",
     "decode_class_b_ratio",
+    "decode_class_c_rogfp",
     "dual_neqr_load",
     "dual_neqr_load_inv",
     "mark_good_oracle",
@@ -1077,8 +1080,14 @@ def decode_class_a_full(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Decode Class A full counts into (gp_signed_image, divzero_mask).
 
-    Reads the ``sign`` qubit, the low q_frac bits of the ``quotient``
-    register (the fractional magnitude), and the ``div_flag``.
+    Reads the ``sign`` qubit, the **full** ``quotient`` register, and the
+    ``div_flag``. The magnitude must be read across the whole register,
+    not just its low ``q_frac`` bits: since ``|I_a - I_b| <= I_a + I_b``
+    the quotient is bounded by ``2**q_frac``, and it *attains* that value
+    at the saturating ``GP = ±1`` endpoints (one channel quantised to 0),
+    which sets bit ``q_frac`` and would be truncated away by a low-bits
+    read. Bits above ``q_frac`` are identically zero, so the full read is
+    exact at every pixel.
 
     Returns
     -------
@@ -1109,7 +1118,7 @@ def decode_class_a_full(
         flat = state.replace(" ", "")
         col = sum(bit_at(flat, pos_qubits[i]) << i for i in range(n))
         row = sum(bit_at(flat, pos_qubits[n + i]) << i for i in range(n))
-        mag = sum(bit_at(flat, quo_qubits[i]) << i for i in range(q_frac))
+        mag = sum(bit_at(flat, quo_qubits[i]) << i for i in range(len(quo_qubits)))
         s = bit_at(flat, sign_q)
         f = bit_at(flat, flag_qubit)
         gp_val = (-1.0 if s else 1.0) * mag / float(1 << q_frac)
@@ -1125,3 +1134,180 @@ def decode_class_a_full(
     for (row, col), votes in flag_counts.items():
         divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
     return gp_img, divzero_mask
+
+
+def class_c_rogfp_full(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    q_frac: int,
+    R_red_fp: int,
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+    """Full autonomous Class C roGFP calibrated-ratio circuit.
+
+    For each pixel in superposition the circuit computes, entirely on the
+    quantum device, the fixed-point quantities
+
+        ratio(p)    = floor(I_a(p) * 2^q_frac / I_b(p))      (fractional R)
+        rc_signed(p)= ratio(p) - R_red_fp                    (signed)
+
+    where ``R_red_fp = round(R_red * 2^q_frac)`` is the classical reduced
+    reference in fixed point. The classical decoder finishes the affine
+    reparametrisation with the single classical calibration scalar
+
+        R_C(p) = rc_signed(p) / ((R_ox - R_red) * 2^q_frac)  in [0, 1]
+
+    — exactly as a wet-lab roGFP calibration applies (R_ox - R_red), and
+    in direct parallel with the ``/2^q_frac`` scalar of the Class-A
+    decoder. The fractional ratio (shift by ``q_frac`` then non-square
+    divide) is what lifts the integer-quotient degeneracy that makes
+    Class B uninformative for roGFP at small ``q`` (the sub-unit
+    physiological F405/F488 ratio).
+
+    Pipeline (composition of already-tested primitives):
+      1. ``dual_neqr_load(I_a, I_b)``
+      2. Bit-shift I_a up by ``q_frac`` into ``num_scaled`` (CNOT copy).
+      3. ``q_div_general(num_scaled, I_b)`` → ``ratio`` holds the
+         fixed-point fractional ratio; div-zero flag set iff I_b == 0.
+      4. ``affine_subtract_constant(ratio, R_red_fp)`` → ``rc_signed``
+         holds ``ratio - R_red_fp`` (signed two's-complement).
+
+    Resource budget at n=1, q=4, q_frac=4: ~114 qubits — past laptop
+    statevector. Use ``AerSimulator(method='mps')``; the bond dimension
+    stays small because the position register superposes only ``4^n``
+    pixel branches.
+
+    Returns
+    -------
+    (qc, layout) with keys: ``position``, ``I_a``, ``I_b``,
+    ``num_scaled``, ``ratio``, ``div_work``, ``div_pad``, ``div_c``,
+    ``div_flag``, ``rc_signed``, ``rc_const``, ``rc_carry``.
+    """
+    n = _validate_dual_images(image_a, image_b, q)
+    if q_frac < 0:
+        raise ValueError(f"q_frac must be >= 0, got {q_frac}")
+    n_pos = 2 * n
+    w = q + q_frac            # dividend / quotient width
+    needed_div_c = (w + 1) * (q + 2)
+    rc_w = w + 1              # signed affine-output width
+
+    layout: dict[str, list[int] | int] = {}
+    cursor = 0
+    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
+    layout["num_scaled"] = list(range(cursor, cursor + w)); cursor += w
+    layout["ratio"] = list(range(cursor, cursor + w)); cursor += w
+    layout["div_work"] = list(range(cursor, cursor + q)); cursor += q
+    layout["div_pad"] = cursor; cursor += 1
+    layout["div_c"] = list(range(cursor, cursor + needed_div_c)); cursor += needed_div_c
+    layout["div_flag"] = cursor; cursor += 1
+    layout["rc_signed"] = list(range(cursor, cursor + rc_w)); cursor += rc_w
+    layout["rc_const"] = list(range(cursor, cursor + rc_w)); cursor += rc_w
+    layout["rc_carry"] = list(range(cursor, cursor + rc_w + 1)); cursor += rc_w + 1
+
+    total = cursor
+    qc = QuantumCircuit(total)
+
+    Ia = layout["I_a"]; Ib = layout["I_b"]
+    num_scaled = layout["num_scaled"]; ratio = layout["ratio"]
+    div_work = layout["div_work"]; div_pad = layout["div_pad"]
+    div_c = layout["div_c"]; div_flag = layout["div_flag"]
+    rc_signed = layout["rc_signed"]; rc_const = layout["rc_const"]
+    rc_carry = layout["rc_carry"]
+    assert isinstance(Ia, list) and isinstance(Ib, list)
+    assert isinstance(num_scaled, list) and isinstance(ratio, list)
+    assert isinstance(div_work, list) and isinstance(div_pad, int)
+    assert isinstance(div_c, list) and isinstance(div_flag, int)
+    assert isinstance(rc_signed, list) and isinstance(rc_const, list)
+    assert isinstance(rc_carry, list)
+
+    # 1. NEQR-encode both channels.
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=layout["position"],            # type: ignore[arg-type]
+        intensity_a_qubits=Ia, intensity_b_qubits=Ib,
+    )
+
+    # 2. num_scaled ← I_a << q_frac (so the quotient carries q_frac
+    #    fractional bits of the ratio I_a / I_b).
+    for i in range(q):
+        qc.cx(Ia[i], num_scaled[i + q_frac])
+
+    # 3. ratio = num_scaled // I_b (non-square divider); div-zero flag.
+    q_div_general(
+        qc,
+        dividend_qubits=num_scaled,
+        divisor_qubits=Ib,
+        quotient_qubits=ratio,
+        work_qubits=div_work,
+        divisor_pad_qubit=div_pad,
+        c_qubits=div_c,
+        div_zero_flag=div_flag,
+    )
+
+    # 4. rc_signed = ratio - R_red_fp (signed two's-complement).
+    affine_subtract_constant(
+        qc,
+        R_qubits=ratio,
+        c_value=R_red_fp,
+        output_signed_qubits=rc_signed,
+        c_const_register_qubits=rc_const,
+        sub_carry_qubits=rc_carry,
+    )
+    return qc, layout
+
+
+def decode_class_c_rogfp(
+    counts: dict[str, int],
+    n: int,
+    q: int,
+    q_frac: int,
+    R_red: float,
+    R_ox: float,
+    layout: dict[str, list[int] | int],
+    total_qubits: int,
+) -> tuple[np.ndarray, np.ndarray]:
+    """Decode Class C counts into (R_C_image, divzero_mask).
+
+    Reads the signed ``rc_signed`` register (= ratio - R_red_fp in
+    fixed point) and the div-zero flag, then applies the single classical
+    calibration scalar to recover the redox index
+    ``R_C = rc_signed / ((R_ox - R_red) * 2^q_frac)``.
+    """
+    side = 1 << n
+    rc_img = np.zeros((side, side), dtype=np.float64)
+    divzero_mask = np.zeros((side, side), dtype=bool)
+    pos_qubits = layout["position"]
+    rc_qubits = layout["rc_signed"]
+    flag_qubit = layout["div_flag"]
+    assert isinstance(pos_qubits, list)
+    assert isinstance(rc_qubits, list)
+    assert isinstance(flag_qubit, int)
+    rc_w = len(rc_qubits)
+    denom = (R_ox - R_red) * float(1 << q_frac)
+
+    def bit_at(flat: str, qubit_idx: int) -> int:
+        return int(flat[total_qubits - 1 - qubit_idx])
+
+    histograms: dict[tuple[int, int], dict[float, int]] = {}
+    flag_counts: dict[tuple[int, int], dict[int, int]] = {}
+    for state, count in counts.items():
+        flat = state.replace(" ", "")
+        col = sum(bit_at(flat, pos_qubits[i]) << i for i in range(n))
+        row = sum(bit_at(flat, pos_qubits[n + i]) << i for i in range(n))
+        raw = sum(bit_at(flat, rc_qubits[i]) << i for i in range(rc_w))
+        if raw >= (1 << (rc_w - 1)):       # two's-complement sign extend
+            raw -= 1 << rc_w
+        rc_val = raw / denom
+        f = bit_at(flat, flag_qubit)
+        histograms.setdefault((row, col), {})
+        histograms[(row, col)][rc_val] = histograms[(row, col)].get(rc_val, 0) + count
+        flag_counts.setdefault((row, col), {})
+        flag_counts[(row, col)][f] = flag_counts[(row, col)].get(f, 0) + count
+
+    for (row, col), votes in histograms.items():
+        rc_img[row, col] = max(votes, key=votes.__getitem__)
+    for (row, col), votes in flag_counts.items():
+        divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
+    return rc_img, divzero_mask
