@@ -5,6 +5,82 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+The autonomous-ratiometric line of work: a reversible-arithmetic layer on
+NEQR intensity registers, three end-to-end operator pipelines built on it,
+a QAE oracle composed from them, and the IBM Heron r2 runtime used to put
+the smallest of them on real hardware. This is the library behind the
+`autonomous_qimp_paper` manuscript.
+
+### Added — processing / arithmetic
+- **Inverses and controlled variants** for every adder: `qc_add_1_inv`,
+  `qc_add_1_ctrl`, `qc_add_1_ctrl_inv`, `q_add_inv`, `q_add_ctrl`,
+  `q_add_ctrl_inv`, `q_sub_inv`, `q_sub_ctrl`, `q_sub_ctrl_inv`. Exact
+  inverses are the prerequisite for using any of this as a QAE state-prep.
+- **`q_mul_const` / `q_mul_const_inv`** — Booth-free shift-add multiply by
+  a classical constant.
+- **Dividers.** `q_div_restoring` (square, q ÷ q) and `q_div_general`
+  (non-square, n ÷ m) shift-subtract dividers with divide-by-zero flags,
+  plus `q_div_restoring_inv`. `q_div` aliases the current default.
+- **`q_div_nonrestoring` / `q_div_nonrestoring_inv`** and the
+  `q_add_sub_ctrl` / `q_add_sub_ctrl_inv` they are built on — an
+  algebraically-equivalent divider costing 48-61 % fewer two-qubit gates
+  after transpile. This is the compression that carries the Class-B
+  pipeline across the Heron r2 gate-noise floor.
+
+### Added — processing / ratiometric_circuit (new module)
+- **Class B**, integer ratio: `class_b_ratio` / `class_b_ratio_inv` /
+  `decode_class_b_ratio`, on a `dual_neqr_load` / `dual_neqr_load_inv`
+  pair of co-registered NEQR images. Computes `R = I_a // I_b` per pixel
+  in-circuit with a divide-by-zero flag, and round-trips to |0...0>.
+- **Class A**, Laurdan generalized polarization: `class_a_gp_prefix` /
+  `decode_class_a_prefix` for the numerator/denominator stage, and
+  `class_a_gp_full` / `decode_class_a_full` for the whole signed
+  fractional pipeline (subtract, conditional negate, bit-shift,
+  non-square divide) recovering GP in [-1, +1].
+- **Class C**, roGFP calibrated redox: `class_c_rogfp_full` /
+  `decode_class_c_rogfp`, a fractional ratio plus an in-circuit
+  `affine_subtract_constant`, recovering R_C in [0, 1]. The fractional
+  ratio is what lifts the integer-quotient degeneracy that makes Class B
+  uninformative at roGFP's sub-unit F405/F488 operating point.
+- **QAE oracle**: `mark_good_oracle` / `mark_good_oracle_inv`, a
+  threshold predicate over the quotient register, self-inverse and
+  divzero-corrected, so Class B composes into an amplitude-estimation
+  state-prep.
+
+### Added — runtime
+- **`qimp.runtime.ibm`** — `get_service`, `list_backends`, `pick_backend`
+  (named or least-busy), `hw_run` on SamplerV2 with TREX / dynamical
+  decoupling / ZNE mitigation modes, `aer_noisy_run` via
+  `AerSimulator.from_backend`, and `persist_run` / `is_run_complete` for
+  QPY + JSON run archival.
+- **`qimp.runtime.circuits`** — `CircuitRecipe` and `build_recipes`, one
+  row of the sweep matrix (circuit + decoder + classical reference) per
+  encoder across FRQI, FRQI-multi, NEQR, QPIE, MCRQI, NCQI and GP.
+
+### Fixed
+- `decode_class_a_full` read only the low `q_frac` bits of the quotient.
+  The magnitude reaches `2**q_frac` at the saturating GP = +/-1 endpoints,
+  so exactly those pixels decoded as 0.0. It now reads the full register.
+- `gp_ratio`: closed-form analytical parameters and corrected H placement.
+- `decode_class_b_ratio` redefined its `bit_at` helper inside the counts
+  loop, closing over the loop variable (ruff B023). Hoisted out.
+- `q_add_sub_ctrl`, `q_add_sub_ctrl_inv`, `q_div_nonrestoring` and
+  `q_div_nonrestoring_inv` were public but missing from `__all__`, so
+  they were invisible to `import *` and to the generated API docs — while
+  being named directly in the manuscript's *Code availability*.
+
+### Changed — tooling
+- `ruff` and `mypy` are now pinned in the dev extra and kept in sync with
+  the pre-commit `rev:`s. A floating `ruff>=0.4` against a pinned
+  `v0.4.10` hook meant CI failed on rules the pre-commit hook never ran.
+- mypy's analysis target moved to 3.12 (supported runtime stays >= 3.10):
+  numpy's PEP 695 stubs cannot be parsed below it, which was aborting the
+  type-check before it reached any project code.
+- The IBM hardware smoke test now skips, rather than fails, without the
+  `[ibm]` extra or saved credentials.
+
 ## [0.2.0] — 2026-05-18
 
 Implements every previously-stubbed library module: RGB encodings, NEQR
