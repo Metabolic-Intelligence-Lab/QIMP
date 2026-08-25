@@ -249,8 +249,13 @@ def measure_good_probability(
     threshold: int,
     grover_k: int,
     shots: int,
+    seed: int | None = None,
 ) -> float:
-    """Build A · Q^k, measure good_qubit, return empirical P(good=1)."""
+    """Build A · Q^k, measure good_qubit, return empirical P(good=1).
+
+    ``seed`` seeds the Aer sampler so the shot noise is reproducible; leave
+    it ``None`` for a fresh draw.
+    """
     qc, b_layout, extra_layout = build_A(image_a, image_b, q, threshold)
     for _ in range(grover_k):
         apply_Q_once(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
@@ -260,7 +265,7 @@ def measure_good_probability(
     qc.add_register(creg)
     qc.measure(extra_layout["good_corrected"], creg[0])
 
-    sim = AerSimulator(method="matrix_product_state")
+    sim = AerSimulator(method="matrix_product_state", seed_simulator=seed)
     # Transpile to MPS-supported gate set (mcx etc. need decomposition).
     qc_t = transpile(qc, sim, basis_gates=["id", "u", "cx"], optimization_level=0)
     result = sim.run(qc_t, shots=shots).result()

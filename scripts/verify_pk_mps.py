@@ -44,6 +44,14 @@ DATASETS = {
     "fura2": dict(tau=1, label="synthetic Fura-2 (a=0.5)"),
 }
 
+# Stable per-dataset offset for the simulator seed (see verify_dataset).
+DS_INDEX = {name: i for i, name in enumerate(DATASETS)}
+
+# Default simulator seed. Without it the Aer sampler draws fresh shot noise
+# on every run and the reported p_emp are not reproducible — only the
+# within-3-sigma verdict is.
+DEFAULT_SEED = 20260610
+
 
 def load_images(name: str) -> tuple[np.ndarray, np.ndarray]:
     if name == "synthetic":
@@ -65,7 +73,8 @@ def classical_a_true(image_a: np.ndarray, image_b: np.ndarray, tau: int) -> floa
     return float(good.sum()) / float(image_a.size)
 
 
-def verify_dataset(name: str, ks: list[int], shots: int, q: int = 2) -> dict:
+def verify_dataset(name: str, ks: list[int], shots: int, q: int = 2,
+                   seed_base: int | None = None) -> dict:
     cfg = DATASETS[name]
     tau = cfg["tau"]
     image_a, image_b = load_images(name)
@@ -78,7 +87,10 @@ def verify_dataset(name: str, ks: list[int], shots: int, q: int = 2) -> dict:
     for k in ks:
         p_theory = float(np.sin((2 * k + 1) * theta) ** 2)
         t0 = time.time()
-        p_emp = measure_good_probability(image_a, image_b, q, tau, k, shots)
+        # One distinct-but-reproducible draw per (dataset, k): the dataset
+        # offset keeps the three curves from sharing a shot-noise stream.
+        seed = None if seed_base is None else seed_base + 1000 * DS_INDEX[name] + k
+        p_emp = measure_good_probability(image_a, image_b, q, tau, k, shots, seed=seed)
         dt = time.time() - t0
         # 1-sigma binomial CI half-width on the empirical estimate
         sigma = float(np.sqrt(max(p_emp * (1 - p_emp), 1e-12) / shots))
@@ -93,8 +105,8 @@ def verify_dataset(name: str, ks: list[int], shots: int, q: int = 2) -> dict:
     all_ok = all(r["within_3sigma"] for r in rows)
     print(f"  --> {'ALL p_k consistent with analytic model' if all_ok else 'SOME MISMATCH'}")
     return dict(dataset=name, label=cfg["label"], tau=tau, q=q,
-                a_true=a_true, theta=theta, shots=shots, rows=rows,
-                all_within_3sigma=all_ok)
+                a_true=a_true, theta=theta, shots=shots, seed_base=seed_base,
+                rows=rows, all_within_3sigma=all_ok)
 
 
 def make_figure(out: dict, dest: Path) -> None:
@@ -161,6 +173,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--ks", type=str, default=None,
                     help="explicit comma-separated Grover powers, e.g. 0,1,2,4,8,16,32")
     ap.add_argument("--shots", type=int, default=1024)
+    ap.add_argument("--seed", type=int, default=DEFAULT_SEED,
+                    help="simulator seed base; pass -1 for an unseeded draw")
     ap.add_argument("--figure", action="store_true",
                     help="also write figures_autonomous/fig_pk_verification.png")
     args = ap.parse_args(argv)
@@ -171,9 +185,11 @@ def main(argv: list[str] | None = None) -> int:
         ks = list(range(args.max_k + 1))
 
     names = list(DATASETS) if args.all else [args.dataset]
-    out = dict(shots=args.shots, ks=ks, datasets={})
+    seed_base = None if args.seed < 0 else args.seed
+    out = dict(shots=args.shots, ks=ks, seed_base=seed_base, datasets={})
     for name in names:
-        out["datasets"][name] = verify_dataset(name, ks, args.shots)
+        out["datasets"][name] = verify_dataset(name, ks, args.shots,
+                                               seed_base=seed_base)
 
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     dest = DATA_DIR / "pk_verification.json"
