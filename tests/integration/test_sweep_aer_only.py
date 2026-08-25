@@ -66,21 +66,17 @@ def test_sweep_aer_only_produces_summary_and_figures(
     )
 
     encoders = {r["encoder"] for r in aer_ideal}
-    assert encoders == {
-        "frqi", "frqi_multi", "neqr", "qpie", "mcrqi", "ncqi", "gp"
-    }, f"unexpected encoder set: {encoders}"
+    assert encoders == {"frqi", "frqi_multi", "neqr", "qpie", "mcrqi", "ncqi", "gp"}, (
+        f"unexpected encoder set: {encoders}"
+    )
 
     figs = list((timestamp_dir / "figures").glob("*.png"))
     assert len(figs) == 7, f"expected 7 figures, got {len(figs)}"
     for f in figs:
-        assert f.stat().st_size > 1024, (
-            f"{f.name} is suspiciously small ({f.stat().st_size} bytes)"
-        )
+        assert f.stat().st_size > 1024, f"{f.name} is suspiciously small ({f.stat().st_size} bytes)"
 
 
-def test_sweep_aer_only_invalid_image_exits_nonzero(
-    tmp_path: Path, repo_root: Path
-) -> None:
+def test_sweep_aer_only_invalid_image_exits_nonzero(tmp_path: Path, repo_root: Path) -> None:
     """Passing a non-existent --image should produce a clean error and a
     non-zero exit code, not a Python traceback."""
     script = repo_root / "scripts" / "run_hardware_sweep.py"

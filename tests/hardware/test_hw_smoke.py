@@ -1,7 +1,11 @@
 """End-to-end smoke test against a real IBM Quantum backend.
 
 Excluded from CI by the `hardware` marker (see pyproject.toml's pytest
-addopts which selects `not slow and not hardware`).
+addopts which selects `not slow and not hardware`, and the explicit
+`and not hardware` in the CI test-slow job, whose `-m` overrides addopts).
+It also skips itself if the `[ibm]` extra or the saved credentials are
+missing, so it degrades to a skip rather than a failure wherever it is
+selected without a device to talk to.
 
 Run manually with:
 
@@ -15,14 +19,25 @@ quality — the PSNR floor is set deliberately low.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import numpy as np
 import pytest
+
+CREDENTIALS = Path.home() / ".qiskit" / "qiskit-ibm.json"
 
 
 @pytest.mark.hardware
 def test_gp_n1_runs_on_real_backend() -> None:
     """Submit the smallest GP recipe (n=1, 4 qubits) to a real backend
     via Sampler v2 + TREX + DD, decode, and assert a generous PSNR floor."""
+    pytest.importorskip(
+        "qiskit_ibm_runtime",
+        reason="needs the [ibm] extra: pip install -e '.[dev,ibm]'",
+    )
+    if not CREDENTIALS.exists():
+        pytest.skip(f"no saved IBM Quantum credentials at {CREDENTIALS}")
+
     from qimp.metrics import psnr
     from qimp.runtime import ibm
     from qimp.runtime.circuits import build_recipes

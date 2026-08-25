@@ -65,8 +65,7 @@ def get_service(instance: str | None = None) -> Any:
     qrs_cls = _resolve_runtime_service_cls()
     if qrs_cls is None:
         raise ImportError(
-            "qimp.runtime.ibm requires `pip install qimp-mi[ibm]` "
-            "(qiskit-ibm-runtime)"
+            "qimp.runtime.ibm requires `pip install qimp-mi[ibm]` (qiskit-ibm-runtime)"
         )
 
     try:
@@ -120,14 +119,11 @@ def pick_backend(
     if name is not None:
         backend = service.backend(name)
     else:
-        backend = service.least_busy(
-            operational=True, simulator=False, min_num_qubits=min_qubits
-        )
+        backend = service.least_busy(operational=True, simulator=False, min_num_qubits=min_qubits)
 
     if backend.num_qubits < min_qubits:
         raise ValueError(
-            f"Backend {backend.name} has {backend.num_qubits} qubits, "
-            f"needs >= {min_qubits}"
+            f"Backend {backend.name} has {backend.num_qubits} qubits, needs >= {min_qubits}"
         )
     logger.info("Picked backend %s (%d qubits)", backend.name, backend.num_qubits)
     return backend
@@ -309,9 +305,7 @@ def hw_run(
     # recommended path for newer Qiskit / qiskit-ibm-runtime and avoids
     # issues with backend-supplied plugin name discovery during transpilation.
     _target = backend.target if isinstance(backend.target, Target) else None
-    transpiled = transpile(
-        measured, target=_target, optimization_level=optimization_level
-    )
+    transpiled = transpile(measured, target=_target, optimization_level=optimization_level)
     summary = _transpile_summary(transpiled)
 
     Options = _sampler_options_cls()

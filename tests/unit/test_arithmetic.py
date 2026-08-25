@@ -250,15 +250,15 @@ def _int_to_bits(value: int, width: int) -> list[int]:
 @pytest.mark.parametrize(
     "q, b_val, k_val, m",
     [
-        (3, 5, 0, 3),    # k=0: accum unchanged
-        (3, 5, 1, 3),    # k=1: trivial
-        (3, 5, 2, 3),    # k=2: single shift
-        (3, 5, 3, 3),    # k=3: two shifts (1+2)
-        (3, 5, 7, 3),    # k=7: three shifts
-        (3, 0, 5, 3),    # b=0: accum unchanged
-        (3, 7, 5, 3),    # 7 * 5 = 35
-        (4, 9, 6, 4),    # 9 * 6 = 54, fits in 4+4=8 bits
-        (4, 3, 3, 4),    # popcount(3) = 2; 25-qubit statevector
+        (3, 5, 0, 3),  # k=0: accum unchanged
+        (3, 5, 1, 3),  # k=1: trivial
+        (3, 5, 2, 3),  # k=2: single shift
+        (3, 5, 3, 3),  # k=3: two shifts (1+2)
+        (3, 5, 7, 3),  # k=7: three shifts
+        (3, 0, 5, 3),  # b=0: accum unchanged
+        (3, 7, 5, 3),  # 7 * 5 = 35
+        (4, 9, 6, 4),  # 9 * 6 = 54, fits in 4+4=8 bits
+        (4, 3, 3, 4),  # popcount(3) = 2; 25-qubit statevector
     ],
 )
 def test_q_mul_const_against_python(q: int, b_val: int, k_val: int, m: int) -> None:
@@ -280,9 +280,7 @@ def test_q_mul_const_against_python(q: int, b_val: int, k_val: int, m: int) -> N
     sv = Statevector.from_instruction(qc)
     got = _read_register(sv, accum_idx)
     expected = (b_val * k_val) & ((1 << (q + m)) - 1)
-    assert got == expected, (
-        f"q={q} b={b_val} k={k_val}: got {got}, expected {expected}"
-    )
+    assert got == expected, f"q={q} b={b_val} k={k_val}: got {got}, expected {expected}"
     # b is preserved; guard restored to 0.
     assert _read_register(sv, b_idx) == b_val
     assert _read_register(sv, [guard_idx]) == 0
@@ -349,10 +347,7 @@ def test_q_sub_ctrl_truth_table(n: int, a_val: int, b_val: int, ctrl_val: int) -
         qc.x(ctrl_idx)
     q_sub_ctrl(qc, ctrl_idx, a_idx, b_idx, c_idx)
     sv = Statevector.from_instruction(qc)
-    if ctrl_val:
-        expected = (b_val - a_val) & ((1 << n) - 1)
-    else:
-        expected = b_val
+    expected = b_val - a_val & (1 << n) - 1 if ctrl_val else b_val
     assert _read_register(sv, b_idx) == expected
     # a is restored regardless of ctrl
     assert _read_register(sv, a_idx) == a_val
@@ -380,8 +375,9 @@ def _make_div_circuit(q: int, dividend_val: int, divisor_val: int):
     _set_register_to_int(qc, div_idx, dividend_val)
     _set_register_to_int(qc, ds_idx, divisor_val)
     q_div_restoring(qc, div_idx, ds_idx, quo_idx, work_idx, pad_idx, c_idx, flag_idx)
-    return qc, dict(div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx,
-                    pad=pad_idx, c=c_idx, flag=flag_idx)
+    return qc, dict(
+        div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx, pad=pad_idx, c=c_idx, flag=flag_idx
+    )
 
 
 @pytest.mark.parametrize(
@@ -429,9 +425,7 @@ def test_q_div_restoring_zero_divisor_flag_q2(dividend: int) -> None:
         (4, 9, 6, 1),
     ],
 )
-def test_q_add_ctrl_inv_round_trip(
-    n: int, a_val: int, b_val: int, ctrl_val: int
-) -> None:
+def test_q_add_ctrl_inv_round_trip(n: int, a_val: int, b_val: int, ctrl_val: int) -> None:
     """q_add_ctrl followed by q_add_ctrl_inv restores b, a, ctrl, and the
     carry register regardless of ctrl_val."""
     a = QuantumRegister(n, "a")
@@ -466,9 +460,7 @@ def test_q_add_ctrl_inv_round_trip(
         (3, 1, 5, 1),
     ],
 )
-def test_q_sub_ctrl_inv_round_trip(
-    n: int, a_val: int, b_val: int, ctrl_val: int
-) -> None:
+def test_q_sub_ctrl_inv_round_trip(n: int, a_val: int, b_val: int, ctrl_val: int) -> None:
     """q_sub_ctrl followed by q_sub_ctrl_inv restores everything."""
     a = QuantumRegister(n, "a")
     b = QuantumRegister(n, "b")
@@ -514,8 +506,9 @@ def _make_div_general_circuit(n: int, m: int, dividend_val: int, divisor_val: in
     _set_register_to_int(qc, div_idx, dividend_val)
     _set_register_to_int(qc, ds_idx, divisor_val)
     q_div_general(qc, div_idx, ds_idx, quo_idx, work_idx, pad_idx, c_idx, flag_idx)
-    return qc, dict(div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx,
-                    pad=pad_idx, c=c_idx, flag=flag_idx)
+    return qc, dict(
+        div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx, pad=pad_idx, c=c_idx, flag=flag_idx
+    )
 
 
 @pytest.mark.parametrize(
@@ -523,16 +516,19 @@ def _make_div_general_circuit(n: int, m: int, dividend_val: int, divisor_val: in
     [
         # Square case n=m=2 (statevector-tractable at 22 qubits):
         # should match q_div_restoring exactly.
-        (2, 2, 3, 1), (2, 2, 3, 2), (2, 2, 2, 3),
+        (2, 2, 3, 1),
+        (2, 2, 3, 2),
+        (2, 2, 2, 3),
         # Smallest non-square (n=3, m=1): 17 qubits, only divisor=1
         # is non-trivial (m=1 means divisor ∈ {0, 1}, the 0 case is
         # the div-by-zero flag path).
-        (3, 1, 0, 1), (3, 1, 1, 1), (3, 1, 5, 1), (3, 1, 7, 1),
+        (3, 1, 0, 1),
+        (3, 1, 1, 1),
+        (3, 1, 5, 1),
+        (3, 1, 7, 1),
     ],
 )
-def test_q_div_general_correctness(
-    n: int, m: int, dividend: int, divisor: int
-) -> None:
+def test_q_div_general_correctness(n: int, m: int, dividend: int, divisor: int) -> None:
     """Verify q_div_general at (n, m, quotient=n): dividend // divisor in
     the quotient register, dividend mod divisor in the dividend register.
 
@@ -564,9 +560,7 @@ def test_q_div_general_correctness(
     "dividend, divisor",
     [(a, b) for a in range(4) for b in range(0, 4)],  # q=2, include b=0
 )
-def test_q_div_restoring_inv_round_trip(
-    dividend: int, divisor: int
-) -> None:
+def test_q_div_restoring_inv_round_trip(dividend: int, divisor: int) -> None:
     """q_div_restoring followed by q_div_restoring_inv restores every
     register to its pre-call state (including the div_zero_flag for the
     divisor=0 case)."""
@@ -585,8 +579,7 @@ def test_q_div_restoring_inv_round_trip(
     sv = Statevector.from_instruction(qc)
     # Dividend restored
     assert _read_register(sv, idx["div"]) == dividend, (
-        f"dividend not restored: got {_read_register(sv, idx['div'])} "
-        f"expected {dividend}"
+        f"dividend not restored: got {_read_register(sv, idx['div'])} expected {dividend}"
     )
     # Divisor preserved
     assert _read_register(sv, idx["ds"]) == divisor
@@ -629,8 +622,9 @@ def _make_nonrestoring_div_circuit(q: int, dividend_val: int, divisor_val: int):
     _set_register_to_int(qc, div_idx, dividend_val)
     _set_register_to_int(qc, ds_idx, divisor_val)
     q_div_nonrestoring(qc, div_idx, ds_idx, quo_idx, work_idx, pad_idx, c_idx, flag_idx)
-    return qc, dict(div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx,
-                    pad=pad_idx, c=c_idx, flag=flag_idx)
+    return qc, dict(
+        div=div_idx, ds=ds_idx, quo=quo_idx, work=work_idx, pad=pad_idx, c=c_idx, flag=flag_idx
+    )
 
 
 @pytest.mark.parametrize(
@@ -710,9 +704,7 @@ def test_q_div_nonrestoring_inv_round_trip(dividend: int, divisor: int) -> None:
         (4, 9, 6, 1),  # ctrl=1 → sub: b = 6 - 9 = -3 mod 32 = 29
     ],
 )
-def test_q_add_sub_ctrl_truth_table(
-    n: int, a_val: int, b_val: int, ctrl_val: int
-) -> None:
+def test_q_add_sub_ctrl_truth_table(n: int, a_val: int, b_val: int, ctrl_val: int) -> None:
     """q_add_sub_ctrl: ctrl=0 → b ← b + a; ctrl=1 → b ← b − a (mod 2^(n+1)).
     `a` is restored regardless of ctrl."""
     a = QuantumRegister(n, "a")
@@ -730,10 +722,7 @@ def test_q_add_sub_ctrl_truth_table(
         qc.x(ctrl_idx)
     q_add_sub_ctrl(qc, ctrl_idx, a_idx, b_idx, c_idx)
     sv = Statevector.from_instruction(qc)
-    if ctrl_val:
-        expected = (b_val - a_val) & ((1 << (n + 1)) - 1)
-    else:
-        expected = (b_val + a_val) & ((1 << (n + 1)) - 1)
+    expected = b_val - a_val & (1 << n + 1) - 1 if ctrl_val else b_val + a_val & (1 << n + 1) - 1
     # The b register only holds the low n bits of the (n+1)-bit result;
     # the carry-out goes to c[-1].
     assert _read_register(sv, b_idx) == (expected & ((1 << n) - 1))
@@ -744,9 +733,7 @@ def test_q_add_sub_ctrl_truth_table(
     "n, a_val, b_val, ctrl_val",
     [(3, 5, 3, 0), (3, 5, 3, 1), (4, 9, 6, 1), (4, 0, 7, 0)],
 )
-def test_q_add_sub_ctrl_inv_round_trip(
-    n: int, a_val: int, b_val: int, ctrl_val: int
-) -> None:
+def test_q_add_sub_ctrl_inv_round_trip(n: int, a_val: int, b_val: int, ctrl_val: int) -> None:
     """q_add_sub_ctrl followed by q_add_sub_ctrl_inv restores b and c."""
     a = QuantumRegister(n, "a")
     b = QuantumRegister(n, "b")

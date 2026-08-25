@@ -15,10 +15,9 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
-
-from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 
 from qimp.processing.ratiometric_circuit import (
     affine_subtract_constant,
@@ -64,7 +63,7 @@ def _statevector_to_counts(sv: Statevector) -> dict[str, int]:
     # n=1 (4-pixel) case with shot=256 per pixel — exact division.
     multiplier = 1024
     for state, p in probs.items():
-        c = int(round(p * multiplier))
+        c = round(p * multiplier)
         if c > 0:
             counts[state] = c
     return counts
@@ -80,9 +79,7 @@ def _statevector_to_counts(sv: Statevector) -> dict[str, int]:
         (np.array([[0, 0], [0, 0]]), np.array([[1, 2], [3, 1]])),  # all zero / all div
     ],
 )
-def test_class_b_ratio_2x2_no_divzero(
-    image_a: np.ndarray, image_b: np.ndarray
-) -> None:
+def test_class_b_ratio_2x2_no_divzero(image_a: np.ndarray, image_b: np.ndarray) -> None:
     """At n=1, q=2 verify integer ratio matches the classical computation
     pixel-by-pixel."""
     q = 2
@@ -135,9 +132,7 @@ def test_class_b_ratio_2x2_with_divzero() -> None:
         (np.array([[2, 2], [2, 2]]), np.array([[2, 2], [2, 2]])),  # equal: num=0 everywhere
     ],
 )
-def test_class_a_prefix_2x2(
-    image_a: np.ndarray, image_b: np.ndarray
-) -> None:
+def test_class_a_prefix_2x2(image_a: np.ndarray, image_b: np.ndarray) -> None:
     """Verify that the Class-A prefix correctly computes
     num = I_a - I_b (signed) and den = I_a + I_b (unsigned) per pixel."""
     q = 2
@@ -194,9 +189,7 @@ def _state_is_all_zero(sv: Statevector, n_qubits: int) -> bool:
         (np.array([[0, 0], [3, 3]]), np.array([[1, 2], [0, 3]])),
     ],
 )
-def test_dual_neqr_load_inv_round_trip(
-    image_a: np.ndarray, image_b: np.ndarray
-) -> None:
+def test_dual_neqr_load_inv_round_trip(image_a: np.ndarray, image_b: np.ndarray) -> None:
     """dual_neqr_load followed by dual_neqr_load_inv returns the
     position + intensity registers to |0…0⟩."""
     q = 2
@@ -209,13 +202,19 @@ def test_dual_neqr_load_inv_round_trip(
     Ia_idx = list(range(2 * n, 2 * n + q))
     Ib_idx = list(range(2 * n + q, 2 * n + 2 * q))
     dual_neqr_load(
-        qc, image_a, image_b, q,
+        qc,
+        image_a,
+        image_b,
+        q,
         position_qubits=pos_idx,
         intensity_a_qubits=Ia_idx,
         intensity_b_qubits=Ib_idx,
     )
     dual_neqr_load_inv(
-        qc, image_a, image_b, q,
+        qc,
+        image_a,
+        image_b,
+        q,
         position_qubits=pos_idx,
         intensity_a_qubits=Ia_idx,
         intensity_b_qubits=Ib_idx,
@@ -291,9 +290,7 @@ def test_mark_good_oracle_truth_table(
     "q, value, threshold",
     [(2, 1, 1), (2, 2, 1), (3, 5, 4)],
 )
-def test_mark_good_oracle_self_inverse(
-    q: int, value: int, threshold: int
-) -> None:
+def test_mark_good_oracle_self_inverse(q: int, value: int, threshold: int) -> None:
     """Calling mark_good_oracle twice cancels: good_qubit returns to |0⟩,
     everything else stays preserved."""
     q_w = q + 1
@@ -349,26 +346,53 @@ def test_class_a_gp_full_builds() -> None:
     qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
     # Sanity check: layout has every expected key.
     expected_keys = {
-        "position", "I_a", "I_b", "num", "den", "add_c", "sub_c",
-        "sign", "ones_reg", "inc_carry", "num_scaled", "quotient",
-        "div_work", "div_pad", "div_c", "div_flag",
+        "position",
+        "I_a",
+        "I_b",
+        "num",
+        "den",
+        "add_c",
+        "sub_c",
+        "sign",
+        "ones_reg",
+        "inc_carry",
+        "num_scaled",
+        "quotient",
+        "div_work",
+        "div_pad",
+        "div_c",
+        "div_flag",
     }
     assert set(layout.keys()) == expected_keys
     # Widths
     q_w = q + 1
     q_dividend = q_w + q_frac
     assert len(layout["position"]) == 2  # type: ignore[arg-type]
-    assert len(layout["I_a"]) == q       # type: ignore[arg-type]
-    assert len(layout["I_b"]) == q       # type: ignore[arg-type]
-    assert len(layout["num"]) == q_w     # type: ignore[arg-type]
-    assert len(layout["den"]) == q_w     # type: ignore[arg-type]
-    assert len(layout["num_scaled"]) == q_dividend   # type: ignore[arg-type]
-    assert len(layout["quotient"]) == q_dividend     # type: ignore[arg-type]
-    assert len(layout["div_work"]) == q_w            # type: ignore[arg-type]
+    assert len(layout["I_a"]) == q  # type: ignore[arg-type]
+    assert len(layout["I_b"]) == q  # type: ignore[arg-type]
+    assert len(layout["num"]) == q_w  # type: ignore[arg-type]
+    assert len(layout["den"]) == q_w  # type: ignore[arg-type]
+    assert len(layout["num_scaled"]) == q_dividend  # type: ignore[arg-type]
+    assert len(layout["quotient"]) == q_dividend  # type: ignore[arg-type]
+    assert len(layout["div_work"]) == q_w  # type: ignore[arg-type]
     # Total qubit count check.
     expected_total = (
-        2 + q + q + q_w + q_w + q_w + q_w + 1 + q_w + (q_w + 1)
-        + q_dividend + q_dividend + q_w + 1 + (q_dividend + 1) * (q_w + 2) + 1
+        2
+        + q
+        + q
+        + q_w
+        + q_w
+        + q_w
+        + q_w
+        + 1
+        + q_w
+        + (q_w + 1)
+        + q_dividend
+        + q_dividend
+        + q_w
+        + 1
+        + (q_dividend + 1) * (q_w + 2)
+        + 1
     )
     assert qc.num_qubits == expected_total
     # Sanity: circuit has at least the per-pixel encoding gates plus
@@ -382,18 +406,14 @@ def test_class_a_gp_full_builds() -> None:
         (np.array([[3, 2], [3, 1]]), np.array([[1, 1], [3, 1]])),
     ],
 )
-def test_class_b_ratio_round_trip(
-    image_a: np.ndarray, image_b: np.ndarray
-) -> None:
+def test_class_b_ratio_round_trip(image_a: np.ndarray, image_b: np.ndarray) -> None:
     """class_b_ratio followed by class_b_ratio_inv returns the entire
     circuit to |0…0⟩ — the prerequisite for QAE oracle composability."""
     q = 2
     qc, layout = class_b_ratio(image_a, image_b, q=q)
     class_b_ratio_inv(qc, image_a, image_b, q=q, layout=layout)
     sv = Statevector.from_instruction(qc)
-    assert _state_is_all_zero(sv, qc.num_qubits), (
-        "class_b_ratio round-trip did not return to |0…0⟩"
-    )
+    assert _state_is_all_zero(sv, qc.num_qubits), "class_b_ratio round-trip did not return to |0…0⟩"
 
 
 @pytest.mark.parametrize(
@@ -407,9 +427,7 @@ def test_class_b_ratio_round_trip(
     # statevector runs without adding coverage.
     + [(3, r, c) for r in (0, 1, 7) for c in (0, 1, 7, 8, 15)],
 )
-def test_affine_subtract_constant_truth_table(
-    q: int, R_val: int, c_value: int
-) -> None:
+def test_affine_subtract_constant_truth_table(q: int, R_val: int, c_value: int) -> None:
     """At small q, verify the affine constant-subtract is bit-exact: the
     output register encodes (R - c_value) mod 2^(q+1) in two's complement
     and the constant register is restored to |0⟩.
@@ -438,8 +456,7 @@ def test_affine_subtract_constant_truth_table(
     got_unsigned = _read_register(sv, out_idx)
     expected_unsigned = (R_val - c_value) & ((1 << q_w) - 1)
     assert got_unsigned == expected_unsigned, (
-        f"q={q} R={R_val} c={c_value}: got {got_unsigned}, "
-        f"expected {expected_unsigned}"
+        f"q={q} R={R_val} c={c_value}: got {got_unsigned}, expected {expected_unsigned}"
     )
     # Constant register restored to |0⟩
     assert _read_register(sv, c_const_idx) == 0
@@ -495,9 +512,7 @@ def test_class_a_gp_full_end_to_end_mps() -> None:
     qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
     assert qc.num_qubits == 71
     counts = _run_mps(qc)
-    gp, divzero = decode_class_a_full(
-        counts, n, q, q_frac, layout, qc.num_qubits
-    )
+    gp, divzero = decode_class_a_full(counts, n, q, q_frac, layout, qc.num_qubits)
     # den = I_a + I_b > 0 at every pixel here, so no div-zero.
     assert not divzero.any(), f"unexpected div-zero flag: {divzero}"
     np.testing.assert_array_equal(gp, expected_gp)
@@ -511,9 +526,7 @@ def test_class_a_gp_full_divzero_flag_mps() -> None:
 
     qc, layout = class_a_gp_full(image_a, image_b, q=q, q_frac=q_frac)
     counts = _run_mps(qc)
-    gp, divzero = decode_class_a_full(
-        counts, n, q, q_frac, layout, qc.num_qubits
-    )
+    gp, divzero = decode_class_a_full(counts, n, q, q_frac, layout, qc.num_qubits)
     assert divzero[0, 1], "div-zero flag not set on the I_a + I_b == 0 pixel"
     # The other three decode exactly; GP is undefined on the flagged pixel.
     expected_valid = {(0, 0): 0.5, (1, 0): -0.5, (1, 1): 0.0}
@@ -541,14 +554,10 @@ def test_class_c_rogfp_full_end_to_end_mps() -> None:
     # R_C = rc_signed / ((R_ox - R_red) * 2^q_frac) = rc_signed / 9
     expected_rc = np.array([[3.0, 5.0], [-3.0, 1.0]]) / 9.0
 
-    qc, layout = class_c_rogfp_full(
-        image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp
-    )
+    qc, layout = class_c_rogfp_full(image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp)
     assert qc.num_qubits == 54
     counts = _run_mps(qc)
-    rc, divzero = decode_class_c_rogfp(
-        counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits
-    )
+    rc, divzero = decode_class_c_rogfp(counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits)
     assert not divzero.any(), f"unexpected div-zero flag: {divzero}"
     np.testing.assert_allclose(rc, expected_rc)
 
@@ -561,20 +570,12 @@ def test_class_c_rogfp_full_divzero_flag_mps() -> None:
     image_a = np.array([[3, 2], [1, 3]], dtype=np.int64)
     image_b = np.array([[2, 0], [1, 3]], dtype=np.int64)  # divzero at (0, 1)
 
-    qc, layout = class_c_rogfp_full(
-        image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp
-    )
+    qc, layout = class_c_rogfp_full(image_a, image_b, q=q, q_frac=q_frac, R_red_fp=R_red_fp)
     counts = _run_mps(qc)
-    rc, divzero = decode_class_c_rogfp(
-        counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits
-    )
+    rc, divzero = decode_class_c_rogfp(counts, n, q, q_frac, R_red, R_ox, layout, qc.num_qubits)
     assert divzero[0, 1], "div-zero flag not set on the I_b == 0 pixel"
     denom = (R_ox - R_red) * (1 << q_frac)
     for r, c in [(0, 0), (1, 0), (1, 1)]:
         assert not divzero[r, c], f"unexpected div-zero at ({r}, {c})"
-        want = (
-            (int(image_a[r, c]) << q_frac) // int(image_b[r, c]) - R_red_fp
-        ) / denom
-        assert rc[r, c] == pytest.approx(want), (
-            f"R_C at ({r}, {c}): got {rc[r, c]}, want {want}"
-        )
+        want = ((int(image_a[r, c]) << q_frac) // int(image_b[r, c]) - R_red_fp) / denom
+        assert rc[r, c] == pytest.approx(want), f"R_C at ({r}, {c}): got {rc[r, c]}, want {want}"

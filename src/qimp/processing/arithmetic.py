@@ -351,17 +351,14 @@ def q_mul_const(
     q = len(b_qubits)
     m = len(k_bits)
     if len(accum_qubits) < q + m:
-        raise ValueError(
-            f"accum_qubits must have ≥ q + m = {q + m} bits, got {len(accum_qubits)}"
-        )
+        raise ValueError(f"accum_qubits must have ≥ q + m = {q + m} bits, got {len(accum_qubits)}")
     popcount = sum(1 for bit in k_bits if bit)
     needed_c = popcount * (q + 2)
     if len(c_qubits) < needed_c:
         raise ValueError(
-            f"c_qubits must have ≥ popcount(k) * (q + 2) = {needed_c} bits, "
-            f"got {len(c_qubits)}"
+            f"c_qubits must have ≥ popcount(k) * (q + 2) = {needed_c} bits, got {len(c_qubits)}"
         )
-    b_extended = list(b_qubits) + [guard_qubit]
+    b_extended = [*list(b_qubits), guard_qubit]
     c_off = 0
     for i, bit in enumerate(k_bits):
         if not bit:
@@ -385,7 +382,7 @@ def q_mul_const_inv(
     """Exact inverse of :func:`q_mul_const`."""
     q = len(b_qubits)
     popcount = sum(1 for bit in k_bits if bit)
-    b_extended = list(b_qubits) + [guard_qubit]
+    b_extended = [*list(b_qubits), guard_qubit]
     c_off = popcount * (q + 2)
     for i in range(len(k_bits) - 1, -1, -1):
         if not k_bits[i]:
@@ -567,23 +564,14 @@ def q_div_restoring(
     """
     q = len(dividend_qubits)
     if len(divisor_qubits) != q:
-        raise ValueError(
-            f"divisor must have q={q} bits, got {len(divisor_qubits)}"
-        )
+        raise ValueError(f"divisor must have q={q} bits, got {len(divisor_qubits)}")
     if len(quotient_qubits) != q:
-        raise ValueError(
-            f"quotient must have q={q} bits, got {len(quotient_qubits)}"
-        )
+        raise ValueError(f"quotient must have q={q} bits, got {len(quotient_qubits)}")
     if len(work_qubits) != q:
-        raise ValueError(
-            f"work_qubits must have q={q} bits, got {len(work_qubits)}"
-        )
+        raise ValueError(f"work_qubits must have q={q} bits, got {len(work_qubits)}")
     needed_c = (q + 1) * (q + 2)
     if len(c_qubits) < needed_c:
-        raise ValueError(
-            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
-            f"got {len(c_qubits)}"
-        )
+        raise ValueError(f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, got {len(c_qubits)}")
 
     # Detect div-by-zero: div_zero_flag = AND_i ¬divisor[i].
     for d in divisor_qubits:
@@ -595,7 +583,7 @@ def q_div_restoring(
     # R = dividend (low) || work (high), 2q bits.
     R = list(dividend_qubits) + list(work_qubits)
     # D = divisor || zero-pad, (q+1) bits with MSB = 0.
-    D = list(divisor_qubits) + [divisor_pad_qubit]
+    D = [*list(divisor_qubits), divisor_pad_qubit]
 
     # Shared clean carry slice for the GTE comparator (reused).
     c_cmp = list(c_qubits[: q + 2])
@@ -683,9 +671,7 @@ def q_div_general(
         raise ValueError(f"work width must equal m={m}, got {len(work_qubits)}")
     needed_c = (n + 1) * (m + 2)
     if len(c_qubits) < needed_c:
-        raise ValueError(
-            f"c_qubits must have ≥ (n+1)(m+2) = {needed_c} bits, got {len(c_qubits)}"
-        )
+        raise ValueError(f"c_qubits must have ≥ (n+1)(m+2) = {needed_c} bits, got {len(c_qubits)}")
 
     # Div-by-zero detect (self-inverse).
     for d in divisor_qubits:
@@ -697,7 +683,7 @@ def q_div_general(
     # R = dividend (low n) || work (high m). Width n + m.
     R = list(dividend_qubits) + list(work_qubits)
     # D = divisor || pad. Width m + 1.
-    D = list(divisor_qubits) + [divisor_pad_qubit]
+    D = [*list(divisor_qubits), divisor_pad_qubit]
 
     c_cmp = list(c_qubits[: m + 2])
     c_act_base = m + 2
@@ -745,26 +731,17 @@ def q_div_restoring_inv(
     """
     q = len(dividend_qubits)
     if len(divisor_qubits) != q:
-        raise ValueError(
-            f"divisor must have q={q} bits, got {len(divisor_qubits)}"
-        )
+        raise ValueError(f"divisor must have q={q} bits, got {len(divisor_qubits)}")
     if len(quotient_qubits) != q:
-        raise ValueError(
-            f"quotient must have q={q} bits, got {len(quotient_qubits)}"
-        )
+        raise ValueError(f"quotient must have q={q} bits, got {len(quotient_qubits)}")
     if len(work_qubits) != q:
-        raise ValueError(
-            f"work_qubits must have q={q} bits, got {len(work_qubits)}"
-        )
+        raise ValueError(f"work_qubits must have q={q} bits, got {len(work_qubits)}")
     needed_c = (q + 1) * (q + 2)
     if len(c_qubits) < needed_c:
-        raise ValueError(
-            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
-            f"got {len(c_qubits)}"
-        )
+        raise ValueError(f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, got {len(c_qubits)}")
 
     R = list(dividend_qubits) + list(work_qubits)
-    D = list(divisor_qubits) + [divisor_pad_qubit]
+    D = [*list(divisor_qubits), divisor_pad_qubit]
     c_cmp = list(c_qubits[: q + 2])
     c_act_base = q + 2
 
@@ -845,23 +822,14 @@ def q_div_nonrestoring(
     """
     q = len(dividend_qubits)
     if len(divisor_qubits) != q:
-        raise ValueError(
-            f"divisor must have q={q} bits, got {len(divisor_qubits)}"
-        )
+        raise ValueError(f"divisor must have q={q} bits, got {len(divisor_qubits)}")
     if len(quotient_qubits) != q:
-        raise ValueError(
-            f"quotient must have q={q} bits, got {len(quotient_qubits)}"
-        )
+        raise ValueError(f"quotient must have q={q} bits, got {len(quotient_qubits)}")
     if len(work_qubits) != q:
-        raise ValueError(
-            f"work_qubits must have q={q} bits, got {len(work_qubits)}"
-        )
+        raise ValueError(f"work_qubits must have q={q} bits, got {len(work_qubits)}")
     needed_c = (q + 1) * (q + 2)
     if len(c_qubits) < needed_c:
-        raise ValueError(
-            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
-            f"got {len(c_qubits)}"
-        )
+        raise ValueError(f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, got {len(c_qubits)}")
 
     # Detect div-by-zero: same as restoring.
     for d in divisor_qubits:
@@ -871,7 +839,7 @@ def q_div_nonrestoring(
         qc.x(d)
 
     R = list(dividend_qubits) + list(work_qubits)
-    D = list(divisor_qubits) + [divisor_pad_qubit]
+    D = [*list(divisor_qubits), divisor_pad_qubit]
 
     def _carry_slot(slot_idx: int) -> list[int]:
         base = slot_idx * (q + 2)
@@ -893,8 +861,7 @@ def q_div_nonrestoring(
     for i in range(q - 2, -1, -1):
         slot = (q - 1) - i
         window_i = R[i : i + q + 1]
-        q_add_sub_ctrl(qc, quotient_qubits[i + 1], D, window_i,
-                       _carry_slot(slot))
+        q_add_sub_ctrl(qc, quotient_qubits[i + 1], D, window_i, _carry_slot(slot))
         _copy_not_sign(window_i, quotient_qubits[i])
 
     # Final correction: if final sign was negative (quotient[0] == 0),
@@ -939,13 +906,10 @@ def q_div_nonrestoring_inv(
     q = len(dividend_qubits)
     needed_c = (q + 1) * (q + 2)
     if len(c_qubits) < needed_c:
-        raise ValueError(
-            f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, "
-            f"got {len(c_qubits)}"
-        )
+        raise ValueError(f"c_qubits must have ≥ (q+1)(q+2) = {needed_c} bits, got {len(c_qubits)}")
 
     R = list(dividend_qubits) + list(work_qubits)
-    D = list(divisor_qubits) + [divisor_pad_qubit]
+    D = [*list(divisor_qubits), divisor_pad_qubit]
 
     def _carry_slot(slot_idx: int) -> list[int]:
         base = slot_idx * (q + 2)
@@ -975,8 +939,7 @@ def q_div_nonrestoring_inv(
         slot = (q - 1) - i
         window_i = R[i : i + q + 1]
         _uncopy_not_sign(window_i, quotient_qubits[i])
-        q_add_sub_ctrl_inv(qc, quotient_qubits[i + 1], D, window_i,
-                           _carry_slot(slot))
+        q_add_sub_ctrl_inv(qc, quotient_qubits[i + 1], D, window_i, _carry_slot(slot))
 
     # Undo first iteration.
     window_first = R[q - 1 : 2 * q]

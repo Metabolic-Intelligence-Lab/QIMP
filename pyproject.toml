@@ -73,8 +73,13 @@ dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
     "pytest-xdist>=3.5",
-    "ruff>=0.4",
-    "mypy>=1.10",
+    # Pinned, not floating: CI installs the dev extra and runs `ruff check`
+    # and `ruff format --check`, so a new ruff release turning on a new rule
+    # (or changing a formatting decision) turns the lint job red on a commit
+    # that changed nothing. Bump these deliberately, together with the
+    # matching `rev:` in .pre-commit-config.yaml.
+    "ruff==0.16.4",
+    "mypy==2.3.1",
     "scipy-stubs",
     "pre-commit>=3.7",
 ]
@@ -151,7 +156,12 @@ ignore = [
 quote-style = "double"
 
 [tool.mypy]
-python_version = "3.10"
+# Analysis target, not the supported runtime floor (that stays 3.10 via
+# `requires-python`). numpy >= 2.2 ships stubs written with PEP 695 `type`
+# aliases, which mypy refuses to parse below 3.12 — with python_version =
+# "3.10" the whole run aborts on numpy/__init__.pyi before checking any of
+# our code. The 3.10 runtime is covered by the CI test matrix instead.
+python_version = "3.12"
 strict = true
 files = ["src/qimp"]
 # `apps/qimp_explorer/pages/*.py` use numeric prefixes (Streamlit's

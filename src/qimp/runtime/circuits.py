@@ -41,7 +41,9 @@ def _downsample_to_n(img: np.ndarray, *, n: int) -> np.ndarray:
         pil = Image.fromarray(img).resize((side, side), Image.Resampling.LANCZOS)
         return np.asarray(pil, dtype=img.dtype)
     if img.ndim == 3 and img.shape[2] in (3, 4):
-        pil = Image.fromarray(img[..., :3], mode="RGB").resize((side, side), Image.Resampling.LANCZOS)
+        pil = Image.fromarray(img[..., :3], mode="RGB").resize(
+            (side, side), Image.Resampling.LANCZOS
+        )
         return np.asarray(pil, dtype=img.dtype)
     raise ValueError(f"unsupported image shape {img.shape}")
 
@@ -128,9 +130,7 @@ def build_recipes(
     neqr_img = (gray.astype(np.float64) / gray_max * max_q_val).round().astype(np.uint8)
     qc_neqr = neqr_circuit(neqr_img, q=q)
 
-    def _decode_neqr(
-        counts: dict[str, int], _n: int = n, _q: int = q
-    ) -> np.ndarray:
+    def _decode_neqr(counts: dict[str, int], _n: int = n, _q: int = q) -> np.ndarray:
         return neqr_decode(counts, n=_n, q=_q)
 
     recipes.append(
@@ -152,9 +152,7 @@ def build_recipes(
     _, _, rms = normalize_amplitudes(gray.astype(np.float64))
     qc_qpie = qpie_circuit(gray.astype(np.float64))
 
-    def _decode_qpie(
-        counts: dict[str, int], _n: int = n, _rms: float = float(rms)
-    ) -> np.ndarray:
+    def _decode_qpie(counts: dict[str, int], _n: int = n, _rms: float = float(rms)) -> np.ndarray:
         return qpie_decode(counts, n=_n, rms=_rms)
 
     recipes.append(
@@ -176,9 +174,7 @@ def build_recipes(
     norm_mc = float(rgb.max()) or 1.0
     qc_mc = mcrqi_circuit(rgb, normalization=norm_mc)
 
-    def _decode_mcrqi(
-        counts: dict[str, int], _n: int = n, _norm: float = norm_mc
-    ) -> np.ndarray:
+    def _decode_mcrqi(counts: dict[str, int], _n: int = n, _norm: float = norm_mc) -> np.ndarray:
         return mcrqi_decode(counts, n=_n, normalization=_norm)
 
     recipes.append(
@@ -201,9 +197,7 @@ def build_recipes(
     ncqi_img = (rgb.astype(np.float64) / rgb_max * max_q_val).round().astype(np.uint8)
     qc_ncqi = ncqi_circuit(ncqi_img, q=q)
 
-    def _decode_ncqi(
-        counts: dict[str, int], _n: int = n, _q: int = q
-    ) -> np.ndarray:
+    def _decode_ncqi(counts: dict[str, int], _n: int = n, _q: int = q) -> np.ndarray:
         return ncqi_decode(counts, n=_n, q=_q)
 
     recipes.append(
@@ -236,9 +230,7 @@ def build_recipes(
     norm_gp = float(rg_stack.max()) or 1.0
 
     qc_gp = frqi_circuit(rg_stack, normalization=norm_gp)
-    gp_params = analytical_gp_params(
-        g_chan, r_chan, alpha=alpha, normalization=norm_gp
-    )
+    gp_params = analytical_gp_params(g_chan, r_chan, alpha=alpha, normalization=norm_gp)
     apply_gp_function(qc_gp, n=n, m=1, params=list(gp_params))
 
     def _decode_gp(counts: dict[str, int], _n: int = n) -> np.ndarray:

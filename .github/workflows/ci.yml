@@ -63,7 +63,9 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e ".[dev]"
-      - run: pytest -v -m "slow or not slow" --cov=qimp --cov-report=term-missing
+      # `-m` replaces the addopts default, so `not hardware` has to be repeated
+      # here or the QPU smoke test gets selected on a runner with no credentials.
+      - run: pytest -v -m "(slow or not slow) and not hardware" --cov=qimp --cov-report=term-missing
 
   examples:
     runs-on: ubuntu-latest

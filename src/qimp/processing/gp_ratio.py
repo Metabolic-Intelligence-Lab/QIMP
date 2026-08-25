@@ -329,9 +329,7 @@ def analytical_gp_params(
     else:
         t = np.asarray(target, dtype=np.float64)
         if t.shape != g.shape:
-            raise ValueError(
-                f"target shape {t.shape} must match channel shape {g.shape}"
-            )
+            raise ValueError(f"target shape {t.shape} must match channel shape {g.shape}")
         t = np.clip(t, -1.0, 1.0)
     base = np.arcsin(-t)
     alpha_per_pixel = (base - phi_G).flatten()

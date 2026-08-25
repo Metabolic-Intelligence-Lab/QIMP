@@ -159,8 +159,13 @@ def test_persist_run_writes_transpiled_when_provided(tmp_path):
     transpiled = _toy_circuit()  # placeholder
 
     run_dir = ibm.persist_run(
-        outdir=tmp_path, label="gp_n1", pass_name="hw",
-        circuit=qc, transpiled=transpiled, counts={}, metadata={"job_id": "x"},
+        outdir=tmp_path,
+        label="gp_n1",
+        pass_name="hw",
+        circuit=qc,
+        transpiled=transpiled,
+        counts={},
+        metadata={"job_id": "x"},
     )
     assert (run_dir / "transpiled.qpy").exists()
 
@@ -170,8 +175,13 @@ def test_is_run_complete_true_when_counts_nonempty(tmp_path):
 
     qc = _toy_circuit()
     ibm.persist_run(
-        outdir=tmp_path, label="frqi_n1", pass_name="aer-ideal",
-        circuit=qc, transpiled=None, counts={"00": 1}, metadata={"status": "completed"},
+        outdir=tmp_path,
+        label="frqi_n1",
+        pass_name="aer-ideal",
+        circuit=qc,
+        transpiled=None,
+        counts={"00": 1},
+        metadata={"status": "completed"},
     )
     assert ibm.is_run_complete(tmp_path, "frqi_n1", "aer-ideal")
 
@@ -187,8 +197,13 @@ def test_is_run_complete_false_when_counts_empty(tmp_path):
 
     qc = _toy_circuit()
     ibm.persist_run(
-        outdir=tmp_path, label="frqi_n1", pass_name="hw",
-        circuit=qc, transpiled=None, counts={}, metadata={"status": "submitted"},
+        outdir=tmp_path,
+        label="frqi_n1",
+        pass_name="hw",
+        circuit=qc,
+        transpiled=None,
+        counts={},
+        metadata={"status": "submitted"},
     )
     assert not ibm.is_run_complete(tmp_path, "frqi_n1", "hw")
 
@@ -247,8 +262,10 @@ def test_hw_run_submits_with_mitigation_and_returns_counts():
     )
     fake_options_cls = MagicMock(return_value=options_obj)
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
-         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls),
+        patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls),
+    ):
         counts, _transpiled, job_id, summary = ibm.hw_run(
             _toy_circuit(),
             backend=fake_backend,
@@ -297,8 +314,10 @@ def test_hw_run_mitigation_none_leaves_options_untouched():
     )
     fake_options_cls = MagicMock(return_value=options_obj)
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
-         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls),
+        patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls),
+    ):
         ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="none")
 
     # Mitigation = "none" must NOT touch the options object:
@@ -334,8 +353,10 @@ def test_hw_run_mitigation_trex_only_enables_twirling_only():
     )
     fake_options_cls = MagicMock(return_value=options_obj)
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
-         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls),
+        patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls),
+    ):
         ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="trex")
 
     assert options_obj.twirling.enable_measure is True
@@ -370,8 +391,10 @@ def test_hw_run_mitigation_dd_only_enables_dd_only():
     )
     fake_options_cls = MagicMock(return_value=options_obj)
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls), \
-         patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls),
+        patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls),
+    ):
         ibm.hw_run(_toy_circuit(), backend=fake_backend, shots=1024, mitigation="dd")
 
     assert options_obj.dynamical_decoupling.enable is True
@@ -390,9 +413,11 @@ def test_hw_run_mitigation_zne_raises_not_implemented():
     fake_backend.name = "ibm_fake"
     fake_backend.num_qubits = 5
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()), \
-         patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()), \
-         pytest.raises(NotImplementedError, match="zne"):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()),
+        patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()),
+        pytest.raises(NotImplementedError, match="zne"),
+    ):
         ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="zne")
 
 
@@ -403,7 +428,9 @@ def test_hw_run_rejects_unknown_mitigation():
     fake_backend.name = "ibm_fake"
     fake_backend.num_qubits = 5
 
-    with patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()), \
-         patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()), \
-         pytest.raises(ValueError, match="unknown mitigation"):
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()),
+        patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()),
+        pytest.raises(ValueError, match="unknown mitigation"),
+    ):
         ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="pec")

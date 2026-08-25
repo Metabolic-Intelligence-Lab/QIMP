@@ -6,7 +6,8 @@ difference, or calibrated ratio) on the quantum device — no
 classically pre-computed target is loaded into the circuit. The
 intended use of these circuits is twofold: (1) as a state-prep oracle
 for downstream QAE / Grover quantum-advantage demonstrations on
-aggregate image statistics (planned, see project plan); (2) as a
+aggregate image statistics (planned, see project plan)
+(2) as a
 reference autonomous primitive that answers the "target loading"
 critique of the parameter-synthesis FRQI route in
 ``qimp.processing.gp_ratio``.
@@ -89,9 +90,7 @@ def _validate_dual_images(image_a: np.ndarray, image_b: np.ndarray, q: int) -> i
     if image_a.min() < 0 or image_b.min() < 0:
         raise ValueError("NEQR requires non-negative intensities")
     if image_a.max() > max_int or image_b.max() > max_int:
-        raise ValueError(
-            f"max intensity exceeds 2^q - 1 = {max_int}; increase q or rescale"
-        )
+        raise ValueError(f"max intensity exceeds 2^q - 1 = {max_int}; increase q or rescale")
     return int(math.log2(side))
 
 
@@ -160,9 +159,7 @@ def dual_neqr_load(
     """
     n = _validate_dual_images(image_a, image_b, q)
     if len(position_qubits) != 2 * n:
-        raise ValueError(
-            f"position_qubits must have 2n={2 * n} bits, got {len(position_qubits)}"
-        )
+        raise ValueError(f"position_qubits must have 2n={2 * n} bits, got {len(position_qubits)}")
     if len(intensity_a_qubits) != q or len(intensity_b_qubits) != q:
         raise ValueError(
             f"intensity registers must have q={q} bits, got "
@@ -181,13 +178,9 @@ def dual_neqr_load(
             if ia == 0 and ib == 0:
                 continue
             if ia != 0:
-                _encode_intensity_at_pixel(
-                    qc, position_qubits, intensity_a_qubits, n, ia, row, col
-                )
+                _encode_intensity_at_pixel(qc, position_qubits, intensity_a_qubits, n, ia, row, col)
             if ib != 0:
-                _encode_intensity_at_pixel(
-                    qc, position_qubits, intensity_b_qubits, n, ib, row, col
-                )
+                _encode_intensity_at_pixel(qc, position_qubits, intensity_b_qubits, n, ib, row, col)
             qc.barrier()
 
 
@@ -218,9 +211,7 @@ def dual_neqr_load_inv(
     """
     n = _validate_dual_images(image_a, image_b, q)
     if len(position_qubits) != 2 * n:
-        raise ValueError(
-            f"position_qubits must have 2n={2 * n} bits, got {len(position_qubits)}"
-        )
+        raise ValueError(f"position_qubits must have 2n={2 * n} bits, got {len(position_qubits)}")
     if len(intensity_a_qubits) != q or len(intensity_b_qubits) != q:
         raise ValueError(
             f"intensity registers must have q={q} bits, got "
@@ -236,19 +227,17 @@ def dual_neqr_load_inv(
             if ia == 0 and ib == 0:
                 continue
             if ia != 0:
-                _encode_intensity_at_pixel(
-                    qc, position_qubits, intensity_a_qubits, n, ia, row, col
-                )
+                _encode_intensity_at_pixel(qc, position_qubits, intensity_a_qubits, n, ia, row, col)
             if ib != 0:
-                _encode_intensity_at_pixel(
-                    qc, position_qubits, intensity_b_qubits, n, ib, row, col
-                )
+                _encode_intensity_at_pixel(qc, position_qubits, intensity_b_qubits, n, ib, row, col)
             qc.barrier()
     qc.h(position_qubits)
 
 
 def class_b_ratio(
-    image_a: np.ndarray, image_b: np.ndarray, q: int,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
     divider: str = "restoring",
 ) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
     """Build an autonomous Class-B integer-quotient ratio circuit.
@@ -271,7 +260,8 @@ def class_b_ratio(
     Returns
     -------
     (qc, layout)
-        ``qc`` is the assembled QuantumCircuit; ``layout`` is a dict
+        ``qc`` is the assembled QuantumCircuit
+        ``layout`` is a dict
         with qubit-index lists for each named register:
         ``position``, ``I_a``, ``I_b``, ``quotient``, ``work``,
         ``pad``, ``c``, ``flag``.
@@ -287,9 +277,7 @@ def class_b_ratio(
         division acts uniformly on the position superposition).
     """
     if divider not in ("restoring", "nonrestoring"):
-        raise ValueError(
-            f"divider must be 'restoring' or 'nonrestoring', got {divider!r}"
-        )
+        raise ValueError(f"divider must be 'restoring' or 'nonrestoring', got {divider!r}")
     n = _validate_dual_images(image_a, image_b, q)
     n_pos = 2 * n
     n_c = (q + 1) * (q + 2)
@@ -297,23 +285,48 @@ def class_b_ratio(
     # Qubit-index layout (allocate in order):
     layout: dict[str, list[int] | int] = {}
     cursor = 0
-    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
-    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
-    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
-    layout["quotient"] = list(range(cursor, cursor + q)); cursor += q
-    layout["work"] = list(range(cursor, cursor + q)); cursor += q
-    layout["pad"] = cursor; cursor += 1
-    layout["c"] = list(range(cursor, cursor + n_c)); cursor += n_c
-    layout["flag"] = cursor; cursor += 1
+    layout["position"] = list(range(cursor, cursor + n_pos))
+    cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["quotient"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["work"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["pad"] = cursor
+    cursor += 1
+    layout["c"] = list(range(cursor, cursor + n_c))
+    cursor += n_c
+    layout["flag"] = cursor
+    cursor += 1
     total = cursor
 
     qc = QuantumCircuit(total)
 
+    # `layout` is dict[str, list[int] | int]; narrow each entry once here so
+    # the primitive calls below take properly-typed arguments.
+    pos = layout["position"]
+    Ia = layout["I_a"]
+    Ib = layout["I_b"]
+    quotient = layout["quotient"]
+    work = layout["work"]
+    pad = layout["pad"]
+    c = layout["c"]
+    flag = layout["flag"]
+    assert isinstance(pos, list) and isinstance(Ia, list) and isinstance(Ib, list)
+    assert isinstance(quotient, list) and isinstance(work, list) and isinstance(c, list)
+    assert isinstance(pad, int) and isinstance(flag, int)
+
     dual_neqr_load(
-        qc, image_a, image_b, q,
-        position_qubits=layout["position"],
-        intensity_a_qubits=layout["I_a"],
-        intensity_b_qubits=layout["I_b"],
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=pos,
+        intensity_a_qubits=Ia,
+        intensity_b_qubits=Ib,
     )
 
     # Class B integer ratio: I_a // I_b. Divider overwrites I_a register
@@ -321,13 +334,13 @@ def class_b_ratio(
     div_fn = q_div_restoring if divider == "restoring" else q_div_nonrestoring
     div_fn(
         qc,
-        dividend_qubits=layout["I_a"],
-        divisor_qubits=layout["I_b"],
-        quotient_qubits=layout["quotient"],
-        work_qubits=layout["work"],
-        divisor_pad_qubit=layout["pad"],
-        c_qubits=layout["c"],
-        div_zero_flag=layout["flag"],
+        dividend_qubits=Ia,
+        divisor_qubits=Ib,
+        quotient_qubits=quotient,
+        work_qubits=work,
+        divisor_pad_qubit=pad,
+        c_qubits=c,
+        div_zero_flag=flag,
     )
     return qc, layout
 
@@ -376,17 +389,19 @@ def decode_class_b_ratio(
     assert isinstance(quo_qubits, list)
     assert isinstance(flag_qubit, int)
 
+    # Qiskit reports MSB → LSB, qubit i is at position total_qubits-1-i.
+    # Defined once with `flat` as a parameter rather than closed over inside
+    # the loop, matching decode_class_a_full / decode_class_c_rogfp.
+    def bit_at(flat: str, qubit_idx: int) -> int:
+        return int(flat[total_qubits - 1 - qubit_idx])
+
     for state, count in counts.items():
         flat = state.replace(" ", "")
-        # Qiskit reports MSB → LSB, qubit i is at position total_qubits-1-i.
-        def bit_at(qubit_idx: int) -> int:
-            return int(flat[total_qubits - 1 - qubit_idx])
-
         # Position layout: low n bits are x (col), high n bits are y (row).
-        col = sum(bit_at(pos_qubits[i]) << i for i in range(n))
-        row = sum(bit_at(pos_qubits[n + i]) << i for i in range(n))
-        quo = sum(bit_at(quo_qubits[i]) << i for i in range(q))
-        flag = bit_at(flag_qubit)
+        col = sum(bit_at(flat, pos_qubits[i]) << i for i in range(n))
+        row = sum(bit_at(flat, pos_qubits[n + i]) << i for i in range(n))
+        quo = sum(bit_at(flat, quo_qubits[i]) << i for i in range(q))
+        flag = bit_at(flat, flag_qubit)
 
         histograms.setdefault((row, col), {})
         histograms[(row, col)][quo] = histograms[(row, col)].get(quo, 0) + count
@@ -395,8 +410,8 @@ def decode_class_b_ratio(
 
     for (row, col), votes in histograms.items():
         quotient_img[row, col] = max(votes, key=votes.__getitem__)
-    for (row, col), votes in flag_counts.items():
-        divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
+    for (row, col), flag_votes in flag_counts.items():
+        divzero_mask[row, col] = max(flag_votes, key=flag_votes.__getitem__) == 1
     return quotient_img, divzero_mask
 
 
@@ -440,27 +455,27 @@ def class_b_ratio_inv(
     """
     # First undo the divider step.
     if divider not in ("restoring", "nonrestoring"):
-        raise ValueError(
-            f"divider must be 'restoring' or 'nonrestoring', got {divider!r}"
-        )
-    inv_fn = (q_div_restoring_inv if divider == "restoring"
-              else q_div_nonrestoring_inv)
+        raise ValueError(f"divider must be 'restoring' or 'nonrestoring', got {divider!r}")
+    inv_fn = q_div_restoring_inv if divider == "restoring" else q_div_nonrestoring_inv
     inv_fn(
         qc,
-        dividend_qubits=layout["I_a"],         # type: ignore[arg-type]
-        divisor_qubits=layout["I_b"],          # type: ignore[arg-type]
-        quotient_qubits=layout["quotient"],    # type: ignore[arg-type]
-        work_qubits=layout["work"],            # type: ignore[arg-type]
-        divisor_pad_qubit=layout["pad"],       # type: ignore[arg-type]
-        c_qubits=layout["c"],                  # type: ignore[arg-type]
-        div_zero_flag=layout["flag"],          # type: ignore[arg-type]
+        dividend_qubits=layout["I_a"],  # type: ignore[arg-type]
+        divisor_qubits=layout["I_b"],  # type: ignore[arg-type]
+        quotient_qubits=layout["quotient"],  # type: ignore[arg-type]
+        work_qubits=layout["work"],  # type: ignore[arg-type]
+        divisor_pad_qubit=layout["pad"],  # type: ignore[arg-type]
+        c_qubits=layout["c"],  # type: ignore[arg-type]
+        div_zero_flag=layout["flag"],  # type: ignore[arg-type]
     )
     # Then undo the dual-NEQR load.
     dual_neqr_load_inv(
-        qc, image_a, image_b, q,
-        position_qubits=layout["position"],            # type: ignore[arg-type]
-        intensity_a_qubits=layout["I_a"],              # type: ignore[arg-type]
-        intensity_b_qubits=layout["I_b"],              # type: ignore[arg-type]
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
+        intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
     )
 
 
@@ -480,7 +495,8 @@ def mark_good_oracle(
     ``threshold + 1`` into a (q+1)-bit constant register, and subtract
     ``threshold_reg ← threshold_reg − value_padded``. The no-borrow bit
     of the result is 1 iff ``threshold + 1 ≥ value``, i.e.
-    ``value ≤ threshold``; CNOT that into ``good_qubit`` and then
+    ``value ≤ threshold``
+    CNOT that into ``good_qubit`` and then
     X-flip it so ``good_qubit ^= (value > threshold)``. Uncompute the
     subtract and the constant materialisation so all ancilla return to
     ``|0⟩``.
@@ -493,7 +509,8 @@ def mark_good_oracle(
         Classical integer in ``[0, 2^q − 1]``. The predicate
         ``value > threshold`` is checked.
     good_qubit
-        Single qubit; XORed with the predicate's truth value.
+        Single qubit
+        XORed with the predicate's truth value.
     threshold_reg_qubits
         ``q + 1``-bit ancilla, ``|0⟩`` on entry and exit. Holds
         ``threshold + 1`` during the test.
@@ -514,13 +531,11 @@ def mark_good_oracle(
     q_w = q + 1
     if len(threshold_reg_qubits) != q_w:
         raise ValueError(
-            f"threshold_reg_qubits must have q+1={q_w} bits, got "
-            f"{len(threshold_reg_qubits)}"
+            f"threshold_reg_qubits must have q+1={q_w} bits, got {len(threshold_reg_qubits)}"
         )
     if len(sub_carry_qubits) != q_w + 1:
         raise ValueError(
-            f"sub_carry_qubits must have q+2={q_w + 1} bits, got "
-            f"{len(sub_carry_qubits)}"
+            f"sub_carry_qubits must have q+2={q_w + 1} bits, got {len(sub_carry_qubits)}"
         )
     target = threshold + 1
     if target < 0 or target >= (1 << q_w):
@@ -535,7 +550,7 @@ def mark_good_oracle(
             qc.x(threshold_reg_qubits[i])
     # Build value_padded by appending the dedicated value_pad_qubit
     # (guaranteed |0⟩) as the MSB of value.
-    value_padded = list(value_qubits) + [value_pad_qubit]
+    value_padded = [*list(value_qubits), value_pad_qubit]
     # Subtract: value_padded ← value_padded − threshold_reg.
     # The no-borrow bit is 1 iff value_padded ≥ threshold_reg, i.e.
     # value ≥ threshold + 1, i.e. value > threshold. That is exactly
@@ -543,6 +558,7 @@ def mark_good_oracle(
     # a = threshold_reg, b = value_padded.
     from qimp.processing.arithmetic import q_sub as _q_sub
     from qimp.processing.arithmetic import q_sub_inv as _q_sub_inv
+
     _q_sub(qc, threshold_reg_qubits, value_padded, sub_carry_qubits)
     qc.cx(sub_carry_qubits[-1], good_qubit)
     # Uncompute the subtract to restore value_padded (and hence
@@ -587,7 +603,8 @@ def mark_good_oracle_inv(
 def _copy_register(qc: QuantumCircuit, src: list[int], dst: list[int]) -> None:
     """In-place classical copy via CNOTs: dst ← dst ⊕ src.
 
-    For basis-state inputs this is a true copy; in superposition it
+    For basis-state inputs this is a true copy
+    in superposition it
     creates entanglement between src and dst with the same per-branch
     value. Used to duplicate an NEQR intensity register so the original
     is preserved while the copy is consumed by arithmetic.
@@ -608,12 +625,14 @@ def class_a_gp_prefix(
     (I_a − G·I_b, two's complement) and denominator (I_a + G·I_b,
     unsigned) registers from two NEQR-encoded intensity images.
 
-    This is the first half of the full GP pipeline; the second half
+    This is the first half of the full GP pipeline
+    the second half
     (conditional |·| then fractional divider) is currently
     statevector-infeasible and pending the non-square ``q_div`` variant
     — see Stage C note at the end of this module. The split exists for
     two reasons: (1) the prefix is bit-exact-testable at small (n, q)
-    while the full pipeline is not; (2) the divider step uses a
+    while the full pipeline is not
+    (2) the divider step uses a
     different carry-ancilla budget that benefits from a separate
     layout pass.
 
@@ -658,30 +677,44 @@ def class_a_gp_prefix(
 
     layout: dict[str, list[int] | int] = {}
     cursor = 0
-    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
-    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
-    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
-    layout["num"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["den"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["add_c"] = list(range(cursor, cursor + q_w)); cursor += q_w  # n+1 carries for the q-wide add (n = q)
-    layout["sub_c"] = list(range(cursor, cursor + q_w)); cursor += q_w  # n+1 carries for the q-wide sub
+    layout["position"] = list(range(cursor, cursor + n_pos))
+    cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["num"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["den"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["add_c"] = list(range(cursor, cursor + q_w))
+    cursor += q_w  # n+1 carries for the q-wide add (n = q)
+    layout["sub_c"] = list(range(cursor, cursor + q_w))
+    cursor += q_w  # n+1 carries for the q-wide sub
     total = cursor
 
     qc = QuantumCircuit(total)
 
-    dual_neqr_load(
-        qc, image_a, image_b, q,
-        position_qubits=layout["position"],
-        intensity_a_qubits=layout["I_a"],
-        intensity_b_qubits=layout["I_b"],
-    )
-
-    Ia = layout["I_a"]; Ib = layout["I_b"]
-    num = layout["num"]; den = layout["den"]
-    add_c = layout["add_c"]; sub_c = layout["sub_c"]
-    assert isinstance(Ia, list) and isinstance(Ib, list)
+    pos = layout["position"]
+    Ia = layout["I_a"]
+    Ib = layout["I_b"]
+    num = layout["num"]
+    den = layout["den"]
+    add_c = layout["add_c"]
+    sub_c = layout["sub_c"]
+    assert isinstance(pos, list) and isinstance(Ia, list) and isinstance(Ib, list)
     assert isinstance(num, list) and isinstance(den, list)
     assert isinstance(add_c, list) and isinstance(sub_c, list)
+
+    dual_neqr_load(
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=pos,
+        intensity_a_qubits=Ia,
+        intensity_b_qubits=Ib,
+    )
 
     # den ← I_a (copy into low q bits; MSB stays 0)
     _copy_register(qc, Ia, den[:q])
@@ -740,19 +773,14 @@ def decode_class_a_prefix(
         row = sum(bit_at(flat, pos[n + i]) << i for i in range(n))
         num_unsigned = sum(bit_at(flat, num_q[i]) << i for i in range(q_w))
         # Convert two's-complement (q+1)-bit to signed int
-        if num_unsigned >> q:
-            num_signed = num_unsigned - (1 << q_w)
-        else:
-            num_signed = num_unsigned
+        num_signed = num_unsigned - (1 << q_w) if num_unsigned >> q else num_unsigned
         den_val = sum(bit_at(flat, den_q[i]) << i for i in range(q_w))
         histograms_num.setdefault((row, col), {})
         histograms_num[(row, col)][num_signed] = (
             histograms_num[(row, col)].get(num_signed, 0) + count
         )
         histograms_den.setdefault((row, col), {})
-        histograms_den[(row, col)][den_val] = (
-            histograms_den[(row, col)].get(den_val, 0) + count
-        )
+        histograms_den[(row, col)][den_val] = histograms_den[(row, col)].get(den_val, 0) + count
     for (row, col), votes in histograms_num.items():
         num_img[row, col] = max(votes, key=votes.__getitem__)
     for (row, col), votes in histograms_den.items():
@@ -793,18 +821,21 @@ def affine_subtract_constant(
     Parameters
     ----------
     R_qubits
-        ``q``-bit unsigned input register; preserved on exit.
+        ``q``-bit unsigned input register
+        preserved on exit.
     c_value
         Classical non-negative integer in ``[0, 2^(q+1) - 1]``.
     output_signed_qubits
-        ``q + 1``-bit register, ``|0⟩`` on entry; holds
+        ``q + 1``-bit register, ``|0⟩`` on entry
+        holds
         ``(R - c_value) mod 2^(q+1)`` on exit (MSB is the sign bit).
     c_const_register_qubits
         ``q + 1``-bit ancilla, ``|0⟩`` on entry and exit. Used to hold
         ``c_value`` temporarily during the subtract.
     sub_carry_qubits
         ``q + 2``-bit carry register for the subtractor, ``|0⟩`` on
-        entry; dirty on exit (carries from the subtract).
+        entry
+        dirty on exit (carries from the subtract).
 
     Notes
     -----
@@ -855,11 +886,13 @@ def affine_subtract_constant(
 
     For an in-circuit /(R_ox - R_red) rescaling, append a ``q_mul_const``
     with ``k_bits`` encoding ``2^k_frac / (R_ox - R_red)`` as a fixed-point
-    integer; the multiply consumes ``R_C_idx`` as its ``b`` argument and
+    integer
+    the multiply consumes ``R_C_idx`` as its ``b`` argument and
     writes the scaled result to a fresh accumulator.
 
     At n=1, q=2 the whole pipeline costs ~35 qubits, past laptop
-    statevector range; component correctness is established by the
+    statevector range
+    component correctness is established by the
     bit-exact unit tests of each primitive (`q_div_restoring`,
     `affine_subtract_constant`).
     """
@@ -867,24 +900,18 @@ def affine_subtract_constant(
     q_w = q + 1
     if len(output_signed_qubits) != q_w:
         raise ValueError(
-            f"output_signed_qubits must have q+1={q_w} bits, got "
-            f"{len(output_signed_qubits)}"
+            f"output_signed_qubits must have q+1={q_w} bits, got {len(output_signed_qubits)}"
         )
     if len(c_const_register_qubits) != q_w:
         raise ValueError(
-            f"c_const_register_qubits must have q+1={q_w} bits, got "
-            f"{len(c_const_register_qubits)}"
+            f"c_const_register_qubits must have q+1={q_w} bits, got {len(c_const_register_qubits)}"
         )
     if len(sub_carry_qubits) != q_w + 1:
         raise ValueError(
-            f"sub_carry_qubits must have q+2={q_w + 1} bits, got "
-            f"{len(sub_carry_qubits)}"
+            f"sub_carry_qubits must have q+2={q_w + 1} bits, got {len(sub_carry_qubits)}"
         )
     if c_value < 0 or c_value >= (1 << q_w):
-        raise ValueError(
-            f"c_value={c_value} out of range [0, 2^(q+1) - 1] = "
-            f"[0, {(1 << q_w) - 1}]"
-        )
+        raise ValueError(f"c_value={c_value} out of range [0, 2^(q+1) - 1] = [0, {(1 << q_w) - 1}]")
 
     # Copy R (q-bit) into the low q bits of output_signed (q+1-bit).
     # MSB stays 0 — this is the zero-extension that turns the unsigned
@@ -900,6 +927,7 @@ def affine_subtract_constant(
 
     # output_signed ← output_signed - c_const_register (q+1-bit width).
     from qimp.processing.arithmetic import q_sub as _q_sub  # local to avoid cycle
+
     _q_sub(qc, c_const_register_qubits, output_signed_qubits, sub_carry_qubits)
 
     # X-unset c_const_register back to |0⟩.
@@ -983,36 +1011,58 @@ def class_a_gp_full(
 
     layout: dict[str, list[int] | int] = {}
     cursor = 0
-    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
-    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
-    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
-    layout["num"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["den"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["add_c"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["sub_c"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["sign"] = cursor; cursor += 1
-    layout["ones_reg"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["inc_carry"] = list(range(cursor, cursor + q_w + 1)); cursor += q_w + 1
-    layout["num_scaled"] = list(range(cursor, cursor + q_dividend)); cursor += q_dividend
-    layout["quotient"] = list(range(cursor, cursor + q_dividend)); cursor += q_dividend
-    layout["div_work"] = list(range(cursor, cursor + q_w)); cursor += q_w
-    layout["div_pad"] = cursor; cursor += 1
-    layout["div_c"] = list(range(cursor, cursor + needed_div_c)); cursor += needed_div_c
-    layout["div_flag"] = cursor; cursor += 1
+    layout["position"] = list(range(cursor, cursor + n_pos))
+    cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["num"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["den"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["add_c"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["sub_c"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["sign"] = cursor
+    cursor += 1
+    layout["ones_reg"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["inc_carry"] = list(range(cursor, cursor + q_w + 1))
+    cursor += q_w + 1
+    layout["num_scaled"] = list(range(cursor, cursor + q_dividend))
+    cursor += q_dividend
+    layout["quotient"] = list(range(cursor, cursor + q_dividend))
+    cursor += q_dividend
+    layout["div_work"] = list(range(cursor, cursor + q_w))
+    cursor += q_w
+    layout["div_pad"] = cursor
+    cursor += 1
+    layout["div_c"] = list(range(cursor, cursor + needed_div_c))
+    cursor += needed_div_c
+    layout["div_flag"] = cursor
+    cursor += 1
 
     total = cursor
     qc = QuantumCircuit(total)
 
     # Helper refs (typed)
-    Ia = layout["I_a"]; Ib = layout["I_b"]
-    num = layout["num"]; den = layout["den"]
-    add_c = layout["add_c"]; sub_c = layout["sub_c"]
+    Ia = layout["I_a"]
+    Ib = layout["I_b"]
+    num = layout["num"]
+    den = layout["den"]
+    add_c = layout["add_c"]
+    sub_c = layout["sub_c"]
     sign = layout["sign"]
-    ones_reg = layout["ones_reg"]; inc_carry = layout["inc_carry"]
+    ones_reg = layout["ones_reg"]
+    inc_carry = layout["inc_carry"]
     num_scaled = layout["num_scaled"]
     quotient = layout["quotient"]
-    div_work = layout["div_work"]; div_pad = layout["div_pad"]
-    div_c = layout["div_c"]; div_flag = layout["div_flag"]
+    div_work = layout["div_work"]
+    div_pad = layout["div_pad"]
+    div_c = layout["div_c"]
+    div_flag = layout["div_flag"]
     assert isinstance(Ia, list) and isinstance(Ib, list)
     assert isinstance(num, list) and isinstance(den, list)
     assert isinstance(add_c, list) and isinstance(sub_c, list)
@@ -1025,9 +1075,13 @@ def class_a_gp_full(
 
     # 1. NEQR-encode both images.
     dual_neqr_load(
-        qc, image_a, image_b, q,
-        position_qubits=layout["position"],            # type: ignore[arg-type]
-        intensity_a_qubits=Ia, intensity_b_qubits=Ib,
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=Ia,
+        intensity_b_qubits=Ib,
     )
 
     # 2. den ← I_a + I_b (q+1 bits, carry into den[q]).
@@ -1123,16 +1177,14 @@ def decode_class_a_full(
         f = bit_at(flat, flag_qubit)
         gp_val = (-1.0 if s else 1.0) * mag / float(1 << q_frac)
         histograms.setdefault((row, col), {})
-        histograms[(row, col)][gp_val] = (
-            histograms[(row, col)].get(gp_val, 0) + count
-        )
+        histograms[(row, col)][gp_val] = histograms[(row, col)].get(gp_val, 0) + count
         flag_counts.setdefault((row, col), {})
         flag_counts[(row, col)][f] = flag_counts[(row, col)].get(f, 0) + count
 
     for (row, col), votes in histograms.items():
         gp_img[row, col] = max(votes, key=votes.__getitem__)
-    for (row, col), votes in flag_counts.items():
-        divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
+    for (row, col), flag_votes in flag_counts.items():
+        divzero_mask[row, col] = max(flag_votes, key=flag_votes.__getitem__) == 1
     return gp_img, divzero_mask
 
 
@@ -1168,12 +1220,14 @@ def class_c_rogfp_full(
       1. ``dual_neqr_load(I_a, I_b)``
       2. Bit-shift I_a up by ``q_frac`` into ``num_scaled`` (CNOT copy).
       3. ``q_div_general(num_scaled, I_b)`` → ``ratio`` holds the
-         fixed-point fractional ratio; div-zero flag set iff I_b == 0.
+         fixed-point fractional ratio
+         div-zero flag set iff I_b == 0.
       4. ``affine_subtract_constant(ratio, R_red_fp)`` → ``rc_signed``
          holds ``ratio - R_red_fp`` (signed two's-complement).
 
     Resource budget at n=1, q=4, q_frac=4: ~114 qubits — past laptop
-    statevector. Use ``AerSimulator(method='mps')``; the bond dimension
+    statevector. Use ``AerSimulator(method='mps')``
+    the bond dimension
     stays small because the position register superposes only ``4^n``
     pixel branches.
 
@@ -1187,33 +1241,50 @@ def class_c_rogfp_full(
     if q_frac < 0:
         raise ValueError(f"q_frac must be >= 0, got {q_frac}")
     n_pos = 2 * n
-    w = q + q_frac            # dividend / quotient width
+    w = q + q_frac  # dividend / quotient width
     needed_div_c = (w + 1) * (q + 2)
-    rc_w = w + 1              # signed affine-output width
+    rc_w = w + 1  # signed affine-output width
 
     layout: dict[str, list[int] | int] = {}
     cursor = 0
-    layout["position"] = list(range(cursor, cursor + n_pos)); cursor += n_pos
-    layout["I_a"] = list(range(cursor, cursor + q)); cursor += q
-    layout["I_b"] = list(range(cursor, cursor + q)); cursor += q
-    layout["num_scaled"] = list(range(cursor, cursor + w)); cursor += w
-    layout["ratio"] = list(range(cursor, cursor + w)); cursor += w
-    layout["div_work"] = list(range(cursor, cursor + q)); cursor += q
-    layout["div_pad"] = cursor; cursor += 1
-    layout["div_c"] = list(range(cursor, cursor + needed_div_c)); cursor += needed_div_c
-    layout["div_flag"] = cursor; cursor += 1
-    layout["rc_signed"] = list(range(cursor, cursor + rc_w)); cursor += rc_w
-    layout["rc_const"] = list(range(cursor, cursor + rc_w)); cursor += rc_w
-    layout["rc_carry"] = list(range(cursor, cursor + rc_w + 1)); cursor += rc_w + 1
+    layout["position"] = list(range(cursor, cursor + n_pos))
+    cursor += n_pos
+    layout["I_a"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["I_b"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["num_scaled"] = list(range(cursor, cursor + w))
+    cursor += w
+    layout["ratio"] = list(range(cursor, cursor + w))
+    cursor += w
+    layout["div_work"] = list(range(cursor, cursor + q))
+    cursor += q
+    layout["div_pad"] = cursor
+    cursor += 1
+    layout["div_c"] = list(range(cursor, cursor + needed_div_c))
+    cursor += needed_div_c
+    layout["div_flag"] = cursor
+    cursor += 1
+    layout["rc_signed"] = list(range(cursor, cursor + rc_w))
+    cursor += rc_w
+    layout["rc_const"] = list(range(cursor, cursor + rc_w))
+    cursor += rc_w
+    layout["rc_carry"] = list(range(cursor, cursor + rc_w + 1))
+    cursor += rc_w + 1
 
     total = cursor
     qc = QuantumCircuit(total)
 
-    Ia = layout["I_a"]; Ib = layout["I_b"]
-    num_scaled = layout["num_scaled"]; ratio = layout["ratio"]
-    div_work = layout["div_work"]; div_pad = layout["div_pad"]
-    div_c = layout["div_c"]; div_flag = layout["div_flag"]
-    rc_signed = layout["rc_signed"]; rc_const = layout["rc_const"]
+    Ia = layout["I_a"]
+    Ib = layout["I_b"]
+    num_scaled = layout["num_scaled"]
+    ratio = layout["ratio"]
+    div_work = layout["div_work"]
+    div_pad = layout["div_pad"]
+    div_c = layout["div_c"]
+    div_flag = layout["div_flag"]
+    rc_signed = layout["rc_signed"]
+    rc_const = layout["rc_const"]
     rc_carry = layout["rc_carry"]
     assert isinstance(Ia, list) and isinstance(Ib, list)
     assert isinstance(num_scaled, list) and isinstance(ratio, list)
@@ -1224,9 +1295,13 @@ def class_c_rogfp_full(
 
     # 1. NEQR-encode both channels.
     dual_neqr_load(
-        qc, image_a, image_b, q,
-        position_qubits=layout["position"],            # type: ignore[arg-type]
-        intensity_a_qubits=Ia, intensity_b_qubits=Ib,
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=Ia,
+        intensity_b_qubits=Ib,
     )
 
     # 2. num_scaled ← I_a << q_frac (so the quotient carries q_frac
@@ -1297,7 +1372,7 @@ def decode_class_c_rogfp(
         col = sum(bit_at(flat, pos_qubits[i]) << i for i in range(n))
         row = sum(bit_at(flat, pos_qubits[n + i]) << i for i in range(n))
         raw = sum(bit_at(flat, rc_qubits[i]) << i for i in range(rc_w))
-        if raw >= (1 << (rc_w - 1)):       # two's-complement sign extend
+        if raw >= (1 << (rc_w - 1)):  # two's-complement sign extend
             raw -= 1 << rc_w
         rc_val = raw / denom
         f = bit_at(flat, flag_qubit)
@@ -1308,6 +1383,6 @@ def decode_class_c_rogfp(
 
     for (row, col), votes in histograms.items():
         rc_img[row, col] = max(votes, key=votes.__getitem__)
-    for (row, col), votes in flag_counts.items():
-        divzero_mask[row, col] = max(votes, key=votes.__getitem__) == 1
+    for (row, col), flag_votes in flag_counts.items():
+        divzero_mask[row, col] = max(flag_votes, key=flag_votes.__getitem__) == 1
     return rc_img, divzero_mask
