@@ -62,6 +62,17 @@ def load_dataset(dataset: str, n: int, q: int) -> tuple[np.ndarray, np.ndarray]:
         base_b = np.array([[1, 1], [3, 1]], dtype=np.int64)
         return (np.tile(base_a, (side // 2, side // 2)),
                 np.tile(base_b, (side // 2, side // 2)))
+    if dataset == "canonical_shared":
+        # Laurdan 2x2 patch quantised on a single SHARED photometric scale
+        # (both emission bands are physically on one scale), so the
+        # inter-channel contrast is not renormalised away as it is by the
+        # per-channel quantisation of `canonical` -- see §5.3 and §6.5.2.
+        # Selected by scripts/select_shared_scale_patch.py: balanced
+        # R = [[1,0],[0,1]] with no divide-by-zero pixel, so every pixel is
+        # a genuine quotient match and a constant readout caps at 50%.
+        d = np.load(REPO / "paper" / "data_autonomous"
+                    / f"canonical_shared_n{n}_q{q}.npz")
+        return d["I_a"].astype(np.int64), d["I_b"].astype(np.int64)
     if dataset == "canonical_nd":
         # Non-degenerate Laurdan 2x2 patch (I_a != I_b, R spans {0,1,2});
         # offset (94,60) of the canonical frame, q=2. See §6.5.9.
@@ -82,7 +93,8 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="run_hardware_class_b_nonrestoring",
                                  description=__doc__)
     ap.add_argument("--dataset", type=str, default="canonical",
-                    choices=["canonical", "canonical_nd", "synthetic", "fura2", "rogfp2"])
+                    choices=["canonical", "canonical_shared", "canonical_nd",
+                             "synthetic", "fura2", "rogfp2"])
     ap.add_argument("--n", type=int, default=1)
     ap.add_argument("--q", type=int, default=2)
     ap.add_argument("--divider", type=str, default="nonrestoring",
@@ -94,7 +106,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--mitigation", type=str, default="trex+dd",
                     choices=["trex+dd", "trex", "dd", "none"])
     ap.add_argument("--outdir", type=Path, default=DEFAULT_OUTDIR)
+    ap.add_argument("--repeat", type=int, default=1,
+                    help="Submit the same circuit N times and report the match-rate "
+                         "distribution plus the per-pixel recovery frequency. Every "
+                         "hardware number in the paper is otherwise a single job on "
+                         "4 pixels.")
     args = ap.parse_args(argv)
+    if args.repeat < 1:
+        ap.error("--repeat must be >= 1")
 
     n, q = args.n, args.q
     side = 1 << n
@@ -120,66 +139,104 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  dataset={args.dataset} n={n} q={q} pixels={n_pixels} shots={shots}")
     print(f"  logical qubits = {qc.num_qubits}, logical size = {qc.size()}")
     print(f"  divider = {args.divider}, mitigation = {args.mitigation}")
-    t0 = time.time()
-    counts, transpiled, job_id, summary = ibm.hw_run(
-        qc, backend=backend, shots=shots, mitigation=args.mitigation,
-    )
-    elapsed = time.time() - t0
-    print(f"  job_id = {job_id}")
-    print(f"  transpiled depth = {summary['depth']}, "
-          f"two-q gates = {summary['two_q_gate_count']}, "
-          f"qubits = {summary['num_qubits']}")
-    print(f"  wallclock = {elapsed:.1f} s")
-    print(f"  unique bitstrings = {len(counts)}")
+    runs = []
+    for rep in range(1, args.repeat + 1):
+        run_label = label if args.repeat == 1 else f"{label}_r{rep}"
+        if args.repeat > 1:
+            print(f"\n  [run {rep}/{args.repeat}] {run_label}")
+        t0 = time.time()
+        counts, transpiled, job_id, summary = ibm.hw_run(
+            qc, backend=backend, shots=shots, mitigation=args.mitigation,
+        )
+        elapsed = time.time() - t0
+        print(f"  job_id = {job_id}")
+        print(f"  transpiled depth = {summary['depth']}, "
+              f"two-q gates = {summary['two_q_gate_count']}, "
+              f"qubits = {summary['num_qubits']}")
+        print(f"  wallclock = {elapsed:.1f} s")
+        print(f"  unique bitstrings = {len(counts)}")
 
-    quotient, divzero = decode_class_b_ratio(
-        counts, n=n, q=q, layout=layout, total_qubits=qc.num_qubits,
-    )
-    match_count = 0
-    for rr in range(side):
-        for cc in range(side):
-            if divzero_classical[rr, cc]:
-                if divzero[rr, cc]:
-                    match_count += 1
-            else:
-                if quotient[rr, cc] == R_classical[rr, cc]:
-                    match_count += 1
-    pct = 100.0 * match_count / n_pixels
-    print(f"  quantum quotient = {quotient.tolist()}")
-    print(f"  classical R      = {R_classical.tolist()}")
-    print(f"  pixelwise match  = {match_count} / {n_pixels} ({pct:.1f}%)")
+        quotient, divzero = decode_class_b_ratio(
+            counts, n=n, q=q, layout=layout, total_qubits=qc.num_qubits,
+        )
+        per_pixel = np.zeros((side, side), dtype=bool)
+        for rr in range(side):
+            for cc in range(side):
+                if divzero_classical[rr, cc]:
+                    per_pixel[rr, cc] = bool(divzero[rr, cc])
+                else:
+                    per_pixel[rr, cc] = (not divzero[rr, cc]) and \
+                        int(quotient[rr, cc]) == int(R_classical[rr, cc])
+        match_count = int(per_pixel.sum())
+        pct = 100.0 * match_count / n_pixels
+        print(f"  quantum quotient = {quotient.tolist()}")
+        print(f"  classical R      = {R_classical.tolist()}")
+        print(f"  pixelwise match  = {match_count} / {n_pixels} ({pct:.1f}%)")
 
-    meta = {
-        "label": label,
-        "dataset": args.dataset,
-        "n": n,
-        "q": q,
-        "n_pixels": n_pixels,
-        "backend": backend.name,
-        "shots": shots,
-        "mitigation": args.mitigation,
-        "job_id": job_id,
-        "depth": summary["depth"],
-        "two_q_gate_count": summary["two_q_gate_count"],
-        "num_qubits": summary["num_qubits"],
-        "logical_qubits": qc.num_qubits,
-        "logical_size": qc.size(),
-        "wallclock_seconds": round(elapsed, 1),
-        "n_unique_bitstrings": len(counts),
-        "divider": args.divider,
-        "quantum_quotient": quotient.tolist(),
-        "quantum_divzero": divzero.tolist(),
-        "classical_R": R_classical.tolist(),
-        "classical_divzero": divzero_classical.tolist(),
-        "match_count": match_count,
-        "match_pct": round(pct, 1),
-    }
-    ibm.persist_run(outdir, label=label, pass_name="hw",
-                    circuit=qc, transpiled=transpiled,
-                    counts=counts, metadata=meta)
+        meta = {
+            "label": run_label,
+            "repeat_index": rep,
+            "repeat_total": args.repeat,
+            "dataset": args.dataset,
+            "n": n,
+            "q": q,
+            "n_pixels": n_pixels,
+            "backend": backend.name,
+            "shots": shots,
+            "mitigation": args.mitigation,
+            "job_id": job_id,
+            "depth": summary["depth"],
+            "two_q_gate_count": summary["two_q_gate_count"],
+            "num_qubits": summary["num_qubits"],
+            "logical_qubits": qc.num_qubits,
+            "logical_size": qc.size(),
+            "wallclock_seconds": round(elapsed, 1),
+            "n_unique_bitstrings": len(counts),
+            "divider": args.divider,
+            "quantum_quotient": quotient.tolist(),
+            "quantum_divzero": divzero.tolist(),
+            "classical_R": R_classical.tolist(),
+            "classical_divzero": divzero_classical.tolist(),
+            "per_pixel_match": per_pixel.tolist(),
+            "match_count": match_count,
+            "match_pct": round(pct, 1),
+        }
+        ibm.persist_run(outdir, label=run_label, pass_name="hw",
+                        circuit=qc, transpiled=transpiled,
+                        counts=counts, metadata=meta)
+        runs.append(meta)
+
+    payload = {r["label"]: r for r in runs}
+    if args.repeat > 1:
+        # A single job on 4 pixels is an anecdote; the distribution over
+        # repeats is the measurement. Per-pixel frequency additionally shows
+        # *which* quotient values survive, which is the §7.2 mechanism claim.
+        counts_arr = np.array([r["match_count"] for r in runs], dtype=float)
+        freq = np.mean([np.array(r["per_pixel_match"], dtype=float) for r in runs], axis=0)
+        agg = {
+            "label": label,
+            "repeat_total": args.repeat,
+            "backend": backend.name,
+            "divider": args.divider,
+            "dataset": args.dataset,
+            "match_counts": [int(c) for c in counts_arr],
+            "match_mean": round(float(counts_arr.mean()), 3),
+            "match_std": round(float(counts_arr.std(ddof=1)) if args.repeat > 1 else 0.0, 3),
+            "match_min": int(counts_arr.min()),
+            "match_max": int(counts_arr.max()),
+            "per_pixel_recovery_frequency": freq.round(3).tolist(),
+            "classical_R": R_classical.tolist(),
+            "classical_divzero": divzero_classical.tolist(),
+            "job_ids": [r["job_id"] for r in runs],
+        }
+        payload["_aggregate"] = agg
+        print(f"\n  === {label}: {args.repeat} runs on {backend.name} ===")
+        print(f"  match counts     = {agg['match_counts']} / {n_pixels}")
+        print(f"  mean +/- sd      = {agg['match_mean']:.2f} +/- {agg['match_std']:.2f}")
+        print(f"  per-pixel recovery frequency = {agg['per_pixel_recovery_frequency']}")
 
     summary_file = outdir / "summary.json"
-    summary_file.write_text(json.dumps({label: meta}, indent=2, default=str))
+    summary_file.write_text(json.dumps(payload, indent=2, default=str))
     print(f"\nSummary written to {summary_file}")
     return 0
 
