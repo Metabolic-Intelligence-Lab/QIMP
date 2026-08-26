@@ -1,0 +1,1 @@
+{"label": "j2_neqr_only", "backend": "ibm_marrakesh", "shots": 4096, "mitigation": "trex+dd", "job_id": "d8c2svc7avuc73dqbrig", "depth": 299, "two_q_gate_count": 146, "num_qubits": 156, "logical_qubits": 6, "logical_size": 29, "wallclock_seconds": 36.8, "n_unique_bitstrings": 64}

@@ -61,3 +61,16 @@ Thumbs.db
 # Legacy/local
 pythonProject/
 your_input_directory_path/
+
+# --- tracked exception -------------------------------------------------
+# The IBM Quantum hardware outputs ARE tracked. The manuscript's Data
+# availability statement points readers at this directory, and §7 asks them
+# to re-run scripts/analyse_hw_signal.py over exactly these counts to check
+# the peakedness and null-baseline argument for themselves. Placed last so
+# it wins over the `data/` and `output/` rules above (last match wins).
+!data/
+data/*
+!data/output/
+data/output/*
+!data/output/ibm_hw/
+!data/output/ibm_hw/**

@@ -1,0 +1,1 @@
+{"label": "zne_fura2_n1q2_fold5", "dataset": "fura2", "n": 1, "q": 2, "fold": 5, "backend": "ibm_marrakesh", "shots": 8192, "job_id": "d8cmlhj8ch0s738v49mg", "two_q_gate_count": 4136, "depth": 8630, "wallclock_seconds": 26.6}

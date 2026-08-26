@@ -1,0 +1,88 @@
+{
+  "dataset": "canonical",
+  "n": 1,
+  "q": 2,
+  "folds": [
+    1,
+    3,
+    5
+  ],
+  "cx_scales": [
+    797.0,
+    2539.0,
+    4002.0
+  ],
+  "R_classical": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      0
+    ]
+  ],
+  "divzero": [
+    [
+      false,
+      false
+    ],
+    [
+      false,
+      true
+    ]
+  ],
+  "R_zne": [
+    [
+      1,
+      1
+    ],
+    [
+      1,
+      3
+    ]
+  ],
+  "match_quotient": 3,
+  "n_quotient_pixels": 3,
+  "jobs": [
+    {
+      "label": "zne_canonical_n1q2_fold1",
+      "dataset": "canonical",
+      "n": 1,
+      "q": 2,
+      "fold": 1,
+      "backend": "ibm_marrakesh",
+      "shots": 8192,
+      "job_id": "d8cmtaijki0s73arh2j0",
+      "two_q_gate_count": 797,
+      "depth": 1502,
+      "wallclock_seconds": 11.0
+    },
+    {
+      "label": "zne_canonical_n1q2_fold3",
+      "dataset": "canonical",
+      "n": 1,
+      "q": 2,
+      "fold": 3,
+      "backend": "ibm_marrakesh",
+      "shots": 8192,
+      "job_id": "d8cmtdb8ch0s738v4msg",
+      "two_q_gate_count": 2539,
+      "depth": 5140,
+      "wallclock_seconds": 23.5
+    },
+    {
+      "label": "zne_canonical_n1q2_fold5",
+      "dataset": "canonical",
+      "n": 1,
+      "q": 2,
+      "fold": 5,
+      "backend": "ibm_marrakesh",
+      "shots": 8192,
+      "job_id": "d8cmtjc7avuc73dr8iog",
+      "two_q_gate_count": 4002,
+      "depth": 8527,
+      "wallclock_seconds": 43.4
+    }
+  ]
+}

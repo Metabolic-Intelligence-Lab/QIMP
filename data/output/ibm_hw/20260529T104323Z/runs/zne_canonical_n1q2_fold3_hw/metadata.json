@@ -1,0 +1,1 @@
+{"label": "zne_canonical_n1q2_fold3", "dataset": "canonical", "n": 1, "q": 2, "fold": 3, "backend": "ibm_marrakesh", "shots": 8192, "job_id": "d8cmro38ch0s738v4kj0", "two_q_gate_count": 2206, "depth": 4395, "wallclock_seconds": 36.8}

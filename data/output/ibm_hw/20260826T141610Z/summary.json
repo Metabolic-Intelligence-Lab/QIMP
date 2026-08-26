@@ -1,0 +1,422 @@
+{
+  "j7x_marrakesh_nomit_r1": {
+    "label": "j7x_marrakesh_nomit_r1",
+    "repeat_index": 1,
+    "repeat_total": 5,
+    "dataset": "canonical",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "none",
+    "job_id": "da7facjsq5js73bjsv7g",
+    "depth": 1255,
+    "two_q_gate_count": 636,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 93,
+    "wallclock_seconds": 27.5,
+    "n_unique_bitstrings": 3722,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "match_count": 4,
+    "match_pct": 100.0
+  },
+  "j7x_marrakesh_nomit_r2": {
+    "label": "j7x_marrakesh_nomit_r2",
+    "repeat_index": 2,
+    "repeat_total": 5,
+    "dataset": "canonical",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "none",
+    "job_id": "da7fajc6l22c73dnh7jg",
+    "depth": 1353,
+    "two_q_gate_count": 663,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 93,
+    "wallclock_seconds": 96.4,
+    "n_unique_bitstrings": 3911,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "match_count": 4,
+    "match_pct": 100.0
+  },
+  "j7x_marrakesh_nomit_r3": {
+    "label": "j7x_marrakesh_nomit_r3",
+    "repeat_index": 3,
+    "repeat_total": 5,
+    "dataset": "canonical",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "none",
+    "job_id": "da7fbbe0ukec73838000",
+    "depth": 1225,
+    "two_q_gate_count": 651,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 93,
+    "wallclock_seconds": 19.4,
+    "n_unique_bitstrings": 3970,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "match_count": 4,
+    "match_pct": 100.0
+  },
+  "j7x_marrakesh_nomit_r4": {
+    "label": "j7x_marrakesh_nomit_r4",
+    "repeat_index": 4,
+    "repeat_total": 5,
+    "dataset": "canonical",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "none",
+    "job_id": "da7fbg60ukec738380e0",
+    "depth": 1283,
+    "two_q_gate_count": 664,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 93,
+    "wallclock_seconds": 11.6,
+    "n_unique_bitstrings": 3956,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "match_count": 4,
+    "match_pct": 100.0
+  },
+  "j7x_marrakesh_nomit_r5": {
+    "label": "j7x_marrakesh_nomit_r5",
+    "repeat_index": 5,
+    "repeat_total": 5,
+    "dataset": "canonical",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "none",
+    "job_id": "da7fbj46l22c73dnh9pg",
+    "depth": 1258,
+    "two_q_gate_count": 668,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 93,
+    "wallclock_seconds": 14.3,
+    "n_unique_bitstrings": 3940,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true
+      ],
+      [
+        true,
+        false
+      ]
+    ],
+    "match_count": 3,
+    "match_pct": 75.0
+  },
+  "_aggregate": {
+    "label": "j7x_marrakesh_nomit",
+    "repeat_total": 5,
+    "backend": "ibm_marrakesh",
+    "divider": "nonrestoring",
+    "dataset": "canonical",
+    "match_counts": [
+      4,
+      4,
+      4,
+      4,
+      3
+    ],
+    "match_mean": 3.8,
+    "match_std": 0.447,
+    "match_min": 3,
+    "match_max": 4,
+    "per_pixel_recovery_frequency": [
+      [
+        1.0,
+        1.0
+      ],
+      [
+        1.0,
+        0.8
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        true
+      ]
+    ],
+    "job_ids": [
+      "da7facjsq5js73bjsv7g",
+      "da7fajc6l22c73dnh7jg",
+      "da7fbbe0ukec73838000",
+      "da7fbg60ukec738380e0",
+      "da7fbj46l22c73dnh9pg"
+    ]
+  }
+}

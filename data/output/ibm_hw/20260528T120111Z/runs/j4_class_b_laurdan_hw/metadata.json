@@ -1,0 +1,1 @@
+{"label": "j4_class_b_laurdan", "backend": "ibm_fez", "shots": 4096, "mitigation": "trex+dd", "job_id": "d8c2t3j8amns73bitetg", "depth": 2248, "two_q_gate_count": 1174, "num_qubits": 156, "logical_qubits": 24, "logical_size": 153, "wallclock_seconds": 700.6, "n_unique_bitstrings": 4096}

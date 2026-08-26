@@ -1,0 +1,57 @@
+{
+  "j3": {
+    "label": "j3_class_b_synthetic",
+    "backend": "ibm_kingston",
+    "shots": 4096,
+    "mitigation": "trex+dd",
+    "job_id": "d8c2t3ajki0s73aqkg5g",
+    "depth": 2280,
+    "two_q_gate_count": 1259,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 156,
+    "wallclock_seconds": 15.6,
+    "n_unique_bitstrings": 4094,
+    "quantum_quotient": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "match_count": 0
+  }
+}

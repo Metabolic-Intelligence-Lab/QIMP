@@ -1,0 +1,63 @@
+{
+  "j8_synthetic_n1q2_nonrestoring": {
+    "label": "j8_synthetic_n1q2_nonrestoring",
+    "dataset": "synthetic",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_kingston",
+    "shots": 4096,
+    "mitigation": "trex+dd",
+    "job_id": "d8ckots7avuc73dr5990",
+    "depth": 1337,
+    "two_q_gate_count": 693,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 96,
+    "wallclock_seconds": 8.9,
+    "n_unique_bitstrings": 4090,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        3,
+        3
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        2
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "match_count": 3,
+    "match_pct": 75.0
+  }
+}

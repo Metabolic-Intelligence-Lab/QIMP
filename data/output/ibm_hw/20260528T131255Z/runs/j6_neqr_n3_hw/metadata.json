@@ -1,0 +1,1 @@
+{"label": "j6_neqr_n3", "backend": "ibm_kingston", "shots": 1024, "mitigation": "trex+dd", "job_id": "d8c3upr8amns73biv1fg", "depth": 22326, "two_q_gate_count": 9524, "num_qubits": 156, "logical_qubits": 10, "logical_size": 457, "wallclock_seconds": 713.3, "n_unique_bitstrings": 661}

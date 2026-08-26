@@ -1,0 +1,63 @@
+{
+  "j12_canonical_n1q3_nonrestoring": {
+    "label": "j12_canonical_n1q3_nonrestoring",
+    "dataset": "canonical",
+    "n": 1,
+    "q": 3,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "trex+dd",
+    "job_id": "d8ckpkijki0s73ardr1g",
+    "depth": 1739,
+    "two_q_gate_count": 1136,
+    "num_qubits": 156,
+    "logical_qubits": 36,
+    "logical_size": 130,
+    "wallclock_seconds": 9.2,
+    "n_unique_bitstrings": 4096,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        3,
+        7
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "classical_R": [
+      [
+        1,
+        0
+      ],
+      [
+        0,
+        0
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        true
+      ],
+      [
+        true,
+        true
+      ]
+    ],
+    "match_count": 4,
+    "match_pct": 100.0
+  }
+}

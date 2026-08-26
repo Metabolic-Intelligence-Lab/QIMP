@@ -1,0 +1,19 @@
+{
+  "j1": {
+    "label": "j1_div_only",
+    "backend": "ibm_marrakesh",
+    "shots": 4096,
+    "mitigation": "trex+dd",
+    "job_id": "d8c27b47avuc73dqb2s0",
+    "depth": 1934,
+    "two_q_gate_count": 1059,
+    "num_qubits": 156,
+    "logical_qubits": 22,
+    "logical_size": 130,
+    "wallclock_seconds": 2721.3,
+    "n_unique_bitstrings": 4089,
+    "decoded_majority_quotient": 0,
+    "classical_truth": 3,
+    "match_majority": false
+  }
+}
