@@ -106,7 +106,7 @@ def main() -> None:
     ax.grid(True, alpha=0.25)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=150, bbox_inches="tight")
+    fig.savefig(OUT, dpi=300, bbox_inches="tight")
     print(f"wrote {OUT}")
 
 

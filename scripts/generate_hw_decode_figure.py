@@ -71,7 +71,7 @@ def main() -> None:
     )
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(OUT, dpi=150, bbox_inches="tight")
+    fig.savefig(OUT, dpi=300, bbox_inches="tight")
     print(f"wrote {OUT}")
 
 

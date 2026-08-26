@@ -161,7 +161,7 @@ def make_figure(out: dict, dest: Path) -> None:
     fig.suptitle("Autonomous QAE oracle on AerSimulator(method='mps') "
                  f"reproduces the ideal per-power success probability up to $k={kmax}$",
                  fontsize=10)
-    fig.savefig(dest, dpi=150)
+    fig.savefig(dest, dpi=300)
     print(f"wrote {dest}")
 
 

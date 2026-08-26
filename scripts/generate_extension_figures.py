@@ -70,7 +70,7 @@ def build_fig11() -> None:
     ax.set_title("Class B Aer-MPS scaling sweep — shot-budget effect")
     ax.legend(fontsize=8, loc="lower left")
     out = FIG_OUT / "fig11_highshot_sweep.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=300, bbox_inches="tight")
     print(f"wrote {out}")
 
 
@@ -135,7 +135,7 @@ def build_fig12() -> None:
     ax.legend(fontsize=8, loc="lower left")
     ax.grid(True, which="both", alpha=0.25)
     out = FIG_OUT / "fig12_qae_extension.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=300, bbox_inches="tight")
     print(f"wrote {out}")
 
 
@@ -217,7 +217,7 @@ def build_fig13() -> None:
     h2, l2 = ax2.get_legend_handles_labels()
     ax.legend(h1 + h2, l1 + l2, fontsize=8, loc="center right")
     out = FIG_OUT / "fig13_hw_neqr_ceiling.png"
-    fig.savefig(out, dpi=150, bbox_inches="tight")
+    fig.savefig(out, dpi=300, bbox_inches="tight")
     print(f"wrote {out}")
 
 

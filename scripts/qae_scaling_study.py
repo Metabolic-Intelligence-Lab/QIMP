@@ -162,7 +162,7 @@ def main():
                  "(exponentially-increasing Grover schedule k=0,1,2,4,8,…)")
     ax.legend(fontsize=7, loc="lower left")
     ax.grid(True, which="both", alpha=0.25)
-    fig.savefig(REPO/"paper"/"figures_autonomous"/"fig_qae_scaling.png", dpi=150)
+    fig.savefig(REPO/"paper"/"figures_autonomous"/"fig_qae_scaling.png", dpi=300)
     print("wrote fig_qae_scaling.png and qae_scaling.json")
 
 if __name__ == "__main__":
