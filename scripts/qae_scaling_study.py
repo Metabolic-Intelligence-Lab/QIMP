@@ -1,6 +1,7 @@
 """
-Rigorous MLQAE sample-complexity scaling study (addresses the reviewer's
-'k={0,1} does not demonstrate the quadratic scaling' point).
+MLQAE error scaling in the query budget M (addresses the reviewer's
+'k={0,1} does not demonstrate the scaling' point). M counts oracle calls,
+not shots -- see the cost convention of the manuscript's §6.4.
 
 Two parts:
  (1) Empirical verification that the autonomous oracle realises the ideal
@@ -158,7 +159,7 @@ def main():
     ax.loglog(Mr, q0*(Mr/Mr[0])**-0.5, "k:", lw=1, alpha=0.5, label="slope −1/2 (MC)")
     ax.set_xlabel("total query budget M = Σ nⱼ(2kⱼ+1)")
     ax.set_ylabel("RMSE of â over 1000 seeds")
-    ax.set_title("MLQAE vs Monte Carlo sample-complexity scaling\n"
+    ax.set_title("MLQAE vs Monte Carlo error scaling in the query budget $M$\n"
                  "(exponentially-increasing Grover schedule k=0,1,2,4,8,…)")
     ax.legend(fontsize=7, loc="lower left")
     ax.grid(True, which="both", alpha=0.25)

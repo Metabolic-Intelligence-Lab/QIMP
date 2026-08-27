@@ -131,7 +131,8 @@ def build_fig12() -> None:
     ax.set_yscale("log")
     ax.set_xlabel(r"total queries $M$")
     ax.set_ylabel(r"$|\hat{a} - a|$  vs  classical MC stderr")
-    ax.set_title("Empirical QAE quadratic advantage across n (Laurdan canonical)")
+    ax.set_title("Per-scale MLQAE single-run estimates vs matched-budget MC error\n"
+                 "(Laurdan canonical; single runs are illustrative, see §6.5.5)")
     ax.legend(fontsize=8, loc="lower left")
     ax.grid(True, which="both", alpha=0.25)
     out = FIG_OUT / "fig12_qae_extension.png"

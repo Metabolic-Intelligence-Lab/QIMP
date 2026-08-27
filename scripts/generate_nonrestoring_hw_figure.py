@@ -2,7 +2,9 @@
 fig11_nonrestoring_hw.png — Class B pipeline hardware match rate vs transpiled
 two-qubit gate count on IBM Heron r2, restoring vs non-restoring divider,
 coloured by use case. Shows the non-restoring compression moving the
-n=1,q=2 pipeline below the empirical survival ceiling.
+n=1,q=2 pipeline below ~700 transpiled CX. Note the vertical axis is a match
+rate, which §7.2 shows does not by itself separate recovery from read-out bias;
+read it together with the sigma column of Table 8.
 
 Reads the persisted summary.json files from data/output/ibm_hw/.
 """
@@ -68,7 +70,7 @@ def main() -> None:
     ax.axhline(12.5, color="0.8", ls="--", lw=0.8, label="q=3 floor (12.5%)")
 
     # survival-ceiling band
-    ax.axvspan(700, 900, color="gold", alpha=0.18, label="survival ceiling (~700–900 CX)")
+    ax.axvspan(700, 900, color="gold", alpha=0.18, label="~700–900 CX region")
 
     seen_uc = set()
     for label, div, uc, npix, fb_cx, fb_match in JOBS:
@@ -98,8 +100,10 @@ def main() -> None:
 
     ax.set_xlabel(r"transpiled two-qubit gate count $N_{2q}$ (Heron r2)")
     ax.set_ylabel("per-pixel match vs classical (%)")
-    ax.set_title("Class B autonomous ratio on hardware:\n"
-                 "non-restoring divider crosses the gate-budget floor")
+    # The title must not assert what §7.3 retracts: the axis is a match
+    # rate, and a match rate does not separate recovery from read-out bias.
+    ax.set_title("Class B autonomous ratio on Heron r2, default TREX + XY4:\n"
+                 "per-pixel match rate vs transpiled two-qubit gate count")
     ax.set_ylim(-5, 108)
     ax.set_xlim(400, 2500)
     ax.legend(fontsize=7.5, loc="upper right", ncol=2)
