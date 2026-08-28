@@ -74,3 +74,7 @@ data/*
 data/output/*
 !data/output/ibm_hw/
 !data/output/ibm_hw/**
+
+# Manuscript and paper build scripts: kept local, not published
+paper/
+scripts/*paper*
