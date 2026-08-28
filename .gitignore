@@ -28,8 +28,6 @@ env/
 .coverage
 htmlcov/
 
-# Claude Code
-.claude/
 
 # Data (not tracked — vive sotto data/)
 data/

@@ -8,7 +8,7 @@ Modular Python library for **Quantum Image Processing** on top of Qiskit:
 FRQI, NEQR, QPIE encodings, geometric / chromatic / arithmetic processing,
 edge detection (QHED), variational QML on encoded images, and figures of merit.
 
-Specification: [`docs/tesi.pdf`](docs/tesi.pdf) (Dolciami, Politecnico di Torino,
+Specification: Dolciami, Politecnico di Torino,
 "A quantum circuit library for image processing", 2022) — Chapter 3 defines the
 library's intended structure; this implementation extends it with the
 Metabolic-Intelligence Lab's Green-Purple ratio pipeline (`qimp.processing.gp_ratio`).
@@ -77,17 +77,13 @@ repo/
 │   ├── config.py     # ProcessingConfig dataclass
 │   └── cli.py        # `qimp` command-line tool
 ├── tests/            # pytest, parametrized over n and q
-├── docs/             # tesi.pdf + mkdocs site
-├── legacy/           # exploratory scripts (Old/) and pre-package code (scripts/)
+├── docs/             # mkdocs site
 └── data/             # GITIGNORED: raw images & outputs
     ├── immagini/     # input dataset (microscopy 16-bit TIFFs)
     └── output/       # processing outputs
 ```
 
 ## Quick start
-
-> **Note:** the package APIs are still being migrated from `legacy/`. The examples
-> below describe the target API for v0.1.0.
 
 ```python
 import numpy as np
@@ -155,7 +151,7 @@ Outputs land in `data/output/ibm/<UTC-timestamp>/`:
 - `runs/<label>_<pass>/{circuit.qpy, transpiled.qpy?, counts.json, metadata.json}` — full reproducibility from disk.
 - `backend_info.json` — name, qubit count, basis gates of the chosen backend.
 
-Designed for the **IBM Quantum Open (free) plan** — hardware execution is restricted to a small whitelist by default to stay well within the monthly QPU budget. See `docs/superpowers/specs/2026-05-25-ibm-quantum-hardware-execution-design.md` for the full design and budget envelope.
+Designed for the **IBM Quantum Open (free) plan** — hardware execution is restricted to a small whitelist by default to stay well within the monthly QPU budget.
 
 Requires the `[ibm]` extra (`pip install -e ".[ibm]"`) and an IBM Quantum API token saved via `QiskitRuntimeService.save_account(...)`.
 

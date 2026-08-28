@@ -5,8 +5,7 @@
 QIMP implements the three canonical quantum image representations from the
 literature — **FRQI**, **NEQR**, and **QPIE** — plus the geometric / chromatic
 operations and the Quantum Hadamard Edge Detection (QHED) algorithm that
-operate on them. Specifications follow `docs/tesi.pdf` (Dolciami, Politecnico
-di Torino, 2022, Chapter 3).
+operate on them. Specifications follow Dolciami, Politecnico di Torino, 2022, Chapter 3.
 
 ## Design
 

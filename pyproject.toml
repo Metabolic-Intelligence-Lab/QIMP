@@ -111,19 +111,15 @@ include = [
 ]
 exclude = [
     "data",
-    "legacy",
     "notebooks",
     "docs/_site",
-    # 15 MB PDF — far too big to ship in source distributions. Link from
-    # the GitHub release page instead.
-    "docs/tesi.pdf",
 ]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
 src = ["src", "tests", "apps"]
-extend-exclude = ["legacy", "data", "notebooks"]
+extend-exclude = ["data", "notebooks"]
 
 [tool.ruff.lint]
 select = [
@@ -168,7 +164,7 @@ files = ["src/qimp"]
 # multi-page convention) which mypy can't import. The helpers in `_io.py`
 # and `_viz.py` are covered by their unit tests; the pages are smoke-tested
 # in `tests/unit/test_app_imports.py`.
-exclude = ["legacy", "data", "tests/fixtures", "apps"]
+exclude = ["data", "tests/fixtures", "apps"]
 
 [[tool.mypy.overrides]]
 # Only mask libs that genuinely lack inline type info / stubs. scipy, pandas,
