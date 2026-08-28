@@ -1,0 +1,3342 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Modular Python library for FRQI / NEQR / QPIE quantum image processing on top of Qiskit.">
+      
+      
+      
+        <link rel="canonical" href="https://Metabolic-Intelligence-Lab.github.io/QIMP/api/processing/">
+      
+      
+        <link rel="prev" href="../encoding/">
+      
+      
+        <link rel="next" href="../io-metrics/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Processing - QIMP — Quantum Image Processing</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference-processing" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="QIMP — Quantum Image Processing" class="md-header__button md-logo" aria-label="QIMP — Quantum Image Processing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            QIMP — Quantum Image Processing
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Processing
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="deep-purple" data-md-color-accent="deep-purple"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Metabolic-Intelligence-Lab/QIMP" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Metabolic-Intelligence-Lab/QIMP
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../getting-started/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Getting Started
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../encoding/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Encodings
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../processing/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Processing
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../examples/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Examples
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../ui/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Interactive UI
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../encoding/" class="md-tabs__link">
+          
+  
+  
+  API Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="QIMP — Quantum Image Processing" class="md-nav__button md-logo" aria-label="QIMP — Quantum Image Processing" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    QIMP — Quantum Image Processing
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Metabolic-Intelligence-Lab/QIMP" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    Metabolic-Intelligence-Lab/QIMP
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encodings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ui/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Interactive UI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../encoding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Encoding
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processing
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessinggeometric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.geometric
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.geometric">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        geometric
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="geometric">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.axis_flip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        axis_flip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.coord_swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        coord_swap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.ort_rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ort_rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.pos_shift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pos_shift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.restr_flip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restr_flip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.restr_coord_swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restr_coord_swap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessingchromatic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.chromatic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.chromatic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chromatic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="chromatic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.frqi_color_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        frqi_color_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.frqi_color_change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        frqi_color_change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_color_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_color_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_half_intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_half_intensity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_classify_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_classify_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessingfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.filters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_decode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_full_edges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_full_edges
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessinggp_ratio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.gp_ratio
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.gp_ratio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gp_ratio
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="gp_ratio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.OptimizationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizationResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.classical_gp_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classical_gp_image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.combined_objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        combined_objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.apply_gp_function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        apply_gp_function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.decode_gp_counts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decode_gp_counts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.analytical_gp_params" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analytical_gp_params
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.evaluate_gp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate_gp
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.optimize_gp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimize_gp
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../io-metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O & Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../runtime-testing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Runtime & Testing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessinggeometric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.geometric
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.geometric">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        geometric
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="geometric">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.axis_flip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        axis_flip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.coord_swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        coord_swap
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.ort_rotation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ort_rotation
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.pos_shift" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pos_shift
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.restr_flip" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restr_flip
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.geometric.restr_coord_swap" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        restr_coord_swap
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessingchromatic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.chromatic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.chromatic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chromatic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="chromatic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.frqi_color_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        frqi_color_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.frqi_color_change" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        frqi_color_change
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_color_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_color_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_half_intensity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_half_intensity
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.chromatic.neqr_classify_complement" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        neqr_classify_complement
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessingfilters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.filters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filters
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="filters">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_decode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_decode
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.filters.qhed_full_edges" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qhed_full_edges
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#qimpprocessinggp_ratio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        qimp.processing.gp_ratio
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="qimp.processing.gp_ratio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gp_ratio
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="gp_ratio">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.OptimizationResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimizationResult
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.classical_gp_image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        classical_gp_image
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.combined_objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        combined_objective
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.apply_gp_function" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        apply_gp_function
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.decode_gp_counts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decode_gp_counts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.analytical_gp_params" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        analytical_gp_params
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.evaluate_gp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        evaluate_gp
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#qimp.processing.gp_ratio.optimize_gp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        optimize_gp
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-reference-processing">API Reference — Processing<a class="headerlink" href="#api-reference-processing" title="Permanent link">&para;</a></h1>
+<h2 id="qimpprocessinggeometric">qimp.processing.geometric<a class="headerlink" href="#qimpprocessinggeometric" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="qimp.processing.geometric" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">qimp.processing.geometric</span>
+
+
+<a href="#qimp.processing.geometric" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents first">
+
+        <p>Geometric transformations on encoded quantum images.</p>
+<p>These operations manipulate <strong>position qubits only</strong> and therefore apply
+identically to FRQI, NEQR, and QPIE. The caller supplies <code>n</code> (qubits per
+spatial axis) and an offset that points to the first position qubit in the
+target circuit:</p>
+<p>============  =================================
+Encoding      Position-qubit offset
+============  =================================
+FRQI          0  (qubits 0..2n-1)
+QPIE          0  (qubits 0..2n-1)
+NEQR          q  (qubits q..q+2n-1, with q the intensity-qubit count)
+============  =================================</p>
+<p>Qubit layout within the position block (LSB-first):
+- <code>pos_offset .. pos_offset + n - 1</code>  → X-axis qubits (column, x_0 … x_{n-1})
+- <code>pos_offset + n .. pos_offset + 2n - 1</code> → Y-axis qubits (row, y_0 … y_{n-1})</p>
+<p>Reference: docs/tesi.pdf §2.3</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.axis_flip" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">axis_flip</span>
+
+
+<a href="#qimp.processing.geometric.axis_flip" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">axis_flip</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="n">Axis</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Flip the image about the given axis.</p>
+<p><code>axis='x'</code> flips about the X axis (inverts Y / row coordinate) by applying
+X gates to the Y-axis qubits. <code>axis='y'</code> flips about the Y axis (inverts
+X / column coordinate) by applying X gates to the X-axis qubits.</p>
+<p>Complexity: <code>O(n)</code> X gates.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.coord_swap" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">coord_swap</span>
+
+
+<a href="#qimp.processing.geometric.coord_swap" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">coord_swap</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Swap row and column coordinates: image transpose.</p>
+<p>Applies <code>n</code> SWAP gates between paired position qubits <code>(x_i, y_i)</code>.
+Complexity: <code>O(n)</code> SWAPs ≡ <code>3n</code> CNOTs.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.ort_rotation" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ort_rotation</span>
+
+
+<a href="#qimp.processing.geometric.ort_rotation" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">ort_rotation</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">angle</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Rotate the image by 90°, 180°, or 270° counter-clockwise.</p>
+<p>Decomposition into flip + swap:</p>
+<ul>
+<li>90°:  coord_swap then axis_flip('y')   (swap rows/cols, then invert cols)</li>
+<li>180°: axis_flip('x') then axis_flip('y')</li>
+<li>270°: coord_swap then axis_flip('x')</li>
+</ul>
+<p>Reference: docs/tesi.pdf §2.3.3</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.pos_shift" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pos_shift</span>
+
+
+<a href="#qimp.processing.geometric.pos_shift" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">pos_shift</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="n">Axis</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">direction</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">magnitude</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Shift the image by <code>magnitude</code> pixels along <code>axis</code>.</p>
+<p>Implemented as a cyclic increment / decrement on the n-qubit position
+register for that axis. Each cyclic step is a cascade of multi-controlled X
+gates of decreasing arity (Toffoli-tower), giving <code>O(n²)</code> gate complexity.</p>
+<p>Reference: docs/tesi.pdf §2.3.5</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.restr_flip" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">restr_flip</span>
+
+
+<a href="#qimp.processing.geometric.restr_flip" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">restr_flip</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">axis</span><span class="p">:</span> <span class="n">Axis</span><span class="p">,</span> <span class="n">region_bits</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Flip only the pixels whose position prefix matches <code>region_bits</code>.</p>
+<p>Each character of <code>region_bits</code> selects a higher-order qubit of the axis
+being preserved (the axis <em>not</em> being flipped). For example, with n=4 and
+<code>region_bits="10"</code> on axis='y': flip the column coordinate only for rows
+whose two MSBs are <code>10</code> (i.e. rows 8..11).</p>
+<p>Implemented as a multi-controlled X on each X-axis qubit, with controls on
+the higher-order qubits of the orthogonal axis taking the prefix as a
+bitmask.</p>
+<p>Reference: docs/tesi.pdf §2.3.4</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.geometric.restr_coord_swap" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">restr_coord_swap</span>
+
+
+<a href="#qimp.processing.geometric.restr_coord_swap" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">restr_coord_swap</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">region_bits</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">pos_offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Coord-swap restricted to a region selected by <code>region_bits</code>.</p>
+<p>Decomposition idea: for each <code>i</code>, apply a controlled-SWAP between
+<code>x_i</code> and <code>y_i</code> conditioned on the region prefix. Implemented as
+<code>CSWAP = CNOT(b,a) → Toffoli(ctrl..., a, b) → CNOT(b, a)</code> per pair.</p>
+<p>Reference: docs/tesi.pdf §2.3.4</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="qimpprocessingchromatic">qimp.processing.chromatic<a class="headerlink" href="#qimpprocessingchromatic" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="qimp.processing.chromatic" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">qimp.processing.chromatic</span>
+
+
+<a href="#qimp.processing.chromatic" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents first">
+
+        <p>Chromatic transformations: color complement, color change, halving, classify.</p>
+<p>Reference: docs/tesi.pdf §2.4</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.chromatic.frqi_color_complement" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">frqi_color_complement</span>
+
+
+<a href="#qimp.processing.chromatic.frqi_color_complement" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">frqi_color_complement</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">color_qubit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Invert FRQI colors by applying an X to the color qubit.</p>
+<p>Maps <code>cos(θ)|0⟩ + sin(θ)|1⟩</code> → <code>sin(θ)|0⟩ + cos(θ)|1⟩</code>, i.e. <code>θ → π−θ</code>.
+If <code>color_qubit</code> is <code>None</code> the highest-indexed qubit is used.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.chromatic.frqi_color_change" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">frqi_color_change</span>
+
+
+<a href="#qimp.processing.chromatic.frqi_color_change" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">frqi_color_change</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">theta</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">color_qubit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Apply a custom unitary on the FRQI color qubit, parameterised by <code>theta</code>.</p>
+<p>The unitary is <code>[[cos(θ/2), sin(θ/2)], [sin(θ/2), -cos(θ/2)]]</code> — a reflection
+matrix that maps <code>cos(α)|0⟩ + sin(α)|1⟩ → cos(α+θ)|0⟩ + sin(α+θ)|1⟩</code>,
+shifting every pixel intensity by <code>θ</code> modulo <code>π</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.chromatic.neqr_color_complement" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">neqr_color_complement</span>
+
+
+<a href="#qimp.processing.chromatic.neqr_color_complement" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">neqr_color_complement</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Bit-wise NOT of every intensity bit: maps <code>i → (2^q − 1) − i</code> for each pixel.</p>
+<p>Applies an X gate to each of the <code>q</code> intensity qubits (assumed to be the
+lowest-indexed <code>q</code> qubits, per the NEQR layout).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.chromatic.neqr_half_intensity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">neqr_half_intensity</span>
+
+
+<a href="#qimp.processing.chromatic.neqr_half_intensity" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">neqr_half_intensity</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">allow_reset</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Divide every pixel intensity by 2 (integer division) by right-shifting one bit.</p>
+<p>Implemented as a cascade of SWAPs that re-labels intensity qubits and a
+final reset of the freed top bit. Effectively maps
+<code>b_{q-1}…b_1 b_0 → 0 b_{q-1}…b_1</code>.</p>
+
+
+<details class="hardware-note" open>
+  <summary>Hardware note</summary>
+  <p>The final <code>qc.reset(q-1)</code> is <strong>non-unitary</strong>: on a real device it implies
+a mid-circuit measurement + conditional X, which is not supported on many
+IBM backends and breaks composability with downstream unitary operations.</p>
+<p>Pass <code>allow_reset=True</code> to acknowledge this and produce the textbook
+circuit. The default (<code>allow_reset=False</code>) raises rather than silently
+emitting a non-unitary op; use the SWAP-only cascade if you intend to
+run on hardware — the freed top bit will then carry whatever was there
+before the call (garbage if not pre-zeroed, but the circuit stays unitary).</p>
+</details>
+
+<details class="superposition-caveat" open>
+  <summary>Superposition caveat</summary>
+  <p>After the SWAP cascade, qubit <code>q-1</code> holds the original LSB of the
+intensity register, which is generally <strong>entangled</strong> with the position
+register on a real image. <code>qc.reset(q-1)</code> then projects that qubit
+onto |0⟩, which drops the pixel branches where the original LSB was 1.
+The textbook <code>i → i // 2</code> map therefore only holds exactly for
+images with all-even intensities; on arbitrary images, half-intensity
+must be implemented via mid-circuit measurement + classical-conditional
+X (post-selection on the LSB), which the current implementation does
+not provide.</p>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.chromatic.neqr_classify_complement" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">neqr_classify_complement</span>
+
+
+<a href="#qimp.processing.chromatic.neqr_classify_complement" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">neqr_classify_complement</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">q</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">threshold_bit</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Binary classification: complement intensity bits below a threshold bit.</p>
+<p>Flips every intensity bit at index &lt; <code>threshold_bit</code>. Useful for
+coarse thresholding workflows.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="qimpprocessingfilters">qimp.processing.filters<a class="headerlink" href="#qimpprocessingfilters" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="qimp.processing.filters" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">qimp.processing.filters</span>
+
+
+<a href="#qimp.processing.filters" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents first">
+
+        <p>Quantum filters for spatial processing.</p>
+<p>Currently exposes the Quantum Hadamard Edge Detection (QHED) algorithm for
+images encoded with QPIE. QHED is a poly(n) algorithm that uses a single
+auxiliary qubit, a Hadamard gate, and a cyclic decrement gate to extract
+gradient information from adjacent pixels in a single shot batch.</p>
+<p>Reference: docs/tesi.pdf §2.7.3, §3.1.4</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.filters.qhed_filter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">qhed_filter</span>
+
+
+<a href="#qimp.processing.filters.qhed_filter" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">qhed_filter</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">QuantumCircuit</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build a QHED circuit that exposes adjacent-pixel gradients of <code>image</code>.</p>
+<p>The circuit has <code>2n + 1</code> qubits:</p>
+<ul>
+<li>qubit 0: auxiliary qubit (LSB)</li>
+<li>qubits 1..2n: position register holding the QPIE-encoded image</li>
+</ul>
+<p>After execution, measuring with <code>aux = 1</code> at position <code>i</code> gives a
+magnitude proportional to <code>|c_i − c_{i+1}|</code> where <code>c</code> are the QPIE
+amplitudes in <strong>row-major flattened order</strong>.</p>
+<p>.. warning::
+   This is <strong>not</strong> a pure horizontal-only gradient. The cyclic decrement
+   acts on the full register modulo <code>2^{2n+1}</code>, so adjacency wraps
+   around at every row boundary: pixel <code>(r, 2^n − 1)</code> is adjacent to
+   pixel <code>(r + 1, 0)</code> in the flattened representation. The output
+   therefore contains spurious "edges" at the last column of every row,
+   which reflect the wrap-around, not the image. For a pure
+   horizontal-only filter, transpose the image and run QHED on the
+   transposed version, then compose horizontally / vertically yourself
+   and discard the boundary columns.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>image</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Square <code>(2^n, 2^n)</code> non-negative intensity array.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="qc">qc</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The QHED circuit (no measurements appended).</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="n">n</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Spatial qubits per axis.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="rms">rms</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Root-mean-square of the input intensities, <code>√(mean(I²))</code>. Forward
+this to <code>qhed_decode</code> to recover the absolute gradient scale.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="note" open>
+  <summary>Notes</summary>
+  <p>Complexity is <code>O(poly(n))</code> after Hadamard + Toffoli decomposition,
+excluding the QPIE <code>initialize</code> which dominates and is itself <code>O(2^{2n})</code>
+in depth.</p>
+</details>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.filters.qhed_decode" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">qhed_decode</span>
+
+
+<a href="#qimp.processing.filters.qhed_decode" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">qhed_decode</span><span class="p">(</span><span class="n">counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">rms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">max_gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Recover the horizontal gradient image from QHED measurement counts.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>counts</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Histogram from <code>ideal_simulation(qc, shots)</code> with <code>qc</code> the QHED filter.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Number of spatial qubits per axis.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>rms</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>RMS scale factor returned by <code>qhed_filter</code>. Use 1.0 to return <em>normalized</em>
+gradients.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_gradient</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If given, clip the output to <code>[0, max_gradient]</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>(2^n, 2^n)</code> float array of horizontal gradient magnitudes.
+Gradients are non-negative; the sign is lost because we measure
+<code>P(aux=1) ∝ (c_i − c_{i+1})²</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.filters.qhed_full_edges" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">qhed_full_edges</span>
+
+
+<a href="#qimp.processing.filters.qhed_full_edges" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">qhed_full_edges</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">counts_horizontal</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">counts_vertical</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">max_gradient</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Combine horizontal and vertical gradients into a single edge map.</p>
+<p>Typical workflow::</p>
+<div class="highlight"><pre><span></span><code>qc_h, n, rms = qhed_filter(image)
+qc_v, _, _   = qhed_filter(image.T)
+counts_h = ideal_simulation(qc_h, shots=N)
+counts_v = ideal_simulation(qc_v, shots=N)
+edges    = qhed_full_edges(image, counts_h, counts_v, max_gradient=5.0)
+</code></pre></div>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="qimpprocessinggp_ratio">qimp.processing.gp_ratio<a class="headerlink" href="#qimpprocessinggp_ratio" title="Permanent link">&para;</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h3 id="qimp.processing.gp_ratio" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">qimp.processing.gp_ratio</span>
+
+
+<a href="#qimp.processing.gp_ratio" class="headerlink" title="Permanent link">&para;</a></h3>
+
+    <div class="doc doc-contents first">
+
+        <p>Green-Purple (GP) ratio computation via a parameterized quantum circuit.</p>
+<p>Application module (not part of the core thesis library). Computes
+<code>(I_G - I_R) / (I_G + I_R)</code> on stacked microscopy channels by encoding the
+two channels as a multi-image FRQI circuit and using two CRY gates per pixel
+to write the GP ratio onto an auxiliary color qubit. Parameters are tuned via
+classical optimisation (scipy.minimize, COBYLA) against the classical GP image.</p>
+<p>Migrated from legacy/scripts/gp_quantum_4.py + quantize_analyze_quantum_gp_v3.py.
+Works for arbitrary <code>n</code> (spatial qubits) and <code>m</code> (image-selection qubits).</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h4 id="qimp.processing.gp_ratio.OptimizationResult" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OptimizationResult</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#qimp.processing.gp_ratio.OptimizationResult" class="headerlink" title="Permanent link">&para;</a></h4>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Outcome of :func:<code>optimize_gp</code>.</p>
+
+
+<p><span class="doc-section-title">Attributes:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td><code><span title="qimp.processing.gp_ratio.OptimizationResult.optimized_qc">optimized_qc</span></code></td>
+            <td>
+                  <code><span title="qiskit.QuantumCircuit">QuantumCircuit</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Circuit with parameters bound to their optimal values.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="qimp.processing.gp_ratio.OptimizationResult.optimized_params">optimized_params</span></code></td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Numerical values of all parameters at the optimum.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="qimp.processing.gp_ratio.OptimizationResult.history_mse, history_psnr, history_tv, history_combined">history_mse, history_psnr, history_tv, history_combined</span></code></td>
+            <td>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Per-iteration objective traces.</p>
+              </div>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td><code><span title="qimp.processing.gp_ratio.OptimizationResult.history_time">history_time</span></code></td>
+            <td>
+                  <code><span title="list">list</span>[<span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Wall-clock seconds elapsed at each iteration.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.classical_gp_image" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">classical_gp_image</span>
+
+
+<a href="#qimp.processing.gp_ratio.classical_gp_image" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">classical_gp_image</span><span class="p">(</span><span class="n">image_g</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">image_r</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">eps</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Classical Green-Purple ratio: <code>(G − α·R) / (G + α·R)</code> element-wise.</p>
+<p>Output is <code>float64</code>, naturally clamped to <code>[-1, 1]</code>, with a small
+<code>eps</code> in the denominator to avoid division by zero where both channels
+are zero. <code>alpha</code> is the red-channel weight (sometimes called <code>G</code> in
+the lab's notation, but renamed here to avoid colliding with the green
+channel name).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.combined_objective" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">combined_objective</span>
+
+
+<a href="#qimp.processing.gp_ratio.combined_objective" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">combined_objective</span><span class="p">(</span><span class="n">mse_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">psnr_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">tv_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">beta</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Weighted scalar objective: <code>α·MSE − β·PSNR + γ·TV</code>.</p>
+<p>Minimising this drives MSE and TV down while pushing PSNR up.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.apply_gp_function" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">apply_gp_function</span>
+
+
+<a href="#qimp.processing.gp_ratio.apply_gp_function" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">apply_gp_function</span><span class="p">(</span><span class="n">qc</span><span class="p">:</span> <span class="n">QuantumCircuit</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">Parameter</span> <span class="o">|</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">QuantumCircuit</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Append the parameterised GP sub-circuit in place (per-pixel).</p>
+<p>For each of the <code>2^(2n)</code> pixel positions, two parameters drive:</p>
+<ol>
+<li>a fully-controlled RY on the <strong>green</strong> branch (position matches +
+   selection qubit = 1) writing onto the color qubit (the "G half"),</li>
+<li>a fully-controlled RY on the <strong>red</strong> branch (position matches +
+   selection qubit = 0) writing onto the same color qubit (the "R
+   half"), followed by an unconditional Hadamard that interferes the
+   two channel amplitudes.</li>
+</ol>
+<p>Splitting the two rotations across the two selection branches is
+what makes the per-pixel parameter pair non-degenerate: had both
+rotations sat on the same selection branch, they would compose into
+a single <code>RY(θ₁+θ₂)</code> and the model would have only one effective
+parameter per pixel. (Older versions of this function also missed
+the position-matching controls — the X-flip mask was applied but
+the CRY took only <code>selection_qubit</code> as control, so every pixel
+branch produced the same rotation. Both bugs are fixed.)</p>
+<p>The circuit assumes the standard FRQI layout: <code>n</code> row qubits, <code>n</code>
+column qubits, <code>m</code> selection qubits, 1 color qubit (color qubit
+index = <code>2n+m</code>).</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>qc</code>
+            </td>
+            <td>
+                  <code><span title="qiskit.QuantumCircuit">QuantumCircuit</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Circuit to modify. Must already encode the FRQI representation of
+two channels (so it has <code>2n+m+1</code> qubits).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Spatial qubits per axis (so image size = <code>2^n × 2^n</code>).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>m</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image-selection qubits (so number of stacked images = <code>2^m</code>).
+Must be ≥ 1 for the GP construction (we need a selection qubit
+to be the extra control).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>params</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="qiskit.circuit.Parameter">Parameter</span> | <span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sequence of <code>2 · 2^(2n)</code> parameters. Built externally via
+<code>[Parameter(f"θ{i}") for i in range(2 * 2**(2*n))]</code> and assigned
+later with <code>qc.assign_parameters(...)</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="qiskit.QuantumCircuit">QuantumCircuit</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The same <code>qc</code>, mutated in place and returned for chaining.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.decode_gp_counts" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">decode_gp_counts</span>
+
+
+<a href="#qimp.processing.gp_ratio.decode_gp_counts" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">decode_gp_counts</span><span class="p">(</span><span class="n">counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Decode GP-circuit measurement counts into a per-pixel GP image.</p>
+<p>Marginalises over the image-selection qubits and computes
+<code>P(color = 1 | position)</code> for each pixel, then maps the probability
+from <code>[0, 1]</code> to the canonical <code>[-1, 1]</code> GP range via <code>2·P - 1</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>counts</code>
+            </td>
+            <td>
+                  <code><span title="dict">dict</span>[<span title="str">str</span>, <span title="int">int</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Histogram returned by :func:<code>qimp.testing.ideal_simulation</code> /
+:func:<code>qimp.testing.exact_counts</code> on a circuit that has had
+:func:<code>apply_gp_function</code> applied.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>n</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Spatial qubits per axis (image side = <code>2^n</code>).</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>m</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Image-selection qubits used at encoding (default 1 for the typical
+<code>(R, G)</code> stack).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>(2^n, 2^n)</code> float array of GP values in <code>[-1, 1]</code>. Pixels with
+zero total counts (unreachable in the measurement) decode to <code>0</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.analytical_gp_params" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">analytical_gp_params</span>
+
+
+<a href="#qimp.processing.gp_ratio.analytical_gp_params" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">analytical_gp_params</span><span class="p">(</span><span class="n">green</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">red</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">normalization</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the closed-form optimal parameters for :func:<code>apply_gp_function</code>.</p>
+<p>With the final Hadamard moved outside the per-pixel loop (see
+<code>apply_gp_function</code> docstring), each pixel <code>p</code> has an independent
+two-parameter block and the decoded value is</p>
+<div class="highlight"><pre><span></span><code>``GP[p] = −(sin(φ_2 + β_p) + sin(φ_1 + α_p)) / 2``
+</code></pre></div>
+<p>where <code>φ_1 = arccos(1 − 2·I_1[p]/N)</code> and <code>φ_2 = arccos(1 − 2·I_2[p]/N)</code>
+are the FRQI angles for the two channels (<code>N</code> is the normalisation
+used at encoding). Setting <code>GP[p] = target[p]</code> is solved by</p>
+<div class="highlight"><pre><span></span><code>``α_p = arcsin(−target[p]) − φ_1``
+``β_p = arcsin(−target[p]) − φ_2``
+</code></pre></div>
+<p>giving the exact circuit output without any numerical optimisation.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>green</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape <code>(2^n, 2^n)</code> channel arrays. The argument names
+track the lab-historical (green, red) labels; the function is
+channel-agnostic and applies to any two intensity bands.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>red</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape <code>(2^n, 2^n)</code> channel arrays. The argument names
+track the lab-historical (green, red) labels; the function is
+channel-agnostic and applies to any two intensity bands.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Sensitivity correction factor for the second channel (the G-factor
+of the Generalized Polarization formula). Ignored when an explicit
+<code>target</code> is supplied.</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>normalization</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>FRQI normalisation. Defaults to <code>max(green.max(), red.max())</code> —
+the same value :func:<code>evaluate_gp</code> uses internally.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>target</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional explicit per-pixel target in [-1, 1]. When supplied, the
+solver fits the circuit to this target instead of the classical
+Generalized Polarization image. This is the entry point for the
+Corollary-1 extensions discussed in the companion paper: any
+bounded ratiometric operator of the two channels (Fura-2 calcium
+ratio, FRET efficiency, SNARF pH, NDVI, …) may be supplied as
+<code>target</code> and the closed form recovers the matching parameters.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Parameter vector of length <code>2 · 2^(2n)</code> ready to be passed to
+:func:<code>apply_gp_function</code> / :func:<code>evaluate_gp</code>. Layout follows
+the same row-major / pixel-index convention as <code>frqi_circuit</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.evaluate_gp" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">evaluate_gp</span>
+
+
+<a href="#qimp.processing.gp_ratio.evaluate_gp" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">evaluate_gp</span><span class="p">(</span><span class="n">green</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">red</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">params</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">|</span> <span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8192</span><span class="p">,</span> <span class="n">exact</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Run the full quantum GP pipeline and return the decoded GP image.</p>
+<p>Encodes <code>(red, green)</code> as a multi-image FRQI circuit, applies
+:func:<code>apply_gp_function</code> with the supplied parameter values, simulates
+the result, and decodes via :func:<code>decode_gp_counts</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>green</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape <code>(2^n, 2^n)</code> channel arrays. Their max value sets
+the FRQI normalisation so the encoder stays well-defined.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>red</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape <code>(2^n, 2^n)</code> channel arrays. Their max value sets
+the FRQI normalisation so the encoder stays well-defined.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>params</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Sequence">Sequence</span>[<span title="float">float</span>] | <span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Numerical parameter values for :func:<code>apply_gp_function</code>. Must have
+length <code>2 · 2^(2n)</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>shots</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Shot count for shot-based simulation (ignored when <code>exact=True</code>).</p>
+              </div>
+            </td>
+            <td>
+                  <code>8192</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>exact</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>True</code>, uses :func:<code>qimp.testing.exact_counts</code> (statevector,
+no shot noise). Otherwise uses :func:<code>qimp.testing.ideal_simulation</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>(2^n, 2^n)</code> float GP image in <code>[-1, 1]</code>.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="qimp.processing.gp_ratio.optimize_gp" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">optimize_gp</span>
+
+
+<a href="#qimp.processing.gp_ratio.optimize_gp" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nf">optimize_gp</span><span class="p">(</span><span class="n">green</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="n">red</span><span class="p">:</span> <span class="n">ndarray</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">exact</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="n">shots</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4096</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationResult</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Optimise the GP circuit parameters against the classical GP image.</p>
+<p>Wires together :func:<code>evaluate_gp</code> (quantum image), :func:<code>classical_gp_image</code>
+(target), and <code>scipy.optimize.minimize(method="COBYLA")</code>. The default
+loss is pure MSE; pass non-zero <code>weights</code> to bring in the PSNR / TV
+terms of :func:<code>combined_objective</code>.</p>
+<p>With the per-pixel ansatz fix in :func:<code>apply_gp_function</code>, the model
+is expressive enough to reproduce the classical GP exactly. Empirically
+COBYLA converges to MSE → 0 (PSNR ~ 85+ dB) in 50 iterations for n=1
+and ~480 for n=2.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>green</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape square <code>(2^n, 2^n)</code> channels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>red</code>
+            </td>
+            <td>
+                  <code><span title="numpy.ndarray">ndarray</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Matching-shape square <code>(2^n, 2^n)</code> channels.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>alpha</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Red-channel weight passed to :func:<code>classical_gp_image</code> (the target).</p>
+              </div>
+            </td>
+            <td>
+                  <code>1.0</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>max_iter</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Cap on COBYLA iterations. Default 200 reaches machine-precision
+convergence for n ≤ 2; larger images may want 1000+.</p>
+              </div>
+            </td>
+            <td>
+                  <code>200</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>seed</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Optional RNG seed for the initial parameter vector.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>weights</code>
+            </td>
+            <td>
+                  <code><span title="tuple">tuple</span>[<span title="float">float</span>, <span title="float">float</span>, <span title="float">float</span>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p><code>(α_MSE, β_PSNR, γ_TV)</code> weights for :func:<code>combined_objective</code>.
+Default <code>(1.0, 0.0, 0.0)</code> (pure MSE) is what reaches the exact
+target; the PSNR / TV terms are mainly diagnostic.</p>
+              </div>
+            </td>
+            <td>
+                  <code>(1.0, 0.0, 0.0)</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>exact</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Forwarded to :func:<code>evaluate_gp</code> on every iteration.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>shots</code>
+            </td>
+            <td>
+                  <code><span title="bool">bool</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Forwarded to :func:<code>evaluate_gp</code> on every iteration.</p>
+              </div>
+            </td>
+            <td>
+                  <code>True</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    <p><span class="doc-section-title">Returns:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="OptimizationResult
+
+
+  
+      dataclass
+   (qimp.processing.gp_ratio.OptimizationResult)" href="#qimp.processing.gp_ratio.OptimizationResult">OptimizationResult</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Result container with the optimised circuit, parameters, and per-
+iteration history of every metric.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.suggest", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
