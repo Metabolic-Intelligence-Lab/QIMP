@@ -793,7 +793,7 @@ def decode_class_a_prefix(
 # at n=1, q=2, putting it past laptop statevector range. We expose the
 # prefix stage above as the bit-exact-testable component; the
 # divider step will be added in a follow-up commit and validated via
-# the MPS simulator on AerSimulator(method='mps').
+# the MPS simulator on AerSimulator(method='matrix_product_state').
 
 
 # ============================================================================
@@ -988,7 +988,7 @@ def class_a_gp_full(
          fractional GP magnitude.
 
     Resource budget at n=1, q=2, q_frac=2: ~70 qubits — past laptop
-    statevector. Use ``AerSimulator(method='mps')`` for execution.
+    statevector. Use ``AerSimulator(method='matrix_product_state')`` for execution.
     Each underlying primitive is bit-exact verified at small width;
     end-to-end correctness relies on the composition (every primitive
     is position-independent so the action lifts uniformly across the
@@ -1226,7 +1226,7 @@ def class_c_rogfp_full(
          holds ``ratio - R_red_fp`` (signed two's-complement).
 
     Resource budget at n=1, q=4, q_frac=4: ~114 qubits — past laptop
-    statevector. Use ``AerSimulator(method='mps')``
+    statevector. Use ``AerSimulator(method='matrix_product_state')``
     the bond dimension
     stays small because the position register superposes only ``4^n``
     pixel branches.

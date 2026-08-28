@@ -105,6 +105,15 @@ def main(argv: list[str] | None = None) -> int:
                     help="If omitted: max(4096, 1024*n_pixels).")
     ap.add_argument("--mitigation", type=str, default="trex+dd",
                     choices=["trex+dd", "trex", "dd", "none"])
+    ap.add_argument("--dd-sequence", type=str, default="XY4",
+                    choices=["XY4", "XpXm", "XX"],
+                    help="Decoupling sequence when mitigation includes DD; these "
+                         "are the three SamplerV2 exposes. XpXm and XX are the "
+                         "matched-pulse-count pair that separates a coherent "
+                         "pulse-error mechanism from an incoherent one: both "
+                         "insert two pulses per window with identical timing, but "
+                         "XpXm's +/- alternation cancels pulse-amplitude error to "
+                         "first order while XX accumulates it (paper section 7.4).")
     ap.add_argument("--outdir", type=Path, default=DEFAULT_OUTDIR)
     ap.add_argument("--repeat", type=int, default=1,
                     help="Submit the same circuit N times and report the match-rate "
@@ -138,7 +147,8 @@ def main(argv: list[str] | None = None) -> int:
     print(f"\n--- {label} ---")
     print(f"  dataset={args.dataset} n={n} q={q} pixels={n_pixels} shots={shots}")
     print(f"  logical qubits = {qc.num_qubits}, logical size = {qc.size()}")
-    print(f"  divider = {args.divider}, mitigation = {args.mitigation}")
+    print(f"  divider = {args.divider}, mitigation = {args.mitigation}"
+          + (f", dd = {args.dd_sequence}" if "dd" in args.mitigation else ""))
     runs = []
     for rep in range(1, args.repeat + 1):
         run_label = label if args.repeat == 1 else f"{label}_r{rep}"
@@ -147,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
         t0 = time.time()
         counts, transpiled, job_id, summary = ibm.hw_run(
             qc, backend=backend, shots=shots, mitigation=args.mitigation,
+            dd_sequence=args.dd_sequence,
         )
         elapsed = time.time() - t0
         print(f"  job_id = {job_id}")
@@ -184,6 +195,7 @@ def main(argv: list[str] | None = None) -> int:
             "backend": backend.name,
             "shots": shots,
             "mitigation": args.mitigation,
+            "dd_sequence": args.dd_sequence,
             "job_id": job_id,
             "depth": summary["depth"],
             "two_q_gate_count": summary["two_q_gate_count"],

@@ -1,5 +1,5 @@
 """Sweep the autonomous Class-B circuit over n ∈ {2, 3, 4, 5} on the
-Laurdan canonical frame at q=2, all via AerSimulator(method='mps') with
+Laurdan canonical frame at q=2, all via AerSimulator(method='matrix_product_state') with
 4096 shots. Records qubit count, transpiled depth, MPS runtime, and
 the bit-exact match rate vs the classical reference.
 

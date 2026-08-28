@@ -535,7 +535,7 @@ def test_q_div_general_correctness(n: int, m: int, dividend: int, divisor: int) 
     Note: larger non-square configurations like (n=3, m=2) push the
     statevector past 28 qubits (~10 GB with Qiskit's transpilation
     overhead) and are statevector-infeasible on the development laptop;
-    they are exercised via the AerSimulator(method='mps') path in the
+    they are exercised via the AerSimulator(method='matrix_product_state') path in the
     Stage E QAE demo (out of scope here).
     """
     qc, idx = _make_div_general_circuit(n, m, dividend, divisor)

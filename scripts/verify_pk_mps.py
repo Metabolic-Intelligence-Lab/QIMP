@@ -6,7 +6,7 @@ noise-free MPS simulator, for k beyond the k=0,1 currently reported.
 This closes the reviewer gap (review point #1): the 1000-seed scaling study
 (scripts/qae_scaling_study.py) evaluates the MLQAE estimator on the *analytic*
 p_k, justified only if the real circuit reproduces those p_k past k=1. Here we
-run the actual A.Q^k circuit on AerSimulator(method='mps') and compare the
+run the actual A.Q^k circuit on AerSimulator(method='matrix_product_state') and compare the
 measured P(good=1) against sin^2((2k+1)theta) for k = 0..max_k.
 
 Reuses the exact A / Grover construction of scripts/qae_demo_class_b.py so the
@@ -158,7 +158,7 @@ def make_figure(out: dict, dest: Path) -> None:
     axR.legend(fontsize=7, loc="upper left")
 
     kmax = max(r["k"] for d in out["datasets"].values() for r in d["rows"])
-    fig.suptitle("Autonomous QAE oracle on AerSimulator(method='mps') "
+    fig.suptitle("Autonomous QAE oracle on AerSimulator(method='matrix_product_state') "
                  f"reproduces the ideal per-power success probability up to $k={kmax}$",
                  fontsize=10)
     fig.savefig(dest, dpi=300)

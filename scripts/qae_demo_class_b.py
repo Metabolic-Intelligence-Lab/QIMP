@@ -14,7 +14,7 @@ amplitude θ from the per-k empirical good-qubit probabilities. We then
 contrast the QAE estimate against a classical Monte Carlo baseline of
 the same total query budget.
 
-Runs on ``AerSimulator(method='mps')`` since the full state-prep has
+Runs on ``AerSimulator(method='matrix_product_state')`` since the full state-prep has
 ~30 qubits (out of statevector range on a 16 GB laptop). Expected
 runtime: 10–30 minutes per IQAE pass at n=1, q=2 on this laptop class;
 the heavy depth (Grover iterations multiply the already-deep state-prep)
@@ -368,7 +368,7 @@ def main(argv: list[str] | None = None) -> int:
           f"{a_true:.4f} ({int(good_mask.sum())} / {n_pixels})")
 
     print(f"\nRunning QAE with shots={args.shots} per k, max_k={args.max_k}")
-    print(f"  (AerSimulator(method='mps'); each k may take minutes)")
+    print(f"  (AerSimulator(method='matrix_product_state'); each k may take minutes)")
 
     probs: dict[int, float] = {}
     for k in range(args.max_k + 1):

@@ -12,6 +12,7 @@ import json
 import logging
 import os
 import tempfile
+import time
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,10 @@ logger = logging.getLogger(__name__)
 # Module-level cache for the QiskitRuntimeService singleton. Tests reset
 # this to None via the autouse `_reset_singleton` fixture.
 _SERVICE: Any = None
+
+# Retry policy for service construction; see get_service().
+_SERVICE_RETRIES = 4
+_SERVICE_BACKOFF_S = 3.0
 
 # Cached QiskitRuntimeService class (or None if the optional [ibm]
 # extra is not installed). Resolved lazily on the first call to
@@ -68,16 +73,35 @@ def get_service(instance: str | None = None) -> Any:
             "qimp.runtime.ibm requires `pip install qimp-mi[ibm]` (qiskit-ibm-runtime)"
         )
 
-    try:
-        _SERVICE = qrs_cls(instance=instance) if instance else qrs_cls()
-    except Exception as exc:
-        raise RuntimeError(
-            "Could not initialise QiskitRuntimeService — is "
-            "~/.qiskit/qiskit-ibm.json present and the token valid? "
-            f"Underlying error: {exc}"
-        ) from exc
+    # Service construction resolves the account's cloud instances against
+    # IBM's global catalog, a network call that fails transiently often
+    # enough to kill an unattended multi-hour submission loop. Observed
+    # failures include DNS resolution errors and SSL EOFs, both of which
+    # surface as "check that you are using a valid API token" even when the
+    # token is fine. Retry with backoff before believing that message.
+    last: Exception | None = None
+    for attempt in range(_SERVICE_RETRIES):
+        try:
+            _SERVICE = qrs_cls(instance=instance) if instance else qrs_cls()
+            return _SERVICE
+        except Exception as exc:  # noqa: BLE001 — re-raised below
+            last = exc
+            if attempt + 1 < _SERVICE_RETRIES:
+                delay = _SERVICE_BACKOFF_S * (2**attempt)
+                logger.warning(
+                    "QiskitRuntimeService init failed (attempt %d/%d), "
+                    "retrying in %.0fs: %s",
+                    attempt + 1, _SERVICE_RETRIES, delay, exc,
+                )
+                time.sleep(delay)
 
-    return _SERVICE
+    raise RuntimeError(
+        "Could not initialise QiskitRuntimeService after "
+        f"{_SERVICE_RETRIES} attempts — is ~/.qiskit/qiskit-ibm.json present "
+        "and the token valid? Note that transient network failures against "
+        "IBM's global catalog also surface as a token error. "
+        f"Underlying error: {last}"
+    ) from last
 
 
 def list_backends(service: Any | None = None) -> list[dict[str, Any]]:
@@ -252,6 +276,7 @@ def hw_run(
     backend: Any,
     shots: int = 4096,
     mitigation: str = "trex+dd",
+    dd_sequence: str = "XY4",
     optimization_level: int = 3,
     timeout_s: float = 1200.0,
 ) -> tuple[dict[str, int], QuantumCircuit, str, dict[str, Any]]:
@@ -268,7 +293,7 @@ def hw_run(
     shots:
         Number of shots.
     mitigation:
-        ``'trex+dd'`` enables twirled readout error extinction and XY4
+        ``'trex+dd'`` enables twirled readout error extinction and
         dynamical decoupling (default). ``'trex'`` enables only TREX,
         ``'dd'`` enables only DD, ``'none'`` disables all mitigation.
         ``'zne'`` enables zero-noise extrapolation on top of TREX+DD
@@ -276,6 +301,15 @@ def hw_run(
         executes three implicit noise-scaled copies and returns the
         extrapolated mitigated counts. The five modes together support
         ablation studies of which layer contributes the recovered signal.
+    dd_sequence:
+        Decoupling sequence used when ``mitigation`` includes DD. ``'XY4'``
+        (default) is the sequence used throughout the paper's campaign.
+        ``'XpXm'`` and ``'XX'`` are the matched-pulse-count pair: both
+        insert two pulses per idle window with identical timing, but
+        XpXm's +/- alternation cancels pulse-amplitude error to first
+        order while XX accumulates it, so the contrast between them
+        separates a coherent pulse-error mechanism from an incoherent one
+        (§7.4). These three are what SamplerV2 exposes.
     optimization_level:
         Transpiler optimisation level (0–3). Defaults to 3.
     timeout_s:
@@ -312,7 +346,7 @@ def hw_run(
     options = Options()
     if mitigation in ("trex+dd", "dd"):
         options.dynamical_decoupling.enable = True
-        options.dynamical_decoupling.sequence_type = "XY4"
+        options.dynamical_decoupling.sequence_type = dd_sequence
     if mitigation in ("trex+dd", "trex"):
         options.twirling.enable_measure = True
     if mitigation == "zne":

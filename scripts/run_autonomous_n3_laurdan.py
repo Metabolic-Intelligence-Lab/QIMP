@@ -1,5 +1,5 @@
 """Run the autonomous Class-B integer-ratio circuit on the 8×8 (n=3)
-Laurdan canonical microscopy frame, via AerSimulator(method='mps') with
+Laurdan canonical microscopy frame, via AerSimulator(method='matrix_product_state') with
 shot-based measurement (statevector at 28 qubits = 4 GiB would take
 ~10 hours via Statevector.from_instruction).
 
@@ -103,7 +103,7 @@ def main() -> int:
     print(f"  transpile elapsed = {time.time() - t0:.2f} s")
     print(f"  transpiled size = {qc_t.size()}")
 
-    print(f"\nRunning AerSimulator(method='mps') with shots={SHOTS}…")
+    print(f"\nRunning AerSimulator(method='matrix_product_state') with shots={SHOTS}…")
     t0 = time.time()
     result = sim.run(qc_t, shots=SHOTS).result()
     counts = result.get_counts()
