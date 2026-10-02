@@ -1,0 +1,105 @@
+{
+  "backend": "ibm_marrakesh",
+  "rows": [
+    {
+      "dataset": "canonical_shared",
+      "n": 1,
+      "q": 2,
+      "basis_only_two_q": 237,
+      "levels": {
+        "0": 1305,
+        "1": 804,
+        "2": 631,
+        "3": 613
+      },
+      "seed_sweep": {
+        "n_seeds": 20,
+        "min": 596,
+        "median": 646.5,
+        "max": 684,
+        "mean": 645.1,
+        "std": 22.909202931297465
+      },
+      "fractional": {
+        "min": 620,
+        "median": 665.5,
+        "max": 687
+      }
+    },
+    {
+      "dataset": "fura2",
+      "n": 1,
+      "q": 2,
+      "basis_only_two_q": 237,
+      "levels": {
+        "0": 1413,
+        "1": 792,
+        "2": 653,
+        "3": 659
+      },
+      "seed_sweep": {
+        "n_seeds": 20,
+        "min": 612,
+        "median": 650.0,
+        "max": 668,
+        "mean": 646.25,
+        "std": 16.061968811614072
+      },
+      "fractional": {
+        "min": 650,
+        "median": 677.0,
+        "max": 714
+      }
+    },
+    {
+      "dataset": "canonical",
+      "n": 2,
+      "q": 2,
+      "basis_only_two_q": 525,
+      "levels": {
+        "0": 3123,
+        "1": 1619,
+        "2": 1235,
+        "3": 1297
+      },
+      "seed_sweep": {
+        "n_seeds": 20,
+        "min": 1241,
+        "median": 1284.0,
+        "max": 1404,
+        "mean": 1290.3,
+        "std": 46.348905624961404
+      },
+      "fractional": {
+        "min": 1295,
+        "median": 1393.0,
+        "max": 1445
+      }
+    },
+    {
+      "dataset": "canonical",
+      "n": 1,
+      "q": 3,
+      "basis_only_two_q": 329,
+      "levels": {
+        "0": 2312,
+        "1": 1403,
+        "2": 1136,
+        "3": 1225
+      },
+      "seed_sweep": {
+        "n_seeds": 20,
+        "min": 1081,
+        "median": 1157.5,
+        "max": 1225,
+        "mean": 1155.8,
+        "std": 37.29766466514605
+      },
+      "fractional": {
+        "min": 1179,
+        "median": 1238.5,
+        "max": 1293
+      }
+    }
+  ]
+}

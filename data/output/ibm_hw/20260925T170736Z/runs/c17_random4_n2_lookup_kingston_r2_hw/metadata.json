@@ -1,0 +1,32 @@
+{
+  "label": "c17_random4_n2_lookup_kingston_r2",
+  "campaign": 17,
+  "dataset": "random4",
+  "n": 2,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "backend": "ibm_kingston",
+  "shots": 16384,
+  "mitigation": "trex",
+  "job_id": "daraq4ihcrkc73drd17g",
+  "two_q_gate_count": 206,
+  "seed_transpiler": 12,
+  "transpiled_sha256": "4bc284a6f9373f98787949b86aefd48cc896b959d7bf0ff50e6274e01d3cf526",
+  "physical_qubits": [
+    39,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    58,
+    70,
+    71
+  ],
+  "round": 2,
+  "remaining_before": 139,
+  "wallclock_seconds": 16.9
+}

@@ -1,0 +1,275 @@
+{
+  "c6_b_fourvalue_p4_16k_marrakesh_r1": {
+    "label": "c6_b_fourvalue_p4_16k_marrakesh_r1",
+    "repeat_index": 1,
+    "repeat_total": 3,
+    "dataset": "fourvalue_p4",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "dahe3eb9k43c73aemhfg",
+    "depth": 1381,
+    "two_q_gate_count": 699,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 96,
+    "wallclock_seconds": 17.0,
+    "n_unique_bitstrings": 15717,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        0
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        false,
+        false
+      ],
+      [
+        true,
+        false
+      ]
+    ],
+    "match_count": 1,
+    "match_pct": 25.0
+  },
+  "c6_b_fourvalue_p4_16k_marrakesh_r2": {
+    "label": "c6_b_fourvalue_p4_16k_marrakesh_r2",
+    "repeat_index": 2,
+    "repeat_total": 3,
+    "dataset": "fourvalue_p4",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "dahe3igmhr3c73e6f3vg",
+    "depth": 1442,
+    "two_q_gate_count": 690,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 96,
+    "wallclock_seconds": 13.3,
+    "n_unique_bitstrings": 15384,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        0
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        false,
+        false
+      ],
+      [
+        true,
+        false
+      ]
+    ],
+    "match_count": 1,
+    "match_pct": 25.0
+  },
+  "c6_b_fourvalue_p4_16k_marrakesh_r3": {
+    "label": "c6_b_fourvalue_p4_16k_marrakesh_r3",
+    "repeat_index": 3,
+    "repeat_total": 3,
+    "dataset": "fourvalue_p4",
+    "n": 1,
+    "q": 2,
+    "n_pixels": 4,
+    "backend": "ibm_marrakesh",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "dahe3lphvn6c73crtjsg",
+    "depth": 1393,
+    "two_q_gate_count": 670,
+    "num_qubits": 156,
+    "logical_qubits": 24,
+    "logical_size": 96,
+    "wallclock_seconds": 13.6,
+    "n_unique_bitstrings": 15532,
+    "divider": "nonrestoring",
+    "quantum_quotient": [
+      [
+        1,
+        1
+      ],
+      [
+        1,
+        1
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        0
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        false,
+        false
+      ],
+      [
+        true,
+        false
+      ]
+    ],
+    "match_count": 1,
+    "match_pct": 25.0
+  },
+  "_aggregate": {
+    "label": "c6_b_fourvalue_p4_16k_marrakesh",
+    "repeat_total": 3,
+    "backend": "ibm_marrakesh",
+    "divider": "nonrestoring",
+    "dataset": "fourvalue_p4",
+    "match_counts": [
+      1,
+      1,
+      1
+    ],
+    "match_mean": 1.0,
+    "match_std": 0.0,
+    "match_min": 1,
+    "match_max": 1,
+    "per_pixel_recovery_frequency": [
+      [
+        0.0,
+        0.0
+      ],
+      [
+        1.0,
+        0.0
+      ]
+    ],
+    "classical_R": [
+      [
+        3,
+        0
+      ],
+      [
+        1,
+        2
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false
+      ],
+      [
+        false,
+        false
+      ]
+    ],
+    "job_ids": [
+      "dahe3eb9k43c73aemhfg",
+      "dahe3igmhr3c73e6f3vg",
+      "dahe3lphvn6c73crtjsg"
+    ]
+  }
+}

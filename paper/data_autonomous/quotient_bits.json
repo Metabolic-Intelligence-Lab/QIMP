@@ -1,0 +1,460 @@
+[
+  {
+    "dataset": "canonical",
+    "mitigation": "dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4996,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5573,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "none",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 11,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.6068,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.6964,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.6041,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.7369,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 3,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5749,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.647,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 2,
+        "p_correct": 0.6631,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 2,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.572,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.6416,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 11,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5512,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5663,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 3,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5544,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5141,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 2,
+        "p_correct": 0.4839,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 2,
+    "q": 2,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5334,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.515,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical",
+    "mitigation": "trex+dd",
+    "divider": "restoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 6,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4519,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5668,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_nd",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5011,
+        "varies": true,
+        "sigma_over_chance": 0.07
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5111,
+        "varies": true,
+        "sigma_over_chance": 0.71
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_nd",
+    "mitigation": "trex+dd",
+    "divider": "restoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.513,
+        "varies": true,
+        "sigma_over_chance": 0.83
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5018,
+        "varies": true,
+        "sigma_over_chance": 0.12
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_shared",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 15,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5232,
+        "varies": true,
+        "sigma_over_chance": 5.76
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.74,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_shared",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 2,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5032,
+        "varies": true,
+        "sigma_over_chance": 0.46
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.6723,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_shared",
+    "mitigation": "trex",
+    "divider": "restoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5071,
+        "varies": true,
+        "sigma_over_chance": 1.02
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.7478,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_shared",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 11,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4998,
+        "varies": true,
+        "sigma_over_chance": -0.05
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5528,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "canonical_shared",
+    "mitigation": "trex+dd",
+    "divider": "restoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4962,
+        "varies": true,
+        "sigma_over_chance": -0.55
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5485,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "fura2",
+    "mitigation": "trex",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 5,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4745,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5445,
+        "varies": true,
+        "sigma_over_chance": 6.37
+      }
+    ]
+  },
+  {
+    "dataset": "fura2",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 2,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4476,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5021,
+        "varies": true,
+        "sigma_over_chance": 0.19
+      }
+    ]
+  },
+  {
+    "dataset": "rogfp2",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 3,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.4555,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.4975,
+        "varies": false,
+        "sigma_over_chance": null
+      },
+      {
+        "bit": 2,
+        "p_correct": 0.5367,
+        "varies": false,
+        "sigma_over_chance": null
+      }
+    ]
+  },
+  {
+    "dataset": "synthetic",
+    "mitigation": "trex+dd",
+    "divider": "nonrestoring",
+    "n": 1,
+    "q": 2,
+    "n_runs": 1,
+    "bits": [
+      {
+        "bit": 0,
+        "p_correct": 0.5078,
+        "varies": true,
+        "sigma_over_chance": 0.5
+      },
+      {
+        "bit": 1,
+        "p_correct": 0.5211,
+        "varies": true,
+        "sigma_over_chance": 1.35
+      }
+    ]
+  }
+]

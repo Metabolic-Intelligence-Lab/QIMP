@@ -1,0 +1,723 @@
+{
+  "c7_a_fourvalue_n2_ucry_kingston_r1": {
+    "label": "c7_a_fourvalue_n2_ucry_kingston_r1",
+    "repeat_index": 1,
+    "repeat_total": 4,
+    "dataset": "fourvalue",
+    "n": 2,
+    "q": 2,
+    "n_pixels": 16,
+    "backend": "ibm_kingston",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "daheohvi3e6s738noqk0",
+    "depth": 1046,
+    "two_q_gate_count": 587,
+    "num_qubits": 156,
+    "logical_qubits": 26,
+    "logical_size": 75,
+    "wallclock_seconds": 15.0,
+    "n_unique_bitstrings": 13923,
+    "divider": "nonrestoring",
+    "load": "ucry",
+    "quantum_quotient": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ]
+    ],
+    "match_count": 16,
+    "match_pct": 100.0
+  },
+  "c7_a_fourvalue_n2_ucry_kingston_r2": {
+    "label": "c7_a_fourvalue_n2_ucry_kingston_r2",
+    "repeat_index": 2,
+    "repeat_total": 4,
+    "dataset": "fourvalue",
+    "n": 2,
+    "q": 2,
+    "n_pixels": 16,
+    "backend": "ibm_kingston",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "daheolhhvn6c73cru9e0",
+    "depth": 1075,
+    "two_q_gate_count": 576,
+    "num_qubits": 156,
+    "logical_qubits": 26,
+    "logical_size": 75,
+    "wallclock_seconds": 12.9,
+    "n_unique_bitstrings": 15528,
+    "divider": "nonrestoring",
+    "load": "ucry",
+    "quantum_quotient": [
+      [
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        3,
+        3,
+        3,
+        3
+      ],
+      [
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        3,
+        3,
+        3,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        true,
+        true,
+        false,
+        true
+      ],
+      [
+        false,
+        true,
+        false,
+        true
+      ],
+      [
+        false,
+        true,
+        false,
+        true
+      ],
+      [
+        false,
+        true,
+        false,
+        true
+      ]
+    ],
+    "match_count": 9,
+    "match_pct": 56.2
+  },
+  "c7_a_fourvalue_n2_ucry_kingston_r3": {
+    "label": "c7_a_fourvalue_n2_ucry_kingston_r3",
+    "repeat_index": 3,
+    "repeat_total": 4,
+    "dataset": "fourvalue",
+    "n": 2,
+    "q": 2,
+    "n_pixels": 16,
+    "backend": "ibm_kingston",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "daheoovi3e6s738noqu0",
+    "depth": 1063,
+    "two_q_gate_count": 605,
+    "num_qubits": 156,
+    "logical_qubits": 26,
+    "logical_size": 75,
+    "wallclock_seconds": 13.9,
+    "n_unique_bitstrings": 15365,
+    "divider": "nonrestoring",
+    "load": "ucry",
+    "quantum_quotient": [
+      [
+        1,
+        1,
+        1,
+        1
+      ],
+      [
+        1,
+        3,
+        1,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        1,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        false,
+        true,
+        false,
+        true
+      ],
+      [
+        false,
+        true,
+        false,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        false,
+        true
+      ]
+    ],
+    "match_count": 11,
+    "match_pct": 68.8
+  },
+  "c7_a_fourvalue_n2_ucry_kingston_r4": {
+    "label": "c7_a_fourvalue_n2_ucry_kingston_r4",
+    "repeat_index": 4,
+    "repeat_total": 4,
+    "dataset": "fourvalue",
+    "n": 2,
+    "q": 2,
+    "n_pixels": 16,
+    "backend": "ibm_kingston",
+    "shots": 16384,
+    "mitigation": "trex",
+    "dd_sequence": "XY4",
+    "job_id": "daheos9hvn6c73cru9m0",
+    "depth": 1130,
+    "two_q_gate_count": 583,
+    "num_qubits": 156,
+    "logical_qubits": 26,
+    "logical_size": 75,
+    "wallclock_seconds": 18.2,
+    "n_unique_bitstrings": 14953,
+    "divider": "nonrestoring",
+    "load": "ucry",
+    "quantum_quotient": [
+      [
+        1,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        1,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "quantum_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "classical_R": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "per_pixel_match": [
+      [
+        false,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        false,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ]
+    ],
+    "match_count": 14,
+    "match_pct": 87.5
+  },
+  "_aggregate": {
+    "label": "c7_a_fourvalue_n2_ucry_kingston",
+    "repeat_total": 4,
+    "backend": "ibm_kingston",
+    "divider": "nonrestoring",
+    "dataset": "fourvalue",
+    "match_counts": [
+      16,
+      9,
+      11,
+      14
+    ],
+    "match_mean": 12.5,
+    "match_std": 3.109,
+    "match_min": 9,
+    "match_max": 16,
+    "per_pixel_recovery_frequency": [
+      [
+        0.5,
+        1.0,
+        0.5,
+        1.0
+      ],
+      [
+        0.5,
+        1.0,
+        0.5,
+        1.0
+      ],
+      [
+        0.75,
+        1.0,
+        0.5,
+        1.0
+      ],
+      [
+        0.75,
+        1.0,
+        0.5,
+        1.0
+      ]
+    ],
+    "classical_R": [
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ],
+      [
+        0,
+        1,
+        0,
+        1
+      ],
+      [
+        2,
+        3,
+        2,
+        3
+      ]
+    ],
+    "classical_divzero": [
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ],
+      [
+        false,
+        false,
+        false,
+        false
+      ]
+    ],
+    "job_ids": [
+      "daheohvi3e6s738noqk0",
+      "daheolhhvn6c73cru9e0",
+      "daheoovi3e6s738noqu0",
+      "daheos9hvn6c73cru9m0"
+    ]
+  }
+}

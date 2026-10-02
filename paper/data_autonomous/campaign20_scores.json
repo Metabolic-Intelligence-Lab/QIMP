@@ -1,0 +1,120 @@
+{
+  "c20_a_canonical_shared_n2_kingston": {
+    "runs": 4,
+    "two_q": 429,
+    "n_valid": 12,
+    "null": 8,
+    "exact": 32,
+    "pooled": 48,
+    "sign_ok": 0,
+    "sign_n": 16,
+    "mae": 0.20833333333333334,
+    "above_null": 0,
+    "jobs": [
+      "dasghqjg95ks73efhk30",
+      "dasgkuqhcrkc73dsr2c0",
+      "dasgoaihcrkc73dsr61g",
+      "dasgobrg95ks73efhrq0"
+    ]
+  },
+  "c20_a_canonical_shared_n3_kingston": {
+    "runs": 4,
+    "two_q": 825,
+    "n_valid": 35,
+    "null": 21,
+    "exact": 84,
+    "pooled": 140,
+    "sign_ok": 0,
+    "sign_n": 56,
+    "mae": 0.22857142857142856,
+    "above_null": 0,
+    "jobs": [
+      "dasgn35vr3kc73ek45t0",
+      "dasgn4jg95ks73efhqag",
+      "dasgor2hcrkc73dsr6k0",
+      "dasgosahcrkc73dsr6lg"
+    ]
+  },
+  "c20_a_fourvalue_n1_kingston": {
+    "runs": 1,
+    "two_q": 324,
+    "n_valid": 4,
+    "null": 1,
+    "exact": 4,
+    "pooled": 4,
+    "sign_ok": 3,
+    "sign_n": 3,
+    "mae": 0.0,
+    "above_null": 1,
+    "jobs": [
+      "darp91ihcrkc73drvhpg"
+    ]
+  },
+  "c20_a_random4_n2_kingston": {
+    "runs": 4,
+    "two_q": 439,
+    "n_valid": 16,
+    "null": 7,
+    "exact": 43,
+    "pooled": 64,
+    "sign_ok": 15,
+    "sign_n": 36,
+    "mae": 0.17578125,
+    "above_null": 4,
+    "jobs": [
+      "dasglb2hcrkc73dsr2o0",
+      "dasgmp2hcrkc73dsr4a0",
+      "dasgollvr3kc73ek47qg",
+      "dasgon3ojkfs738pb3k0"
+    ]
+  },
+  "c20_c_canonical_shared_n2_kingston": {
+    "runs": 3,
+    "two_q": 393,
+    "n_valid": 12,
+    "null": 6,
+    "exact": 33,
+    "pooled": 36,
+    "sign_ok": 34,
+    "sign_n": 36,
+    "mae": 0.08333333333333333,
+    "above_null": 3,
+    "jobs": [
+      "dasgnbtvr3kc73ek4670",
+      "dasgnhlvr3kc73ek46e0",
+      "dasgpfrg95ks73efhsu0"
+    ]
+  },
+  "c20_c_fourvalue_n1_kingston": {
+    "runs": 2,
+    "two_q": 308,
+    "n_valid": 4,
+    "null": 1,
+    "exact": 4,
+    "pooled": 8,
+    "sign_ok": 8,
+    "sign_n": 8,
+    "mae": 0.5625,
+    "above_null": 2,
+    "jobs": [
+      "dasgo1lvr3kc73ek4770",
+      "dasgo33g95ks73efhrh0"
+    ]
+  },
+  "c20_c_random4_n2_kingston": {
+    "runs": 2,
+    "two_q": 403,
+    "n_valid": 16,
+    "null": 5,
+    "exact": 13,
+    "pooled": 32,
+    "sign_ok": 25,
+    "sign_n": 30,
+    "mae": 0.5859375,
+    "above_null": 2,
+    "jobs": [
+      "dasgnlahcrkc73dsr5a0",
+      "dasgnmdvr3kc73ek46pg"
+    ]
+  }
+}

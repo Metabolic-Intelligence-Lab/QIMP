@@ -1,0 +1,19 @@
+{
+  "dataset": "random4",
+  "n": 3,
+  "q": 2,
+  "divider": "nonrestoring",
+  "load": "ucry",
+  "backend": "ibm_kingston",
+  "n_pixels": 64,
+  "label": "c16_B_kingston_r3",
+  "campaign": 16,
+  "source_run": "c8_a_random4_n3_ucry_kingston_r1_hw",
+  "source_job_id": "dahfh80mhr3c73e6gk7g",
+  "job_id": "dai0in7i3e6s738ofan0",
+  "shots": 40960,
+  "mitigation": "trex",
+  "two_q_gate_count": 1224,
+  "wallclock_seconds": 559.9,
+  "remaining_before": 29
+}

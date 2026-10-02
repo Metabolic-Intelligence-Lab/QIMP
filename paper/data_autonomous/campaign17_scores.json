@@ -1,0 +1,367 @@
+{
+  "balanced8_n3": {
+    "runs": 3,
+    "two_q": 564,
+    "n_valid": 64,
+    "null": 16,
+    "flatfield": 169,
+    "argmax": 126,
+    "joint": 186,
+    "joint_null": 48,
+    "pooled": 192,
+    "runs_above_null": 3,
+    "P1_runs": 3,
+    "per_run": [
+      {
+        "label": "c17_balanced8_n3_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 51,
+        "argmax": 39,
+        "joint": 61,
+        "joint_q1": 46,
+        "excess_q1": 0.05019500334996533,
+        "P1": true
+      },
+      {
+        "label": "c17_balanced8_n3_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 60,
+        "argmax": 43,
+        "joint": 62,
+        "joint_q1": 46,
+        "excess_q1": 0.09181486183429277,
+        "P1": true
+      },
+      {
+        "label": "c17_balanced8_n3_lookup_kingston_r3",
+        "round": 3,
+        "flatfield": 58,
+        "argmax": 44,
+        "joint": 63,
+        "joint_q1": 47,
+        "excess_q1": 0.10529698932095195,
+        "P1": true
+      }
+    ]
+  },
+  "canonical_shared_n1": {
+    "runs": 2,
+    "two_q": 111,
+    "n_valid": 4,
+    "null": 2,
+    "flatfield": 8,
+    "argmax": 8,
+    "joint": 8,
+    "joint_null": 2,
+    "pooled": 8,
+    "runs_above_null": 2,
+    "P1_runs": 2,
+    "per_run": [
+      {
+        "label": "c17_canonical_shared_n1_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 4,
+        "argmax": 4,
+        "joint": 4,
+        "joint_q1": 2,
+        "excess_q1": 0.43730837067837547,
+        "P1": true
+      },
+      {
+        "label": "c17_canonical_shared_n1_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 4,
+        "argmax": 4,
+        "joint": 4,
+        "joint_q1": 2,
+        "excess_q1": 0.5325848888130288,
+        "P1": true
+      }
+    ]
+  },
+  "canonical_shared_n2": {
+    "runs": 2,
+    "two_q": 202,
+    "n_valid": 12,
+    "null": 6,
+    "flatfield": 24,
+    "argmax": 24,
+    "joint": 24,
+    "joint_null": 12,
+    "pooled": 24,
+    "runs_above_null": 2,
+    "P1_runs": 2,
+    "per_run": [
+      {
+        "label": "c17_canonical_shared_n2_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 12,
+        "argmax": 12,
+        "joint": 12,
+        "joint_q1": 6,
+        "excess_q1": 0.24794290646099812,
+        "P1": true
+      },
+      {
+        "label": "c17_canonical_shared_n2_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 12,
+        "argmax": 12,
+        "joint": 12,
+        "joint_q1": 6,
+        "excess_q1": 0.3297173789991413,
+        "P1": true
+      }
+    ]
+  },
+  "canonical_shared_n3": {
+    "runs": 3,
+    "two_q": 571,
+    "n_valid": 35,
+    "null": 19,
+    "flatfield": 88,
+    "argmax": 69,
+    "joint": 80,
+    "joint_null": 36,
+    "pooled": 105,
+    "runs_above_null": 3,
+    "P1_runs": 3,
+    "per_run": [
+      {
+        "label": "c17_canonical_shared_n3_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 28,
+        "argmax": 17,
+        "joint": 20,
+        "joint_q1": 11,
+        "excess_q1": 0.034191676668977,
+        "P1": true
+      },
+      {
+        "label": "c17_canonical_shared_n3_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 30,
+        "argmax": 26,
+        "joint": 30,
+        "joint_q1": 14,
+        "excess_q1": 0.07667322340122508,
+        "P1": true
+      },
+      {
+        "label": "c17_canonical_shared_n3_lookup_kingston_r3",
+        "round": 3,
+        "flatfield": 30,
+        "argmax": 26,
+        "joint": 30,
+        "joint_q1": 14,
+        "excess_q1": 0.07739006466828216,
+        "P1": true
+      }
+    ]
+  },
+  "fourvalue_n1": {
+    "runs": 2,
+    "two_q": 111,
+    "n_valid": 4,
+    "null": 1,
+    "flatfield": 8,
+    "argmax": 8,
+    "joint": 8,
+    "joint_null": 2,
+    "pooled": 8,
+    "runs_above_null": 2,
+    "P1_runs": 2,
+    "per_run": [
+      {
+        "label": "c17_fourvalue_n1_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 4,
+        "argmax": 4,
+        "joint": 4,
+        "joint_q1": 3,
+        "excess_q1": 0.49429546375901107,
+        "P1": true
+      },
+      {
+        "label": "c17_fourvalue_n1_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 4,
+        "argmax": 4,
+        "joint": 4,
+        "joint_q1": 3,
+        "excess_q1": 0.5292627551418669,
+        "P1": true
+      }
+    ]
+  },
+  "fourvalue_n2": {
+    "runs": 3,
+    "two_q": 116,
+    "n_valid": 16,
+    "null": 4,
+    "flatfield": 48,
+    "argmax": 48,
+    "joint": 48,
+    "joint_null": 12,
+    "pooled": 48,
+    "runs_above_null": 3,
+    "P1_runs": 3,
+    "per_run": [
+      {
+        "label": "c17_fourvalue_n2_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 16,
+        "argmax": 16,
+        "joint": 16,
+        "joint_q1": 12,
+        "excess_q1": 0.5239423449497896,
+        "P1": true
+      },
+      {
+        "label": "c17_fourvalue_n2_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 16,
+        "argmax": 16,
+        "joint": 16,
+        "joint_q1": 12,
+        "excess_q1": 0.5440952522163349,
+        "P1": true
+      },
+      {
+        "label": "c17_fourvalue_n2_lookup_kingston_r3",
+        "round": 3,
+        "flatfield": 16,
+        "argmax": 16,
+        "joint": 16,
+        "joint_q1": 12,
+        "excess_q1": 0.5647704018873617,
+        "P1": true
+      }
+    ]
+  },
+  "fura2_n3": {
+    "runs": 3,
+    "two_q": 573,
+    "n_valid": 54,
+    "null": 39,
+    "flatfield": 126,
+    "argmax": 117,
+    "joint": 139,
+    "joint_null": 81,
+    "pooled": 162,
+    "runs_above_null": 3,
+    "P1_runs": 3,
+    "per_run": [
+      {
+        "label": "c17_fura2_n3_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 42,
+        "argmax": 39,
+        "joint": 49,
+        "joint_q1": 12,
+        "excess_q1": 0.05821465074861703,
+        "P1": true
+      },
+      {
+        "label": "c17_fura2_n3_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 41,
+        "argmax": 39,
+        "joint": 44,
+        "joint_q1": 9,
+        "excess_q1": 0.06833986022030639,
+        "P1": true
+      },
+      {
+        "label": "c17_fura2_n3_lookup_kingston_r3",
+        "round": 3,
+        "flatfield": 43,
+        "argmax": 39,
+        "joint": 46,
+        "joint_q1": 9,
+        "excess_q1": 0.06645970273179343,
+        "P1": true
+      }
+    ]
+  },
+  "random4_n2": {
+    "runs": 2,
+    "two_q": 206,
+    "n_valid": 16,
+    "null": 7,
+    "flatfield": 32,
+    "argmax": 32,
+    "joint": 32,
+    "joint_null": 6,
+    "pooled": 32,
+    "runs_above_null": 2,
+    "P1_runs": 2,
+    "per_run": [
+      {
+        "label": "c17_random4_n2_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 16,
+        "argmax": 16,
+        "joint": 16,
+        "joint_q1": 10,
+        "excess_q1": 0.3128581286214047,
+        "P1": true
+      },
+      {
+        "label": "c17_random4_n2_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 16,
+        "argmax": 16,
+        "joint": 16,
+        "joint_q1": 10,
+        "excess_q1": 0.385208102114115,
+        "P1": true
+      }
+    ]
+  },
+  "random4_n3": {
+    "runs": 3,
+    "two_q": 573,
+    "n_valid": 64,
+    "null": 35,
+    "flatfield": 162,
+    "argmax": 145,
+    "joint": 147,
+    "joint_null": 27,
+    "pooled": 192,
+    "runs_above_null": 3,
+    "P1_runs": 3,
+    "per_run": [
+      {
+        "label": "c17_random4_n3_lookup_kingston_r1",
+        "round": 1,
+        "flatfield": 54,
+        "argmax": 48,
+        "joint": 50,
+        "joint_q1": 20,
+        "excess_q1": 0.056963470996413815,
+        "P1": true
+      },
+      {
+        "label": "c17_random4_n3_lookup_kingston_r2",
+        "round": 2,
+        "flatfield": 52,
+        "argmax": 47,
+        "joint": 46,
+        "joint_q1": 16,
+        "excess_q1": 0.06623402746647457,
+        "P1": true
+      },
+      {
+        "label": "c17_random4_n3_lookup_kingston_r3",
+        "round": 3,
+        "flatfield": 56,
+        "argmax": 50,
+        "joint": 51,
+        "joint_q1": 20,
+        "excess_q1": 0.07027682770243975,
+        "P1": true
+      }
+    ]
+  }
+}

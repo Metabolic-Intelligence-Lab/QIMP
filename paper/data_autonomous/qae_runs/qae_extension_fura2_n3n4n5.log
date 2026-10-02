@@ -1,0 +1,38 @@
+
+=== QAE fura2 n=3 (8x8) ============================
+  classical a_true = 0.2344 (15 / 64 good pixels, threshold R>0); quotient values [0, 2]
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.2305  (theory sin^2((2k+1)*theta), theta=0.505)  (6.2 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 0.9980  (theory sin^2((2k+1)*theta), theta=0.505)  (49.2 s)
+  MLQAE a_hat = 0.2361  vs truth a = 0.2344  (|err| = 0.001702)
+  Classical MC stderr at 1024 queries: 0.01324
+  Empirical advantage: 7.78x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension_fura2.json)
+
+=== QAE fura2 n=4 (16x16) ============================
+  classical a_true = 0.2500 (64 / 256 good pixels, threshold R>0); quotient values [0, 2]
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.2461  (theory sin^2((2k+1)*theta), theta=0.524)  (75.5 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 1.0000  (theory sin^2((2k+1)*theta), theta=0.524)  (743.4 s)
+  MLQAE a_hat = 0.2495  vs truth a = 0.2500  (|err| = 0.0004533)
+  Classical MC stderr at 1024 queries: 0.01353
+  Empirical advantage: 29.85x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension_fura2.json)
+
+=== QAE fura2 n=5 (32x32) ============================
+  classical a_true = 0.2920 (299 / 1024 good pixels, threshold R>0); quotient values [0, 2]
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.2695  (theory sin^2((2k+1)*theta), theta=0.571)  (394.6 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 0.9883  (theory sin^2((2k+1)*theta), theta=0.571)  (25573.7 s)
+  MLQAE a_hat = 0.2800  vs truth a = 0.2920  (|err| = 0.01196)
+  Classical MC stderr at 1024 queries: 0.01421
+  Empirical advantage: 1.19x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension_fura2.json)
+
+Final write: /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension_fura2.json

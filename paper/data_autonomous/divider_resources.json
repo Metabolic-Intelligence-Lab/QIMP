@@ -1,0 +1,37 @@
+{
+  "rows": [
+    {
+      "q": 1,
+      "lookup_cx": 7,
+      "lookup_qubits": 4,
+      "longdiv_cx": 98,
+      "longdiv_qubits": 12,
+      "synthesis_seconds": 0.72
+    },
+    {
+      "q": 2,
+      "lookup_cx": 48,
+      "lookup_qubits": 7,
+      "longdiv_cx": 189,
+      "longdiv_qubits": 22,
+      "synthesis_seconds": 0.0
+    },
+    {
+      "q": 3,
+      "lookup_cx": 277,
+      "lookup_qubits": 10,
+      "longdiv_cx": 305,
+      "longdiv_qubits": 34,
+      "synthesis_seconds": 0.01
+    },
+    {
+      "q": 4,
+      "lookup_cx": 1250,
+      "lookup_qubits": 13,
+      "longdiv_cx": 445,
+      "longdiv_qubits": 48,
+      "synthesis_seconds": 0.08
+    }
+  ],
+  "crossover_q": 4
+}

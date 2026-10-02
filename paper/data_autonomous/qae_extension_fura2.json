@@ -1,0 +1,83 @@
+[
+  {
+    "dataset": "fura2",
+    "n": 3,
+    "side": 8,
+    "n_pixels": 64,
+    "threshold": 0,
+    "quotient_values": [
+      0,
+      2
+    ],
+    "shots_per_k": 512,
+    "max_k": 1,
+    "total_queries": 1024,
+    "a_true": 0.234375,
+    "probs": {
+      "0": 0.23046875,
+      "1": 0.998046875
+    },
+    "timings_seconds": {
+      "0": 6.21185040473938,
+      "1": 49.212777853012085
+    },
+    "a_hat": 0.23607724402746688,
+    "abs_err_qae": 0.0017022440274668815,
+    "mc_stderr_same_budget": 0.013237736046607381,
+    "advantage_ratio": 7.776638268666172
+  },
+  {
+    "dataset": "fura2",
+    "n": 4,
+    "side": 16,
+    "n_pixels": 256,
+    "threshold": 0,
+    "quotient_values": [
+      0,
+      2
+    ],
+    "shots_per_k": 512,
+    "max_k": 1,
+    "total_queries": 1024,
+    "a_true": 0.25,
+    "probs": {
+      "0": 0.24609375,
+      "1": 1.0
+    },
+    "timings_seconds": {
+      "0": 75.47088432312012,
+      "1": 743.4439082145691
+    },
+    "a_hat": 0.24954668731964502,
+    "abs_err_qae": 0.00045331268035497807,
+    "mc_stderr_same_budget": 0.013531646934131853,
+    "advantage_ratio": 29.850581112214975
+  },
+  {
+    "dataset": "fura2",
+    "n": 5,
+    "side": 32,
+    "n_pixels": 1024,
+    "threshold": 0,
+    "quotient_values": [
+      0,
+      2
+    ],
+    "shots_per_k": 512,
+    "max_k": 1,
+    "total_queries": 1024,
+    "a_true": 0.2919921875,
+    "probs": {
+      "0": 0.26953125,
+      "1": 0.98828125
+    },
+    "timings_seconds": {
+      "0": 394.5812363624573,
+      "1": 25573.681287765503
+    },
+    "a_hat": 0.2800304150720425,
+    "abs_err_qae": 0.011961772427957484,
+    "mc_stderr_same_budget": 0.014208710395819543,
+    "advantage_ratio": 1.1878432298720576
+  }
+]

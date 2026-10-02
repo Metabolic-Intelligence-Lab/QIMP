@@ -1,0 +1,25 @@
+Preparing 4×4 q=2 Laurdan dataset…
+  I_a = [[0, 1, 3, 1], [3, 3, 2, 3], [1, 1, 1, 1], [0, 3, 1, 0]]
+  I_b = [[0, 0, 2, 1], [3, 3, 2, 3], [1, 1, 1, 1], [0, 2, 1, 0]]
+  R_classical (with divzero masked to 0) = [[0, 0, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [0, 1, 1, 0]]
+  divzero pixels: 4 / 16
+
+Building autonomous Class-B circuit at n=2, q=2…
+  qubits  = 26
+  size    = 262
+  build elapsed = 0.01 s
+
+Running Aer statevector (~1 GiB at 26 qubits)…
+  statevector elapsed = 8502.13 s
+
+Extracting basis-state counts (deterministic)…
+  basis states with weight: 16
+  extract elapsed = 2.70 s
+
+Decoding quantum-decoded ratio image + divzero mask…
+  Quantum-decoded R = [[3, 3, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [3, 1, 1, 3]]
+  Quantum divzero flag = [[True, True, False, False], [False, False, False, False], [False, False, False, False], [True, False, False, True]]
+
+Saved C:\Users\giuseppe.maulucci\OneDrive - Università Cattolica del Sacro Cuore\Metabolic Intelligence - Projects-MI\2024_QIMP\repo\paper\data_autonomous/canonical_4x4.npz
+
+Bit-exact match (valid pixels): True

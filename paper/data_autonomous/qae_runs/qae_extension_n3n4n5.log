@@ -1,0 +1,38 @@
+
+=== QAE Laurdan n=3 (8x8) ============================
+  classical a_true = 0.4531 (29 / 64 good pixels)
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.4375  (theoretical sin^2((2k+1)*theta) with theta=0.738)  (2.1 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 0.6348  (theoretical sin^2((2k+1)*theta) with theta=0.738)  (13.0 s)
+  MLQAE a_hat = 0.4529  vs truth a = 0.4531  (|err| = 0.0001792)
+  Classical MC stderr at 1024 queries: 0.01556
+  Empirical advantage: 86.83x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension.json)
+
+=== QAE Laurdan n=4 (16x16) ============================
+  classical a_true = 0.2383 (61 / 256 good pixels)
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.2539  (theoretical sin^2((2k+1)*theta) with theta=0.510)  (8.4 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 1.0000  (theoretical sin^2((2k+1)*theta) with theta=0.510)  (120.6 s)
+  MLQAE a_hat = 0.2509  vs truth a = 0.2383  (|err| = 0.01263)
+  Classical MC stderr at 1024 queries: 0.01331
+  Empirical advantage: 1.05x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension.json)
+
+=== QAE Laurdan n=5 (32x32) ============================
+  classical a_true = 0.1689 (173 / 1024 good pixels)
+  shots per Grover power: 512, max_k = 1
+  k=0: building circuit + MPS sampling...
+    P(good=1 | k=0) = 0.1445  (theoretical sin^2((2k+1)*theta) with theta=0.424)  (145.2 s)
+  k=1: building circuit + MPS sampling...
+    P(good=1 | k=1) = 0.9277  (theoretical sin^2((2k+1)*theta) with theta=0.424)  (5514.0 s)
+  MLQAE a_hat = 0.1729  vs truth a = 0.1689  (|err| = 0.003948)
+  Classical MC stderr at 1024 queries: 0.01171
+  Empirical advantage: 2.97x
+  (checkpointed /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension.json)
+
+Final write: /mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/Metabolic Intelligence - Projects-MI/2024_QIMP/repo/paper/data_autonomous/qae_extension.json

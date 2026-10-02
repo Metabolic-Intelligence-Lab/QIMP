@@ -1,0 +1,8382 @@
+{
+  "j3_class_b_synthetic@j3_class_b_synthetic_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2949,
+    "mean_sigma_over_null": 3.3,
+    "min_margin_over_runner_up": 0.0218,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 3,
+        "divzero": false,
+        "histogram": [
+          0.2849,
+          0.2632,
+          0.2387,
+          0.2132
+        ],
+        "argmax": 0,
+        "top_share": 0.2849,
+        "sigma_over_null": 2.68,
+        "margin_over_runner_up": 0.0218,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2846,
+          0.2283,
+          0.2598,
+          0.2273
+        ],
+        "argmax": 0,
+        "top_share": 0.2846,
+        "sigma_over_null": 2.59,
+        "margin_over_runner_up": 0.0248,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3107,
+          0.2682,
+          0.2186,
+          0.2024
+        ],
+        "argmax": 0,
+        "top_share": 0.3107,
+        "sigma_over_null": 4.41,
+        "margin_over_runner_up": 0.0425,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2993,
+          0.2273,
+          0.2304,
+          0.243
+        ],
+        "argmax": 0,
+        "top_share": 0.2993,
+        "sigma_over_null": 3.52,
+        "margin_over_runner_up": 0.0563,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j3_class_b_synthetic",
+    "backend": "ibm_kingston",
+    "cx": 1259,
+    "match": null,
+    "dataset": "synthetic",
+    "divider": "restoring"
+  },
+  "j4_class_b_laurdan@j4_class_b_laurdan_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.278,
+    "mean_sigma_over_null": 2.06,
+    "min_margin_over_runner_up": 0.0058,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2696,
+          0.2475,
+          0.2595,
+          0.2235
+        ],
+        "argmax": 0,
+        "top_share": 0.2696,
+        "sigma_over_null": 1.49,
+        "margin_over_runner_up": 0.0102,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3014,
+          0.2295,
+          0.2685,
+          0.2006
+        ],
+        "argmax": 0,
+        "top_share": 0.3014,
+        "sigma_over_null": 3.76,
+        "margin_over_runner_up": 0.0329,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2694,
+          0.2637,
+          0.2502,
+          0.2167
+        ],
+        "argmax": 0,
+        "top_share": 0.2694,
+        "sigma_over_null": 1.45,
+        "margin_over_runner_up": 0.0058,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2655,
+          0.2717,
+          0.2541,
+          0.2087
+        ],
+        "argmax": 1,
+        "top_share": 0.2717,
+        "sigma_over_null": 1.56,
+        "margin_over_runner_up": 0.0062,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4_class_b_laurdan",
+    "backend": "ibm_fez",
+    "cx": 1174,
+    "match": null,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j7_class_b_laurdan_nonrestoring@j7_class_b_laurdan_nonrestoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2871,
+    "mean_sigma_over_null": 2.73,
+    "min_margin_over_runner_up": 0.0037,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2288,
+          0.2717,
+          0.2316,
+          0.268
+        ],
+        "argmax": 1,
+        "top_share": 0.2717,
+        "sigma_over_null": 1.64,
+        "margin_over_runner_up": 0.0037,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2166,
+          0.2869,
+          0.2317,
+          0.2648
+        ],
+        "argmax": 1,
+        "top_share": 0.2869,
+        "sigma_over_null": 2.69,
+        "margin_over_runner_up": 0.0221,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2431,
+          0.2804,
+          0.2255,
+          0.251
+        ],
+        "argmax": 1,
+        "top_share": 0.2804,
+        "sigma_over_null": 2.24,
+        "margin_over_runner_up": 0.0294,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2133,
+          0.3095,
+          0.2063,
+          0.2708
+        ],
+        "argmax": 1,
+        "top_share": 0.3095,
+        "sigma_over_null": 4.36,
+        "margin_over_runner_up": 0.0387,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7_class_b_laurdan_nonrestoring",
+    "backend": "ibm_marrakesh",
+    "cx": 679,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j8_synthetic_n1q2_nonrestoring@j8_synthetic_n1q2_nonrestoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2849,
+    "mean_sigma_over_null": 2.59,
+    "min_margin_over_runner_up": 0.0115,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 3,
+        "divzero": false,
+        "histogram": [
+          0.2133,
+          0.268,
+          0.2392,
+          0.2795
+        ],
+        "argmax": 3,
+        "top_share": 0.2795,
+        "sigma_over_null": 2.2,
+        "margin_over_runner_up": 0.0115,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2151,
+          0.2557,
+          0.2264,
+          0.3028
+        ],
+        "argmax": 3,
+        "top_share": 0.3028,
+        "sigma_over_null": 3.97,
+        "margin_over_runner_up": 0.0472,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2401,
+          0.2866,
+          0.2233,
+          0.25
+        ],
+        "argmax": 1,
+        "top_share": 0.2866,
+        "sigma_over_null": 2.69,
+        "margin_over_runner_up": 0.0366,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2391,
+          0.2706,
+          0.2553,
+          0.235
+        ],
+        "argmax": 1,
+        "top_share": 0.2706,
+        "sigma_over_null": 1.49,
+        "margin_over_runner_up": 0.0153,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j8_synthetic_n1q2_nonrestoring",
+    "backend": "ibm_kingston",
+    "cx": 693,
+    "match": 3,
+    "dataset": "synthetic",
+    "divider": "nonrestoring"
+  },
+  "j9_fura2_n1q2_nonrestoring@j9_fura2_n1q2_nonrestoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2974,
+    "mean_sigma_over_null": 3.5,
+    "min_margin_over_runner_up": 0.0049,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2229,
+          0.3187,
+          0.1867,
+          0.2717
+        ],
+        "argmax": 1,
+        "top_share": 0.3187,
+        "sigma_over_null": 5.07,
+        "margin_over_runner_up": 0.0469,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2123,
+          0.2906,
+          0.2114,
+          0.2857
+        ],
+        "argmax": 1,
+        "top_share": 0.2906,
+        "sigma_over_null": 3.0,
+        "margin_over_runner_up": 0.0049,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.258,
+          0.29,
+          0.2187,
+          0.2333
+        ],
+        "argmax": 1,
+        "top_share": 0.29,
+        "sigma_over_null": 3.06,
+        "margin_over_runner_up": 0.032,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2547,
+          0.2902,
+          0.2265,
+          0.2286
+        ],
+        "argmax": 1,
+        "top_share": 0.2902,
+        "sigma_over_null": 2.87,
+        "margin_over_runner_up": 0.0355,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j9_fura2_n1q2_nonrestoring",
+    "backend": "ibm_fez",
+    "cx": 675,
+    "match": 0,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j13_rogfp2_n1q3_nonrestoring@j13_rogfp2_n1q3_nonrestoring_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.158,
+    "mean_sigma_over_null": 3.19,
+    "min_margin_over_runner_up": 0.0043,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.1169,
+          0.1427,
+          0.1092,
+          0.147,
+          0.0954,
+          0.1273,
+          0.1195,
+          0.1419
+        ],
+        "argmax": 3,
+        "top_share": 0.147,
+        "sigma_over_null": 2.27,
+        "margin_over_runner_up": 0.0043,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.1231,
+          0.1577,
+          0.1394,
+          0.1373,
+          0.1027,
+          0.1292,
+          0.1048,
+          0.1058
+        ],
+        "argmax": 1,
+        "top_share": 0.1577,
+        "sigma_over_null": 3.1,
+        "margin_over_runner_up": 0.0183,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1075,
+          0.1434,
+          0.1142,
+          0.1736,
+          0.0906,
+          0.1349,
+          0.1066,
+          0.1292
+        ],
+        "argmax": 3,
+        "top_share": 0.1736,
+        "sigma_over_null": 4.78,
+        "margin_over_runner_up": 0.0302,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1225,
+          0.1539,
+          0.1225,
+          0.1404,
+          0.1135,
+          0.1326,
+          0.0989,
+          0.1157
+        ],
+        "argmax": 1,
+        "top_share": 0.1539,
+        "sigma_over_null": 2.61,
+        "margin_over_runner_up": 0.0135,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j13_rogfp2_n1q3_nonrestoring",
+    "backend": "ibm_marrakesh",
+    "cx": 1247,
+    "match": 0,
+    "dataset": "rogfp2",
+    "divider": "nonrestoring"
+  },
+  "j12_canonical_n1q3_nonrestoring@j12_canonical_n1q3_nonrestoring_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.1462,
+    "mean_sigma_over_null": 2.05,
+    "min_margin_over_runner_up": 0.0,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1076,
+          0.1539,
+          0.1087,
+          0.1137,
+          0.1097,
+          0.1429,
+          0.1197,
+          0.1439
+        ],
+        "argmax": 1,
+        "top_share": 0.1539,
+        "sigma_over_null": 2.76,
+        "margin_over_runner_up": 0.0101,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1296,
+          0.1412,
+          0.098,
+          0.1222,
+          0.118,
+          0.1359,
+          0.1349,
+          0.1201
+        ],
+        "argmax": 1,
+        "top_share": 0.1412,
+        "sigma_over_null": 1.51,
+        "margin_over_runner_up": 0.0053,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1182,
+          0.1404,
+          0.1079,
+          0.1455,
+          0.1019,
+          0.1421,
+          0.0985,
+          0.1455
+        ],
+        "argmax": 3,
+        "top_share": 0.1455,
+        "sigma_over_null": 2.12,
+        "margin_over_runner_up": 0.0,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1279,
+          0.133,
+          0.1198,
+          0.133,
+          0.1086,
+          0.1239,
+          0.1096,
+          0.1442
+        ],
+        "argmax": 7,
+        "top_share": 0.1442,
+        "sigma_over_null": 1.82,
+        "margin_over_runner_up": 0.0112,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j12_canonical_n1q3_nonrestoring",
+    "backend": "ibm_marrakesh",
+    "cx": 1136,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j11_canonical_n2q2_nonrestoring@j11_canonical_n2q2_nonrestoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2754,
+    "mean_sigma_over_null": 1.87,
+    "min_margin_over_runner_up": 0.0,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2137,
+          0.2802,
+          0.2431,
+          0.2631
+        ],
+        "argmax": 1,
+        "top_share": 0.2802,
+        "sigma_over_null": 2.26,
+        "margin_over_runner_up": 0.0171,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2392,
+          0.2712,
+          0.2184,
+          0.2712
+        ],
+        "argmax": 1,
+        "top_share": 0.2712,
+        "sigma_over_null": 1.67,
+        "margin_over_runner_up": 0.0,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2288,
+          0.2863,
+          0.2241,
+          0.2608
+        ],
+        "argmax": 1,
+        "top_share": 0.2863,
+        "sigma_over_null": 2.73,
+        "margin_over_runner_up": 0.0254,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2383,
+          0.28,
+          0.2322,
+          0.2495
+        ],
+        "argmax": 1,
+        "top_share": 0.28,
+        "sigma_over_null": 2.17,
+        "margin_over_runner_up": 0.0305,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2531,
+          0.2636,
+          0.2245,
+          0.2588
+        ],
+        "argmax": 1,
+        "top_share": 0.2636,
+        "sigma_over_null": 1.02,
+        "margin_over_runner_up": 0.0048,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2259,
+          0.2665,
+          0.2514,
+          0.2561
+        ],
+        "argmax": 1,
+        "top_share": 0.2665,
+        "sigma_over_null": 1.24,
+        "margin_over_runner_up": 0.0104,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2479,
+          0.27,
+          0.2447,
+          0.2374
+        ],
+        "argmax": 1,
+        "top_share": 0.27,
+        "sigma_over_null": 1.42,
+        "margin_over_runner_up": 0.0221,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2383,
+          0.2789,
+          0.2302,
+          0.2525
+        ],
+        "argmax": 1,
+        "top_share": 0.2789,
+        "sigma_over_null": 2.1,
+        "margin_over_runner_up": 0.0264,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2567,
+          0.2465,
+          0.2244,
+          0.2724
+        ],
+        "argmax": 3,
+        "top_share": 0.2724,
+        "sigma_over_null": 1.7,
+        "margin_over_runner_up": 0.0157,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2689,
+          0.284,
+          0.2236,
+          0.2236
+        ],
+        "argmax": 1,
+        "top_share": 0.284,
+        "sigma_over_null": 2.55,
+        "margin_over_runner_up": 0.0151,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2692,
+          0.2702,
+          0.2184,
+          0.2422
+        ],
+        "argmax": 1,
+        "top_share": 0.2702,
+        "sigma_over_null": 1.45,
+        "margin_over_runner_up": 0.001,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2365,
+          0.2615,
+          0.2345,
+          0.2675
+        ],
+        "argmax": 3,
+        "top_share": 0.2675,
+        "sigma_over_null": 1.28,
+        "margin_over_runner_up": 0.006,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2706,
+          0.2591,
+          0.2169,
+          0.2534
+        ],
+        "argmax": 0,
+        "top_share": 0.2706,
+        "sigma_over_null": 1.54,
+        "margin_over_runner_up": 0.0115,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.22,
+          0.2856,
+          0.221,
+          0.2735
+        ],
+        "argmax": 1,
+        "top_share": 0.2856,
+        "sigma_over_null": 2.59,
+        "margin_over_runner_up": 0.0121,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2587,
+          0.2762,
+          0.2187,
+          0.2464
+        ],
+        "argmax": 1,
+        "top_share": 0.2762,
+        "sigma_over_null": 1.89,
+        "margin_over_runner_up": 0.0175,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2541,
+          0.2829,
+          0.2037,
+          0.2593
+        ],
+        "argmax": 1,
+        "top_share": 0.2829,
+        "sigma_over_null": 2.37,
+        "margin_over_runner_up": 0.0237,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j11_canonical_n2q2_nonrestoring",
+    "backend": "ibm_kingston",
+    "cx": 1348,
+    "match": 8,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j9b_fura2_n1q2_nonrestoring_marrakesh@j9b_fura2_n1q2_nonrestoring_marrakesh_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2985,
+    "mean_sigma_over_null": 3.59,
+    "min_margin_over_runner_up": 0.0044,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2201,
+          0.2557,
+          0.242,
+          0.2822
+        ],
+        "argmax": 3,
+        "top_share": 0.2822,
+        "sigma_over_null": 2.46,
+        "margin_over_runner_up": 0.0265,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2246,
+          0.2824,
+          0.2061,
+          0.2868
+        ],
+        "argmax": 3,
+        "top_share": 0.2868,
+        "sigma_over_null": 2.57,
+        "margin_over_runner_up": 0.0044,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2221,
+          0.2975,
+          0.2153,
+          0.2652
+        ],
+        "argmax": 1,
+        "top_share": 0.2975,
+        "sigma_over_null": 3.5,
+        "margin_over_runner_up": 0.0323,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.225,
+          0.3277,
+          0.194,
+          0.2533
+        ],
+        "argmax": 1,
+        "top_share": 0.3277,
+        "sigma_over_null": 5.85,
+        "margin_over_runner_up": 0.0744,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j9b_fura2_n1q2_nonrestoring_marrakesh",
+    "backend": "ibm_marrakesh",
+    "cx": 670,
+    "match": 0,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j4b_laurdan_restoring_marrakesh@j4b_laurdan_restoring_marrakesh_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.287,
+    "mean_sigma_over_null": 2.73,
+    "min_margin_over_runner_up": 0.0048,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2803,
+          0.2722,
+          0.2508,
+          0.1967
+        ],
+        "argmax": 0,
+        "top_share": 0.2803,
+        "sigma_over_null": 2.19,
+        "margin_over_runner_up": 0.0082,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.305,
+          0.2554,
+          0.2301,
+          0.2095
+        ],
+        "argmax": 0,
+        "top_share": 0.305,
+        "sigma_over_null": 4.15,
+        "margin_over_runner_up": 0.0496,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2934,
+          0.2615,
+          0.2405,
+          0.2046
+        ],
+        "argmax": 0,
+        "top_share": 0.2934,
+        "sigma_over_null": 3.17,
+        "margin_over_runner_up": 0.0319,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2644,
+          0.2692,
+          0.2375,
+          0.2289
+        ],
+        "argmax": 1,
+        "top_share": 0.2692,
+        "sigma_over_null": 1.43,
+        "margin_over_runner_up": 0.0048,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4b_laurdan_restoring_marrakesh",
+    "backend": "ibm_marrakesh",
+    "cx": 1237,
+    "match": 0,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j7none_laurdan_nonrestoring_nomit@j7none_laurdan_nonrestoring_nomit_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4187,
+    "mean_sigma_over_null": 12.87,
+    "min_margin_over_runner_up": 0.0616,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3119,
+          0.4663,
+          0.0748,
+          0.1471
+        ],
+        "argmax": 1,
+        "top_share": 0.4663,
+        "sigma_over_null": 20.18,
+        "margin_over_runner_up": 0.1544,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2856,
+          0.4483,
+          0.0952,
+          0.1709
+        ],
+        "argmax": 1,
+        "top_share": 0.4483,
+        "sigma_over_null": 14.32,
+        "margin_over_runner_up": 0.1627,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3311,
+          0.4297,
+          0.0709,
+          0.1683
+        ],
+        "argmax": 1,
+        "top_share": 0.4297,
+        "sigma_over_null": 12.47,
+        "margin_over_runner_up": 0.0986,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2414,
+          0.3305,
+          0.1592,
+          0.2688
+        ],
+        "argmax": 1,
+        "top_share": 0.3305,
+        "sigma_over_null": 4.49,
+        "margin_over_runner_up": 0.0616,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_laurdan_nonrestoring_nomit",
+    "backend": "ibm_kingston",
+    "cx": 680,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7rep_laurdan_nonrestoring_fez@j7rep_laurdan_nonrestoring_fez_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3065,
+    "mean_sigma_over_null": 4.18,
+    "min_margin_over_runner_up": 0.0342,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2512,
+          0.318,
+          0.1904,
+          0.2404
+        ],
+        "argmax": 1,
+        "top_share": 0.318,
+        "sigma_over_null": 5.01,
+        "margin_over_runner_up": 0.0667,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2399,
+          0.3179,
+          0.1975,
+          0.2447
+        ],
+        "argmax": 1,
+        "top_share": 0.3179,
+        "sigma_over_null": 5.05,
+        "margin_over_runner_up": 0.0732,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2567,
+          0.2995,
+          0.2019,
+          0.2419
+        ],
+        "argmax": 1,
+        "top_share": 0.2995,
+        "sigma_over_null": 3.75,
+        "margin_over_runner_up": 0.0428,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2396,
+          0.2905,
+          0.2137,
+          0.2562
+        ],
+        "argmax": 1,
+        "top_share": 0.2905,
+        "sigma_over_null": 2.9,
+        "margin_over_runner_up": 0.0342,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_laurdan_nonrestoring_fez",
+    "backend": "ibm_fez",
+    "cx": 679,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7nd_laurdan_nd_nonrestoring@j7nd_laurdan_nd_nonrestoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2731,
+    "mean_sigma_over_null": 1.68,
+    "min_margin_over_runner_up": 0.0059,
+    "constant_readout_baseline": "1/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2376,
+          0.2588,
+          0.2384,
+          0.2653
+        ],
+        "argmax": 3,
+        "top_share": 0.2653,
+        "sigma_over_null": 1.24,
+        "margin_over_runner_up": 0.0065,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2454,
+          0.2819,
+          0.2099,
+          0.2627
+        ],
+        "argmax": 1,
+        "top_share": 0.2819,
+        "sigma_over_null": 2.32,
+        "margin_over_runner_up": 0.0193,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2574,
+          0.2594,
+          0.2178,
+          0.2653
+        ],
+        "argmax": 3,
+        "top_share": 0.2653,
+        "sigma_over_null": 1.13,
+        "margin_over_runner_up": 0.0059,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2309,
+          0.28,
+          0.2526,
+          0.2366
+        ],
+        "argmax": 1,
+        "top_share": 0.28,
+        "sigma_over_null": 2.05,
+        "margin_over_runner_up": 0.0274,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7nd_laurdan_nd_nonrestoring",
+    "backend": "ibm_marrakesh",
+    "cx": 671,
+    "match": 2,
+    "dataset": "canonical_nd",
+    "divider": "nonrestoring"
+  },
+  "j4nd_laurdan_nd_restoring@j4nd_laurdan_nd_restoring_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2895,
+    "mean_sigma_over_null": 2.92,
+    "min_margin_over_runner_up": 0.0218,
+    "constant_readout_baseline": "1/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2883,
+          0.2331,
+          0.2607,
+          0.218
+        ],
+        "argmax": 0,
+        "top_share": 0.2883,
+        "sigma_over_null": 2.96,
+        "margin_over_runner_up": 0.0276,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2759,
+          0.2459,
+          0.2541,
+          0.2241
+        ],
+        "argmax": 0,
+        "top_share": 0.2759,
+        "sigma_over_null": 1.86,
+        "margin_over_runner_up": 0.0218,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.3045,
+          0.2201,
+          0.2422,
+          0.2332
+        ],
+        "argmax": 0,
+        "top_share": 0.3045,
+        "sigma_over_null": 3.97,
+        "margin_over_runner_up": 0.0623,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2892,
+          0.2517,
+          0.233,
+          0.2261
+        ],
+        "argmax": 0,
+        "top_share": 0.2892,
+        "sigma_over_null": 2.88,
+        "margin_over_runner_up": 0.0375,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4nd_laurdan_nd_restoring",
+    "backend": "ibm_kingston",
+    "cx": 1217,
+    "match": 1,
+    "dataset": "canonical_nd",
+    "divider": "restoring"
+  },
+  "j15_shared_nonrestoring_smoke@j15_shared_nonrestoring_smoke_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3011,
+    "mean_sigma_over_null": 3.77,
+    "min_margin_over_runner_up": 0.0116,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2405,
+          0.3143,
+          0.1959,
+          0.2493
+        ],
+        "argmax": 1,
+        "top_share": 0.3143,
+        "sigma_over_null": 4.76,
+        "margin_over_runner_up": 0.065,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2399,
+          0.3064,
+          0.1975,
+          0.2563
+        ],
+        "argmax": 1,
+        "top_share": 0.3064,
+        "sigma_over_null": 4.19,
+        "margin_over_runner_up": 0.0501,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2697,
+          0.2813,
+          0.2033,
+          0.2457
+        ],
+        "argmax": 1,
+        "top_share": 0.2813,
+        "sigma_over_null": 2.33,
+        "margin_over_runner_up": 0.0116,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2477,
+          0.3023,
+          0.2093,
+          0.2406
+        ],
+        "argmax": 1,
+        "top_share": 0.3023,
+        "sigma_over_null": 3.8,
+        "margin_over_runner_up": 0.0546,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_smoke",
+    "backend": "ibm_marrakesh",
+    "cx": 655,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j15_shared_nonrestoring_r1@j15_shared_nonrestoring_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2952,
+    "mean_sigma_over_null": 3.36,
+    "min_margin_over_runner_up": 0.0041,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.282,
+          0.2779,
+          0.2087,
+          0.2314
+        ],
+        "argmax": 0,
+        "top_share": 0.282,
+        "sigma_over_null": 2.3,
+        "margin_over_runner_up": 0.0041,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2799,
+          0.3027,
+          0.1935,
+          0.2239
+        ],
+        "argmax": 1,
+        "top_share": 0.3027,
+        "sigma_over_null": 3.95,
+        "margin_over_runner_up": 0.0228,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2522,
+          0.2818,
+          0.2207,
+          0.2453
+        ],
+        "argmax": 1,
+        "top_share": 0.2818,
+        "sigma_over_null": 2.34,
+        "margin_over_runner_up": 0.0296,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2559,
+          0.3144,
+          0.2002,
+          0.2295
+        ],
+        "argmax": 1,
+        "top_share": 0.3144,
+        "sigma_over_null": 4.84,
+        "margin_over_runner_up": 0.0585,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 593,
+    "match": 1,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j15_shared_nonrestoring_r2@j15_shared_nonrestoring_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3086,
+    "mean_sigma_over_null": 4.34,
+    "min_margin_over_runner_up": 0.003,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2765,
+          0.2795,
+          0.223,
+          0.221
+        ],
+        "argmax": 1,
+        "top_share": 0.2795,
+        "sigma_over_null": 2.16,
+        "margin_over_runner_up": 0.003,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2636,
+          0.332,
+          0.1883,
+          0.2161
+        ],
+        "argmax": 1,
+        "top_share": 0.332,
+        "sigma_over_null": 6.02,
+        "margin_over_runner_up": 0.0684,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2423,
+          0.3225,
+          0.2153,
+          0.2199
+        ],
+        "argmax": 1,
+        "top_share": 0.3225,
+        "sigma_over_null": 5.48,
+        "margin_over_runner_up": 0.0801,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2507,
+          0.3005,
+          0.2229,
+          0.2259
+        ],
+        "argmax": 1,
+        "top_share": 0.3005,
+        "sigma_over_null": 3.7,
+        "margin_over_runner_up": 0.0498,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 646,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j15_shared_nonrestoring_r3@j15_shared_nonrestoring_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2875,
+    "mean_sigma_over_null": 2.76,
+    "min_margin_over_runner_up": 0.0079,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2498,
+          0.2684,
+          0.2055,
+          0.2763
+        ],
+        "argmax": 3,
+        "top_share": 0.2763,
+        "sigma_over_null": 1.94,
+        "margin_over_runner_up": 0.0079,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2819,
+          0.2908,
+          0.1886,
+          0.2387
+        ],
+        "argmax": 1,
+        "top_share": 0.2908,
+        "sigma_over_null": 3.0,
+        "margin_over_runner_up": 0.0088,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2344,
+          0.2552,
+          0.2244,
+          0.286
+        ],
+        "argmax": 3,
+        "top_share": 0.286,
+        "sigma_over_null": 2.76,
+        "margin_over_runner_up": 0.0308,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2531,
+          0.2971,
+          0.1914,
+          0.2584
+        ],
+        "argmax": 1,
+        "top_share": 0.2971,
+        "sigma_over_null": 3.36,
+        "margin_over_runner_up": 0.0387,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 665,
+    "match": 1,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j15_shared_nonrestoring_r4@j15_shared_nonrestoring_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2947,
+    "mean_sigma_over_null": 3.29,
+    "min_margin_over_runner_up": 0.0087,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2657,
+          0.2744,
+          0.2164,
+          0.2435
+        ],
+        "argmax": 1,
+        "top_share": 0.2744,
+        "sigma_over_null": 1.81,
+        "margin_over_runner_up": 0.0087,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2793,
+          0.305,
+          0.2148,
+          0.2009
+        ],
+        "argmax": 1,
+        "top_share": 0.305,
+        "sigma_over_null": 3.88,
+        "margin_over_runner_up": 0.0258,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2609,
+          0.2888,
+          0.2108,
+          0.2396
+        ],
+        "argmax": 1,
+        "top_share": 0.2888,
+        "sigma_over_null": 2.94,
+        "margin_over_runner_up": 0.0279,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2707,
+          0.3105,
+          0.2175,
+          0.2013
+        ],
+        "argmax": 1,
+        "top_share": 0.3105,
+        "sigma_over_null": 4.54,
+        "margin_over_runner_up": 0.0399,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 639,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j15_shared_nonrestoring_r5@j15_shared_nonrestoring_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3109,
+    "mean_sigma_over_null": 4.5,
+    "min_margin_over_runner_up": 0.0038,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2365,
+          0.3052,
+          0.211,
+          0.2473
+        ],
+        "argmax": 1,
+        "top_share": 0.3052,
+        "sigma_over_null": 4.07,
+        "margin_over_runner_up": 0.0579,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2557,
+          0.3139,
+          0.1726,
+          0.2578
+        ],
+        "argmax": 1,
+        "top_share": 0.3139,
+        "sigma_over_null": 4.58,
+        "margin_over_runner_up": 0.0561,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2894,
+          0.2856,
+          0.1853,
+          0.2397
+        ],
+        "argmax": 0,
+        "top_share": 0.2894,
+        "sigma_over_null": 2.94,
+        "margin_over_runner_up": 0.0038,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2594,
+          0.3352,
+          0.1919,
+          0.2135
+        ],
+        "argmax": 1,
+        "top_share": 0.3352,
+        "sigma_over_null": 6.43,
+        "margin_over_runner_up": 0.0758,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j15_shared_nonrestoring_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 664,
+    "match": 3,
+    "dataset": "canonical_shared",
+    "divider": "nonrestoring"
+  },
+  "j14_shared_restoring_r1@j14_shared_restoring_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3099,
+    "mean_sigma_over_null": 4.42,
+    "min_margin_over_runner_up": 0.0234,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2871,
+          0.2637,
+          0.248,
+          0.2012
+        ],
+        "argmax": 0,
+        "top_share": 0.2871,
+        "sigma_over_null": 2.74,
+        "margin_over_runner_up": 0.0234,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.3323,
+          0.2557,
+          0.2269,
+          0.1851
+        ],
+        "argmax": 0,
+        "top_share": 0.3323,
+        "sigma_over_null": 6.03,
+        "margin_over_runner_up": 0.0766,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.3127,
+          0.2701,
+          0.2101,
+          0.2072
+        ],
+        "argmax": 0,
+        "top_share": 0.3127,
+        "sigma_over_null": 4.65,
+        "margin_over_runner_up": 0.0426,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3075,
+          0.2311,
+          0.2437,
+          0.2176
+        ],
+        "argmax": 0,
+        "top_share": 0.3075,
+        "sigma_over_null": 4.27,
+        "margin_over_runner_up": 0.0638,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_shared_restoring_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 1088,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "restoring"
+  },
+  "j14_shared_restoring_r2@j14_shared_restoring_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2968,
+    "mean_sigma_over_null": 3.45,
+    "min_margin_over_runner_up": 0.0095,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3084,
+          0.2384,
+          0.2545,
+          0.1987
+        ],
+        "argmax": 0,
+        "top_share": 0.3084,
+        "sigma_over_null": 4.39,
+        "margin_over_runner_up": 0.0539,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2845,
+          0.2652,
+          0.2527,
+          0.1977
+        ],
+        "argmax": 0,
+        "top_share": 0.2845,
+        "sigma_over_null": 2.56,
+        "margin_over_runner_up": 0.0193,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2904,
+          0.2167,
+          0.2677,
+          0.2252
+        ],
+        "argmax": 0,
+        "top_share": 0.2904,
+        "sigma_over_null": 3.04,
+        "margin_over_runner_up": 0.0227,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3037,
+          0.2063,
+          0.2942,
+          0.1958
+        ],
+        "argmax": 0,
+        "top_share": 0.3037,
+        "sigma_over_null": 3.81,
+        "margin_over_runner_up": 0.0095,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_shared_restoring_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 1175,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "restoring"
+  },
+  "j14_shared_restoring_r3@j14_shared_restoring_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3065,
+    "mean_sigma_over_null": 4.16,
+    "min_margin_over_runner_up": 0.0065,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3107,
+          0.2714,
+          0.2193,
+          0.1986
+        ],
+        "argmax": 0,
+        "top_share": 0.3107,
+        "sigma_over_null": 4.47,
+        "margin_over_runner_up": 0.0393,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2849,
+          0.2784,
+          0.2396,
+          0.197
+        ],
+        "argmax": 0,
+        "top_share": 0.2849,
+        "sigma_over_null": 2.65,
+        "margin_over_runner_up": 0.0065,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2893,
+          0.2462,
+          0.2783,
+          0.1862
+        ],
+        "argmax": 0,
+        "top_share": 0.2893,
+        "sigma_over_null": 2.87,
+        "margin_over_runner_up": 0.011,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3413,
+          0.2232,
+          0.2432,
+          0.1922
+        ],
+        "argmax": 0,
+        "top_share": 0.3413,
+        "sigma_over_null": 6.67,
+        "margin_over_runner_up": 0.0981,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_shared_restoring_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 1132,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "restoring"
+  },
+  "j14_shared_restoring_r4@j14_shared_restoring_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2963,
+    "mean_sigma_over_null": 3.42,
+    "min_margin_over_runner_up": 0.0121,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3207,
+          0.2545,
+          0.2299,
+          0.1949
+        ],
+        "argmax": 0,
+        "top_share": 0.3207,
+        "sigma_over_null": 5.31,
+        "margin_over_runner_up": 0.0662,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.3075,
+          0.2533,
+          0.2452,
+          0.194
+        ],
+        "argmax": 0,
+        "top_share": 0.3075,
+        "sigma_over_null": 4.19,
+        "margin_over_runner_up": 0.0543,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2785,
+          0.2523,
+          0.2664,
+          0.2028
+        ],
+        "argmax": 0,
+        "top_share": 0.2785,
+        "sigma_over_null": 2.07,
+        "margin_over_runner_up": 0.0121,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2783,
+          0.2631,
+          0.2403,
+          0.2184
+        ],
+        "argmax": 0,
+        "top_share": 0.2783,
+        "sigma_over_null": 2.12,
+        "margin_over_runner_up": 0.0152,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_shared_restoring_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 1117,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "restoring"
+  },
+  "j14_shared_restoring_r5@j14_shared_restoring_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2812,
+    "mean_sigma_over_null": 2.3,
+    "min_margin_over_runner_up": 0.0065,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2756,
+          0.2495,
+          0.2691,
+          0.2058
+        ],
+        "argmax": 0,
+        "top_share": 0.2756,
+        "sigma_over_null": 1.94,
+        "margin_over_runner_up": 0.0065,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2872,
+          0.2589,
+          0.2439,
+          0.21
+        ],
+        "argmax": 0,
+        "top_share": 0.2872,
+        "sigma_over_null": 2.8,
+        "margin_over_runner_up": 0.0282,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.2692,
+          0.2387,
+          0.2623,
+          0.2298
+        ],
+        "argmax": 0,
+        "top_share": 0.2692,
+        "sigma_over_null": 1.41,
+        "margin_over_runner_up": 0.0069,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2928,
+          0.2717,
+          0.2378,
+          0.1977
+        ],
+        "argmax": 0,
+        "top_share": 0.2928,
+        "sigma_over_null": 3.04,
+        "margin_over_runner_up": 0.0211,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_shared_restoring_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 1132,
+    "match": 2,
+    "dataset": "canonical_shared",
+    "divider": "restoring"
+  },
+  "j7rep_canonical_nonrestoring_r1@j7rep_canonical_nonrestoring_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.306,
+    "mean_sigma_over_null": 4.15,
+    "min_margin_over_runner_up": 0.0095,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2524,
+          0.3267,
+          0.1905,
+          0.2305
+        ],
+        "argmax": 1,
+        "top_share": 0.3267,
+        "sigma_over_null": 5.74,
+        "margin_over_runner_up": 0.0743,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2306,
+          0.3015,
+          0.1758,
+          0.2921
+        ],
+        "argmax": 1,
+        "top_share": 0.3015,
+        "sigma_over_null": 3.87,
+        "margin_over_runner_up": 0.0095,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2573,
+          0.3097,
+          0.2019,
+          0.2311
+        ],
+        "argmax": 1,
+        "top_share": 0.3097,
+        "sigma_over_null": 4.43,
+        "margin_over_runner_up": 0.0524,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2568,
+          0.286,
+          0.1931,
+          0.2641
+        ],
+        "argmax": 1,
+        "top_share": 0.286,
+        "sigma_over_null": 2.57,
+        "margin_over_runner_up": 0.0219,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_canonical_nonrestoring_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 640,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7rep_canonical_nonrestoring_r2@j7rep_canonical_nonrestoring_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3265,
+    "mean_sigma_over_null": 5.67,
+    "min_margin_over_runner_up": 0.0281,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2528,
+          0.3456,
+          0.182,
+          0.2197
+        ],
+        "argmax": 1,
+        "top_share": 0.3456,
+        "sigma_over_null": 7.28,
+        "margin_over_runner_up": 0.0928,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2428,
+          0.3375,
+          0.1797,
+          0.24
+        ],
+        "argmax": 1,
+        "top_share": 0.3375,
+        "sigma_over_null": 6.53,
+        "margin_over_runner_up": 0.0946,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2851,
+          0.3133,
+          0.1777,
+          0.2239
+        ],
+        "argmax": 1,
+        "top_share": 0.3133,
+        "sigma_over_null": 4.61,
+        "margin_over_runner_up": 0.0281,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2526,
+          0.3095,
+          0.1801,
+          0.2578
+        ],
+        "argmax": 1,
+        "top_share": 0.3095,
+        "sigma_over_null": 4.27,
+        "margin_over_runner_up": 0.0518,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_canonical_nonrestoring_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 649,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7rep_canonical_nonrestoring_r3@j7rep_canonical_nonrestoring_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.277,
+    "mean_sigma_over_null": 2.0,
+    "min_margin_over_runner_up": 0.002,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2307,
+          0.2653,
+          0.2406,
+          0.2634
+        ],
+        "argmax": 1,
+        "top_share": 0.2653,
+        "sigma_over_null": 1.13,
+        "margin_over_runner_up": 0.002,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2253,
+          0.2814,
+          0.2002,
+          0.293
+        ],
+        "argmax": 3,
+        "top_share": 0.293,
+        "sigma_over_null": 3.2,
+        "margin_over_runner_up": 0.0116,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2509,
+          0.2763,
+          0.2129,
+          0.26
+        ],
+        "argmax": 1,
+        "top_share": 0.2763,
+        "sigma_over_null": 2.02,
+        "margin_over_runner_up": 0.0163,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2321,
+          0.2595,
+          0.2352,
+          0.2732
+        ],
+        "argmax": 3,
+        "top_share": 0.2732,
+        "sigma_over_null": 1.65,
+        "margin_over_runner_up": 0.0137,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_canonical_nonrestoring_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 626,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7rep_canonical_nonrestoring_r4@j7rep_canonical_nonrestoring_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3173,
+    "mean_sigma_over_null": 4.97,
+    "min_margin_over_runner_up": 0.0539,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.23,
+          0.3109,
+          0.2022,
+          0.257
+        ],
+        "argmax": 1,
+        "top_share": 0.3109,
+        "sigma_over_null": 4.69,
+        "margin_over_runner_up": 0.0539,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2431,
+          0.334,
+          0.1923,
+          0.2306
+        ],
+        "argmax": 1,
+        "top_share": 0.334,
+        "sigma_over_null": 6.27,
+        "margin_over_runner_up": 0.0909,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2289,
+          0.3134,
+          0.2092,
+          0.2485
+        ],
+        "argmax": 1,
+        "top_share": 0.3134,
+        "sigma_over_null": 4.67,
+        "margin_over_runner_up": 0.0648,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.238,
+          0.3109,
+          0.1989,
+          0.2522
+        ],
+        "argmax": 1,
+        "top_share": 0.3109,
+        "sigma_over_null": 4.26,
+        "margin_over_runner_up": 0.0587,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_canonical_nonrestoring_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 678,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7rep_canonical_nonrestoring_r5@j7rep_canonical_nonrestoring_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2805,
+    "mean_sigma_over_null": 2.26,
+    "min_margin_over_runner_up": 0.0127,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2523,
+          0.2685,
+          0.198,
+          0.2812
+        ],
+        "argmax": 3,
+        "top_share": 0.2812,
+        "sigma_over_null": 2.4,
+        "margin_over_runner_up": 0.0127,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2641,
+          0.2799,
+          0.2047,
+          0.2512
+        ],
+        "argmax": 1,
+        "top_share": 0.2799,
+        "sigma_over_null": 2.2,
+        "margin_over_runner_up": 0.0158,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2658,
+          0.2831,
+          0.1955,
+          0.2556
+        ],
+        "argmax": 1,
+        "top_share": 0.2831,
+        "sigma_over_null": 2.4,
+        "margin_over_runner_up": 0.0173,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2287,
+          0.2618,
+          0.2317,
+          0.2778
+        ],
+        "argmax": 3,
+        "top_share": 0.2778,
+        "sigma_over_null": 2.03,
+        "margin_over_runner_up": 0.016,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7rep_canonical_nonrestoring_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 678,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j4rep_canonical_restoring_r1@j4rep_canonical_restoring_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3182,
+    "mean_sigma_over_null": 5.05,
+    "min_margin_over_runner_up": 0.033,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2997,
+          0.2555,
+          0.2286,
+          0.2161
+        ],
+        "argmax": 0,
+        "top_share": 0.2997,
+        "sigma_over_null": 3.7,
+        "margin_over_runner_up": 0.0442,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2947,
+          0.2617,
+          0.2238,
+          0.2198
+        ],
+        "argmax": 0,
+        "top_share": 0.2947,
+        "sigma_over_null": 3.27,
+        "margin_over_runner_up": 0.033,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3502,
+          0.2417,
+          0.2096,
+          0.1985
+        ],
+        "argmax": 0,
+        "top_share": 0.3502,
+        "sigma_over_null": 7.63,
+        "margin_over_runner_up": 0.1085,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3282,
+          0.235,
+          0.2443,
+          0.1925
+        ],
+        "argmax": 0,
+        "top_share": 0.3282,
+        "sigma_over_null": 5.61,
+        "margin_over_runner_up": 0.0839,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4rep_canonical_restoring_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 1127,
+    "match": 0,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j4rep_canonical_restoring_r2@j4rep_canonical_restoring_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3118,
+    "mean_sigma_over_null": 4.58,
+    "min_margin_over_runner_up": 0.0385,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3109,
+          0.265,
+          0.2345,
+          0.1896
+        ],
+        "argmax": 0,
+        "top_share": 0.3109,
+        "sigma_over_null": 4.41,
+        "margin_over_runner_up": 0.0459,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3255,
+          0.2466,
+          0.2357,
+          0.1922
+        ],
+        "argmax": 0,
+        "top_share": 0.3255,
+        "sigma_over_null": 5.79,
+        "margin_over_runner_up": 0.0789,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3131,
+          0.2567,
+          0.232,
+          0.1982
+        ],
+        "argmax": 0,
+        "top_share": 0.3131,
+        "sigma_over_null": 4.55,
+        "margin_over_runner_up": 0.0565,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2977,
+          0.2283,
+          0.2592,
+          0.2148
+        ],
+        "argmax": 0,
+        "top_share": 0.2977,
+        "sigma_over_null": 3.55,
+        "margin_over_runner_up": 0.0385,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4rep_canonical_restoring_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 1120,
+    "match": 0,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j4rep_canonical_restoring_r3@j4rep_canonical_restoring_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3284,
+    "mean_sigma_over_null": 5.78,
+    "min_margin_over_runner_up": 0.0484,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3259,
+          0.2555,
+          0.2266,
+          0.1919
+        ],
+        "argmax": 0,
+        "top_share": 0.3259,
+        "sigma_over_null": 5.65,
+        "margin_over_runner_up": 0.0704,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3169,
+          0.2685,
+          0.2334,
+          0.1812
+        ],
+        "argmax": 0,
+        "top_share": 0.3169,
+        "sigma_over_null": 5.01,
+        "margin_over_runner_up": 0.0484,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3445,
+          0.2199,
+          0.2503,
+          0.1854
+        ],
+        "argmax": 0,
+        "top_share": 0.3445,
+        "sigma_over_null": 6.85,
+        "margin_over_runner_up": 0.0942,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3261,
+          0.2446,
+          0.2387,
+          0.1906
+        ],
+        "argmax": 0,
+        "top_share": 0.3261,
+        "sigma_over_null": 5.61,
+        "margin_over_runner_up": 0.0815,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4rep_canonical_restoring_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 1081,
+    "match": 0,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j4rep_canonical_restoring_r4@j4rep_canonical_restoring_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3304,
+    "mean_sigma_over_null": 5.95,
+    "min_margin_over_runner_up": 0.0562,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3363,
+          0.2581,
+          0.2297,
+          0.176
+        ],
+        "argmax": 0,
+        "top_share": 0.3363,
+        "sigma_over_null": 6.37,
+        "margin_over_runner_up": 0.0782,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3276,
+          0.2714,
+          0.2276,
+          0.1733
+        ],
+        "argmax": 0,
+        "top_share": 0.3276,
+        "sigma_over_null": 5.81,
+        "margin_over_runner_up": 0.0562,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3327,
+          0.241,
+          0.2521,
+          0.1742
+        ],
+        "argmax": 0,
+        "top_share": 0.3327,
+        "sigma_over_null": 6.27,
+        "margin_over_runner_up": 0.0806,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3252,
+          0.2373,
+          0.2468,
+          0.1907
+        ],
+        "argmax": 0,
+        "top_share": 0.3252,
+        "sigma_over_null": 5.34,
+        "margin_over_runner_up": 0.0784,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4rep_canonical_restoring_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 1135,
+    "match": 1,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j4rep_canonical_restoring_r5@j4rep_canonical_restoring_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2998,
+    "mean_sigma_over_null": 3.68,
+    "min_margin_over_runner_up": 0.0352,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2493,
+          0.2845,
+          0.2434,
+          0.2229
+        ],
+        "argmax": 1,
+        "top_share": 0.2845,
+        "sigma_over_null": 2.55,
+        "margin_over_runner_up": 0.0352,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3067,
+          0.2416,
+          0.2565,
+          0.1952
+        ],
+        "argmax": 0,
+        "top_share": 0.3067,
+        "sigma_over_null": 4.29,
+        "margin_over_runner_up": 0.0502,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3074,
+          0.2264,
+          0.2408,
+          0.2254
+        ],
+        "argmax": 0,
+        "top_share": 0.3074,
+        "sigma_over_null": 4.14,
+        "margin_over_runner_up": 0.0666,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3007,
+          0.2204,
+          0.2439,
+          0.2351
+        ],
+        "argmax": 0,
+        "top_share": 0.3007,
+        "sigma_over_null": 3.74,
+        "margin_over_runner_up": 0.0568,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j4rep_canonical_restoring_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 1094,
+    "match": 2,
+    "dataset": "canonical",
+    "divider": "restoring"
+  },
+  "j7none_rep_kingston_nomit_r1@j7none_rep_kingston_nomit_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3653,
+    "mean_sigma_over_null": 8.28,
+    "min_margin_over_runner_up": 0.0099,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3738,
+          0.3564,
+          0.1297,
+          0.14
+        ],
+        "argmax": 0,
+        "top_share": 0.3738,
+        "sigma_over_null": 12.63,
+        "margin_over_runner_up": 0.0174,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3513,
+          0.3612,
+          0.1442,
+          0.1433
+        ],
+        "argmax": 1,
+        "top_share": 0.3612,
+        "sigma_over_null": 8.92,
+        "margin_over_runner_up": 0.0099,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3206,
+          0.3917,
+          0.1334,
+          0.1542
+        ],
+        "argmax": 1,
+        "top_share": 0.3917,
+        "sigma_over_null": 7.86,
+        "margin_over_runner_up": 0.0711,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3343,
+          0.2818,
+          0.1878,
+          0.1961
+        ],
+        "argmax": 0,
+        "top_share": 0.3343,
+        "sigma_over_null": 3.7,
+        "margin_over_runner_up": 0.0525,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_rep_kingston_nomit_r1",
+    "backend": "ibm_kingston",
+    "cx": 679,
+    "match": 2,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7none_rep_kingston_nomit_r2@j7none_rep_kingston_nomit_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4055,
+    "mean_sigma_over_null": 11.64,
+    "min_margin_over_runner_up": 0.0204,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2812,
+          0.4435,
+          0.1138,
+          0.1614
+        ],
+        "argmax": 1,
+        "top_share": 0.4435,
+        "sigma_over_null": 15.33,
+        "margin_over_runner_up": 0.1623,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2827,
+          0.4203,
+          0.1124,
+          0.1846
+        ],
+        "argmax": 1,
+        "top_share": 0.4203,
+        "sigma_over_null": 13.58,
+        "margin_over_runner_up": 0.1376,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2508,
+          0.4311,
+          0.1097,
+          0.2083
+        ],
+        "argmax": 1,
+        "top_share": 0.4311,
+        "sigma_over_null": 12.5,
+        "margin_over_runner_up": 0.1803,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.199,
+          0.307,
+          0.1667,
+          0.3273
+        ],
+        "argmax": 3,
+        "top_share": 0.3273,
+        "sigma_over_null": 5.16,
+        "margin_over_runner_up": 0.0204,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_rep_kingston_nomit_r2",
+    "backend": "ibm_kingston",
+    "cx": 674,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7none_rep_kingston_nomit_r3@j7none_rep_kingston_nomit_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4375,
+    "mean_sigma_over_null": 13.82,
+    "min_margin_over_runner_up": 0.1182,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3057,
+          0.4239,
+          0.1096,
+          0.1608
+        ],
+        "argmax": 1,
+        "top_share": 0.4239,
+        "sigma_over_null": 14.96,
+        "margin_over_runner_up": 0.1182,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2717,
+          0.4536,
+          0.1126,
+          0.1621
+        ],
+        "argmax": 1,
+        "top_share": 0.4536,
+        "sigma_over_null": 14.95,
+        "margin_over_runner_up": 0.1818,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2725,
+          0.4702,
+          0.1049,
+          0.1524
+        ],
+        "argmax": 1,
+        "top_share": 0.4702,
+        "sigma_over_null": 16.01,
+        "margin_over_runner_up": 0.1978,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1558,
+          0.2224,
+          0.2195,
+          0.4023
+        ],
+        "argmax": 3,
+        "top_share": 0.4023,
+        "sigma_over_null": 9.34,
+        "margin_over_runner_up": 0.1799,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_rep_kingston_nomit_r3",
+    "backend": "ibm_kingston",
+    "cx": 678,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7none_rep_kingston_nomit_r4@j7none_rep_kingston_nomit_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4184,
+    "mean_sigma_over_null": 12.78,
+    "min_margin_over_runner_up": 0.0729,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2647,
+          0.47,
+          0.1009,
+          0.1645
+        ],
+        "argmax": 1,
+        "top_share": 0.47,
+        "sigma_over_null": 18.99,
+        "margin_over_runner_up": 0.2053,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2262,
+          0.3676,
+          0.1116,
+          0.2946
+        ],
+        "argmax": 1,
+        "top_share": 0.3676,
+        "sigma_over_null": 7.04,
+        "margin_over_runner_up": 0.0729,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2684,
+          0.4483,
+          0.1004,
+          0.1829
+        ],
+        "argmax": 1,
+        "top_share": 0.4483,
+        "sigma_over_null": 16.8,
+        "margin_over_runner_up": 0.1799,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2012,
+          0.3877,
+          0.1454,
+          0.2658
+        ],
+        "argmax": 1,
+        "top_share": 0.3877,
+        "sigma_over_null": 8.3,
+        "margin_over_runner_up": 0.1219,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_rep_kingston_nomit_r4",
+    "backend": "ibm_kingston",
+    "cx": 640,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7none_rep_kingston_nomit_r5@j7none_rep_kingston_nomit_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4384,
+    "mean_sigma_over_null": 14.11,
+    "min_margin_over_runner_up": 0.0797,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2529,
+          0.4812,
+          0.1115,
+          0.1545
+        ],
+        "argmax": 1,
+        "top_share": 0.4812,
+        "sigma_over_null": 19.26,
+        "margin_over_runner_up": 0.2283,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2896,
+          0.431,
+          0.1018,
+          0.1776
+        ],
+        "argmax": 1,
+        "top_share": 0.431,
+        "sigma_over_null": 12.43,
+        "margin_over_runner_up": 0.1414,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2565,
+          0.485,
+          0.1084,
+          0.15
+        ],
+        "argmax": 1,
+        "top_share": 0.485,
+        "sigma_over_null": 17.44,
+        "margin_over_runner_up": 0.2285,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1902,
+          0.2768,
+          0.1765,
+          0.3565
+        ],
+        "argmax": 3,
+        "top_share": 0.3565,
+        "sigma_over_null": 7.29,
+        "margin_over_runner_up": 0.0797,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7none_rep_kingston_nomit_r5",
+    "backend": "ibm_kingston",
+    "cx": 663,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_kingston_mit_r1@j7x_kingston_mit_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3003,
+    "mean_sigma_over_null": 3.7,
+    "min_margin_over_runner_up": 0.0216,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2694,
+          0.316,
+          0.175,
+          0.2397
+        ],
+        "argmax": 1,
+        "top_share": 0.316,
+        "sigma_over_null": 4.68,
+        "margin_over_runner_up": 0.0467,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2797,
+          0.305,
+          0.189,
+          0.2264
+        ],
+        "argmax": 1,
+        "top_share": 0.305,
+        "sigma_over_null": 4.15,
+        "margin_over_runner_up": 0.0253,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2591,
+          0.3013,
+          0.1923,
+          0.2473
+        ],
+        "argmax": 1,
+        "top_share": 0.3013,
+        "sigma_over_null": 3.78,
+        "margin_over_runner_up": 0.0422,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2423,
+          0.2573,
+          0.2216,
+          0.2789
+        ],
+        "argmax": 3,
+        "top_share": 0.2789,
+        "sigma_over_null": 2.18,
+        "margin_over_runner_up": 0.0216,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_kingston_mit_r1",
+    "backend": "ibm_kingston",
+    "cx": 707,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_kingston_mit_r2@j7x_kingston_mit_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3078,
+    "mean_sigma_over_null": 4.28,
+    "min_margin_over_runner_up": 0.0117,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3029,
+          0.3146,
+          0.1785,
+          0.204
+        ],
+        "argmax": 1,
+        "top_share": 0.3146,
+        "sigma_over_null": 4.57,
+        "margin_over_runner_up": 0.0117,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2811,
+          0.3101,
+          0.1744,
+          0.2344
+        ],
+        "argmax": 1,
+        "top_share": 0.3101,
+        "sigma_over_null": 4.68,
+        "margin_over_runner_up": 0.0291,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2678,
+          0.3234,
+          0.1775,
+          0.2313
+        ],
+        "argmax": 1,
+        "top_share": 0.3234,
+        "sigma_over_null": 5.47,
+        "margin_over_runner_up": 0.0557,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2342,
+          0.2679,
+          0.2147,
+          0.2832
+        ],
+        "argmax": 3,
+        "top_share": 0.2832,
+        "sigma_over_null": 2.4,
+        "margin_over_runner_up": 0.0153,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_kingston_mit_r2",
+    "backend": "ibm_kingston",
+    "cx": 673,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_kingston_mit_r3@j7x_kingston_mit_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3113,
+    "mean_sigma_over_null": 4.53,
+    "min_margin_over_runner_up": 0.001,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2881,
+          0.3202,
+          0.1585,
+          0.2332
+        ],
+        "argmax": 1,
+        "top_share": 0.3202,
+        "sigma_over_null": 5.04,
+        "margin_over_runner_up": 0.0321,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.251,
+          0.3343,
+          0.1964,
+          0.2184
+        ],
+        "argmax": 1,
+        "top_share": 0.3343,
+        "sigma_over_null": 6.29,
+        "margin_over_runner_up": 0.0833,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2448,
+          0.2988,
+          0.1953,
+          0.261
+        ],
+        "argmax": 1,
+        "top_share": 0.2988,
+        "sigma_over_null": 3.76,
+        "margin_over_runner_up": 0.0378,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2223,
+          0.291,
+          0.1947,
+          0.292
+        ],
+        "argmax": 3,
+        "top_share": 0.292,
+        "sigma_over_null": 3.03,
+        "margin_over_runner_up": 0.001,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_kingston_mit_r3",
+    "backend": "ibm_kingston",
+    "cx": 621,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_kingston_mit_r4@j7x_kingston_mit_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3258,
+    "mean_sigma_over_null": 5.58,
+    "min_margin_over_runner_up": 0.0337,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2817,
+          0.3431,
+          0.1579,
+          0.2173
+        ],
+        "argmax": 1,
+        "top_share": 0.3431,
+        "sigma_over_null": 6.78,
+        "margin_over_runner_up": 0.0614,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2887,
+          0.3224,
+          0.1756,
+          0.2133
+        ],
+        "argmax": 1,
+        "top_share": 0.3224,
+        "sigma_over_null": 5.31,
+        "margin_over_runner_up": 0.0337,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2281,
+          0.3396,
+          0.2191,
+          0.2131
+        ],
+        "argmax": 1,
+        "top_share": 0.3396,
+        "sigma_over_null": 6.56,
+        "margin_over_runner_up": 0.1116,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2165,
+          0.244,
+          0.2413,
+          0.2982
+        ],
+        "argmax": 3,
+        "top_share": 0.2982,
+        "sigma_over_null": 3.67,
+        "margin_over_runner_up": 0.0541,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_kingston_mit_r4",
+    "backend": "ibm_kingston",
+    "cx": 679,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_kingston_mit_r5@j7x_kingston_mit_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2994,
+    "mean_sigma_over_null": 3.62,
+    "min_margin_over_runner_up": 0.001,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.249,
+          0.3075,
+          0.1905,
+          0.253
+        ],
+        "argmax": 1,
+        "top_share": 0.3075,
+        "sigma_over_null": 4.18,
+        "margin_over_runner_up": 0.0544,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2876,
+          0.2886,
+          0.1911,
+          0.2327
+        ],
+        "argmax": 1,
+        "top_share": 0.2886,
+        "sigma_over_null": 2.8,
+        "margin_over_runner_up": 0.001,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2313,
+          0.3095,
+          0.217,
+          0.2423
+        ],
+        "argmax": 1,
+        "top_share": 0.3095,
+        "sigma_over_null": 4.14,
+        "margin_over_runner_up": 0.0672,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1898,
+          0.2805,
+          0.2376,
+          0.2921
+        ],
+        "argmax": 3,
+        "top_share": 0.2921,
+        "sigma_over_null": 3.38,
+        "margin_over_runner_up": 0.0116,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_kingston_mit_r5",
+    "backend": "ibm_kingston",
+    "cx": 694,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_marrakesh_nomit_r1@j7x_marrakesh_nomit_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4143,
+    "mean_sigma_over_null": 12.11,
+    "min_margin_over_runner_up": 0.1188,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2908,
+          0.433,
+          0.1129,
+          0.1633
+        ],
+        "argmax": 1,
+        "top_share": 0.433,
+        "sigma_over_null": 17.47,
+        "margin_over_runner_up": 0.1422,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2633,
+          0.4308,
+          0.1009,
+          0.205
+        ],
+        "argmax": 1,
+        "top_share": 0.4308,
+        "sigma_over_null": 12.94,
+        "margin_over_runner_up": 0.1675,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2838,
+          0.4026,
+          0.1188,
+          0.1947
+        ],
+        "argmax": 1,
+        "top_share": 0.4026,
+        "sigma_over_null": 10.63,
+        "margin_over_runner_up": 0.1188,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1818,
+          0.265,
+          0.1625,
+          0.3907
+        ],
+        "argmax": 3,
+        "top_share": 0.3907,
+        "sigma_over_null": 7.39,
+        "margin_over_runner_up": 0.1257,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_marrakesh_nomit_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 636,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_marrakesh_nomit_r2@j7x_marrakesh_nomit_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4075,
+    "mean_sigma_over_null": 12.06,
+    "min_margin_over_runner_up": 0.0363,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.277,
+          0.466,
+          0.0916,
+          0.1654
+        ],
+        "argmax": 1,
+        "top_share": 0.466,
+        "sigma_over_null": 18.64,
+        "margin_over_runner_up": 0.189,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3193,
+          0.4184,
+          0.0911,
+          0.1712
+        ],
+        "argmax": 1,
+        "top_share": 0.4184,
+        "sigma_over_null": 12.29,
+        "margin_over_runner_up": 0.0991,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3083,
+          0.4387,
+          0.1136,
+          0.1393
+        ],
+        "argmax": 1,
+        "top_share": 0.4387,
+        "sigma_over_null": 13.87,
+        "margin_over_runner_up": 0.1304,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2369,
+          0.2703,
+          0.186,
+          0.3067
+        ],
+        "argmax": 3,
+        "top_share": 0.3067,
+        "sigma_over_null": 3.43,
+        "margin_over_runner_up": 0.0363,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_marrakesh_nomit_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 663,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_marrakesh_nomit_r3@j7x_marrakesh_nomit_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3525,
+    "mean_sigma_over_null": 7.43,
+    "min_margin_over_runner_up": 0.019,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1935,
+          0.3381,
+          0.1611,
+          0.3073
+        ],
+        "argmax": 1,
+        "top_share": 0.3381,
+        "sigma_over_null": 7.24,
+        "margin_over_runner_up": 0.0308,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2083,
+          0.3877,
+          0.143,
+          0.261
+        ],
+        "argmax": 1,
+        "top_share": 0.3877,
+        "sigma_over_null": 8.98,
+        "margin_over_runner_up": 0.1267,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1929,
+          0.3457,
+          0.1752,
+          0.2862
+        ],
+        "argmax": 1,
+        "top_share": 0.3457,
+        "sigma_over_null": 7.79,
+        "margin_over_runner_up": 0.0595,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.185,
+          0.3194,
+          0.1572,
+          0.3384
+        ],
+        "argmax": 3,
+        "top_share": 0.3384,
+        "sigma_over_null": 5.73,
+        "margin_over_runner_up": 0.019,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_marrakesh_nomit_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 651,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_marrakesh_nomit_r4@j7x_marrakesh_nomit_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4068,
+    "mean_sigma_over_null": 11.81,
+    "min_margin_over_runner_up": 0.0057,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2727,
+          0.4361,
+          0.1172,
+          0.174
+        ],
+        "argmax": 1,
+        "top_share": 0.4361,
+        "sigma_over_null": 16.12,
+        "margin_over_runner_up": 0.1634,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2676,
+          0.4456,
+          0.1111,
+          0.1757
+        ],
+        "argmax": 1,
+        "top_share": 0.4456,
+        "sigma_over_null": 13.41,
+        "margin_over_runner_up": 0.178,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2582,
+          0.4227,
+          0.1464,
+          0.1727
+        ],
+        "argmax": 1,
+        "top_share": 0.4227,
+        "sigma_over_null": 13.23,
+        "margin_over_runner_up": 0.1645,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1969,
+          0.3229,
+          0.1629,
+          0.3173
+        ],
+        "argmax": 1,
+        "top_share": 0.3229,
+        "sigma_over_null": 4.48,
+        "margin_over_runner_up": 0.0057,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_marrakesh_nomit_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 664,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_marrakesh_nomit_r5@j7x_marrakesh_nomit_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3761,
+    "mean_sigma_over_null": 9.38,
+    "min_margin_over_runner_up": 0.0902,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2415,
+          0.3823,
+          0.1553,
+          0.221
+        ],
+        "argmax": 1,
+        "top_share": 0.3823,
+        "sigma_over_null": 10.46,
+        "margin_over_runner_up": 0.1408,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2664,
+          0.3949,
+          0.1328,
+          0.2058
+        ],
+        "argmax": 1,
+        "top_share": 0.3949,
+        "sigma_over_null": 12.39,
+        "margin_over_runner_up": 0.1285,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2616,
+          0.3558,
+          0.1561,
+          0.2264
+        ],
+        "argmax": 1,
+        "top_share": 0.3558,
+        "sigma_over_null": 6.52,
+        "margin_over_runner_up": 0.0942,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2811,
+          0.3713,
+          0.1423,
+          0.2052
+        ],
+        "argmax": 1,
+        "top_share": 0.3713,
+        "sigma_over_null": 8.13,
+        "margin_over_runner_up": 0.0902,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_marrakesh_nomit_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 668,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_trex_only_r1@j7x_trex_only_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3821,
+    "mean_sigma_over_null": 10.13,
+    "min_margin_over_runner_up": 0.0335,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2778,
+          0.4313,
+          0.1231,
+          0.1677
+        ],
+        "argmax": 1,
+        "top_share": 0.4313,
+        "sigma_over_null": 16.83,
+        "margin_over_runner_up": 0.1535,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2846,
+          0.3874,
+          0.1314,
+          0.1966
+        ],
+        "argmax": 1,
+        "top_share": 0.3874,
+        "sigma_over_null": 10.09,
+        "margin_over_runner_up": 0.1028,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3031,
+          0.403,
+          0.1206,
+          0.1734
+        ],
+        "argmax": 1,
+        "top_share": 0.403,
+        "sigma_over_null": 10.43,
+        "margin_over_runner_up": 0.0999,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2194,
+          0.273,
+          0.201,
+          0.3065
+        ],
+        "argmax": 3,
+        "top_share": 0.3065,
+        "sigma_over_null": 3.19,
+        "margin_over_runner_up": 0.0335,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_trex_only_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 654,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_trex_only_r2@j7x_trex_only_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4305,
+    "mean_sigma_over_null": 13.56,
+    "min_margin_over_runner_up": 0.1105,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2608,
+          0.4702,
+          0.1053,
+          0.1637
+        ],
+        "argmax": 1,
+        "top_share": 0.4702,
+        "sigma_over_null": 20.19,
+        "margin_over_runner_up": 0.2094,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2434,
+          0.4427,
+          0.1189,
+          0.1949
+        ],
+        "argmax": 1,
+        "top_share": 0.4427,
+        "sigma_over_null": 13.41,
+        "margin_over_runner_up": 0.1993,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2721,
+          0.4348,
+          0.1056,
+          0.1874
+        ],
+        "argmax": 1,
+        "top_share": 0.4348,
+        "sigma_over_null": 13.84,
+        "margin_over_runner_up": 0.1627,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2014,
+          0.2638,
+          0.1604,
+          0.3743
+        ],
+        "argmax": 3,
+        "top_share": 0.3743,
+        "sigma_over_null": 6.8,
+        "margin_over_runner_up": 0.1105,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_trex_only_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 677,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_trex_only_r3@j7x_trex_only_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4798,
+    "mean_sigma_over_null": 17.29,
+    "min_margin_over_runner_up": 0.1181,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.279,
+          0.5263,
+          0.0733,
+          0.1215
+        ],
+        "argmax": 1,
+        "top_share": 0.5263,
+        "sigma_over_null": 25.82,
+        "margin_over_runner_up": 0.2473,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2917,
+          0.5,
+          0.0712,
+          0.1371
+        ],
+        "argmax": 1,
+        "top_share": 0.5,
+        "sigma_over_null": 19.48,
+        "margin_over_runner_up": 0.2083,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3141,
+          0.5138,
+          0.071,
+          0.1012
+        ],
+        "argmax": 1,
+        "top_share": 0.5138,
+        "sigma_over_null": 16.81,
+        "margin_over_runner_up": 0.1997,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2612,
+          0.3792,
+          0.1038,
+          0.2558
+        ],
+        "argmax": 1,
+        "top_share": 0.3792,
+        "sigma_over_null": 7.06,
+        "margin_over_runner_up": 0.1181,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_trex_only_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 612,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_trex_only_r4@j7x_trex_only_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.4173,
+    "mean_sigma_over_null": 12.58,
+    "min_margin_over_runner_up": 0.0406,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3109,
+          0.4527,
+          0.0947,
+          0.1417
+        ],
+        "argmax": 1,
+        "top_share": 0.4527,
+        "sigma_over_null": 18.06,
+        "margin_over_runner_up": 0.1417,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3041,
+          0.4247,
+          0.1227,
+          0.1485
+        ],
+        "argmax": 1,
+        "top_share": 0.4247,
+        "sigma_over_null": 12.57,
+        "margin_over_runner_up": 0.1206,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3062,
+          0.4424,
+          0.1056,
+          0.1457
+        ],
+        "argmax": 1,
+        "top_share": 0.4424,
+        "sigma_over_null": 13.68,
+        "margin_over_runner_up": 0.1362,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3087,
+          0.3493,
+          0.1116,
+          0.2304
+        ],
+        "argmax": 1,
+        "top_share": 0.3493,
+        "sigma_over_null": 6.02,
+        "margin_over_runner_up": 0.0406,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_trex_only_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 666,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_trex_only_r5@j7x_trex_only_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3892,
+    "mean_sigma_over_null": 10.54,
+    "min_margin_over_runner_up": 0.0426,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2876,
+          0.4339,
+          0.1167,
+          0.1617
+        ],
+        "argmax": 1,
+        "top_share": 0.4339,
+        "sigma_over_null": 16.01,
+        "margin_over_runner_up": 0.1463,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.333,
+          0.3899,
+          0.1013,
+          0.1758
+        ],
+        "argmax": 1,
+        "top_share": 0.3899,
+        "sigma_over_null": 10.04,
+        "margin_over_runner_up": 0.0569,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3141,
+          0.4178,
+          0.0942,
+          0.1738
+        ],
+        "argmax": 1,
+        "top_share": 0.4178,
+        "sigma_over_null": 11.98,
+        "margin_over_runner_up": 0.1037,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2407,
+          0.2726,
+          0.1715,
+          0.3152
+        ],
+        "argmax": 3,
+        "top_share": 0.3152,
+        "sigma_over_null": 4.13,
+        "margin_over_runner_up": 0.0426,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_trex_only_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 631,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_dd_only_r1@j7x_dd_only_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3134,
+    "mean_sigma_over_null": 4.71,
+    "min_margin_over_runner_up": 0.0245,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2786,
+          0.3391,
+          0.1732,
+          0.209
+        ],
+        "argmax": 1,
+        "top_share": 0.3391,
+        "sigma_over_null": 6.8,
+        "margin_over_runner_up": 0.0605,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2831,
+          0.3313,
+          0.1538,
+          0.2318
+        ],
+        "argmax": 1,
+        "top_share": 0.3313,
+        "sigma_over_null": 5.86,
+        "margin_over_runner_up": 0.0482,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2588,
+          0.3054,
+          0.1874,
+          0.2483
+        ],
+        "argmax": 1,
+        "top_share": 0.3054,
+        "sigma_over_null": 4.15,
+        "margin_over_runner_up": 0.0466,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2308,
+          0.2778,
+          0.238,
+          0.2533
+        ],
+        "argmax": 1,
+        "top_share": 0.2778,
+        "sigma_over_null": 2.01,
+        "margin_over_runner_up": 0.0245,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_dd_only_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 674,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_dd_only_r2@j7x_dd_only_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.2858,
+    "mean_sigma_over_null": 2.65,
+    "min_margin_over_runner_up": 0.0144,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.194,
+          0.2939,
+          0.2325,
+          0.2795
+        ],
+        "argmax": 1,
+        "top_share": 0.2939,
+        "sigma_over_null": 3.27,
+        "margin_over_runner_up": 0.0144,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2478,
+          0.2468,
+          0.2249,
+          0.2806
+        ],
+        "argmax": 3,
+        "top_share": 0.2806,
+        "sigma_over_null": 2.24,
+        "margin_over_runner_up": 0.0328,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2253,
+          0.3007,
+          0.2498,
+          0.2243
+        ],
+        "argmax": 1,
+        "top_share": 0.3007,
+        "sigma_over_null": 3.74,
+        "margin_over_runner_up": 0.0509,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2391,
+          0.2682,
+          0.2468,
+          0.2459
+        ],
+        "argmax": 1,
+        "top_share": 0.2682,
+        "sigma_over_null": 1.35,
+        "margin_over_runner_up": 0.0214,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_dd_only_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 667,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_dd_only_r3@j7x_dd_only_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3599,
+    "mean_sigma_over_null": 8.1,
+    "min_margin_over_runner_up": 0.0021,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3801,
+          0.1575,
+          0.3109,
+          0.1515
+        ],
+        "argmax": 0,
+        "top_share": 0.3801,
+        "sigma_over_null": 9.49,
+        "margin_over_runner_up": 0.0692,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3456,
+          0.1826,
+          0.3044,
+          0.1674
+        ],
+        "argmax": 0,
+        "top_share": 0.3456,
+        "sigma_over_null": 7.38,
+        "margin_over_runner_up": 0.0412,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.365,
+          0.1445,
+          0.3629,
+          0.1276
+        ],
+        "argmax": 0,
+        "top_share": 0.365,
+        "sigma_over_null": 8.18,
+        "margin_over_runner_up": 0.0021,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.3491,
+          0.1489,
+          0.3443,
+          0.1576
+        ],
+        "argmax": 0,
+        "top_share": 0.3491,
+        "sigma_over_null": 7.36,
+        "margin_over_runner_up": 0.0048,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_dd_only_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 664,
+    "match": 0,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_dd_only_r4@j7x_dd_only_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.311,
+    "mean_sigma_over_null": 4.52,
+    "min_margin_over_runner_up": 0.0131,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2952,
+          0.3082,
+          0.1908,
+          0.2058
+        ],
+        "argmax": 1,
+        "top_share": 0.3082,
+        "sigma_over_null": 4.24,
+        "margin_over_runner_up": 0.0131,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2757,
+          0.3247,
+          0.1878,
+          0.2118
+        ],
+        "argmax": 1,
+        "top_share": 0.3247,
+        "sigma_over_null": 5.67,
+        "margin_over_runner_up": 0.049,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2727,
+          0.337,
+          0.1759,
+          0.2144
+        ],
+        "argmax": 1,
+        "top_share": 0.337,
+        "sigma_over_null": 6.39,
+        "margin_over_runner_up": 0.0642,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2483,
+          0.2592,
+          0.2185,
+          0.2741
+        ],
+        "argmax": 3,
+        "top_share": 0.2741,
+        "sigma_over_null": 1.76,
+        "margin_over_runner_up": 0.0149,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_dd_only_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 677,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j7x_dd_only_r5@j7x_dd_only_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3013,
+    "mean_sigma_over_null": 3.79,
+    "min_margin_over_runner_up": 0.0195,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.25,
+          0.3102,
+          0.1978,
+          0.242
+        ],
+        "argmax": 1,
+        "top_share": 0.3102,
+        "sigma_over_null": 4.39,
+        "margin_over_runner_up": 0.0602,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2466,
+          0.3071,
+          0.2006,
+          0.2457
+        ],
+        "argmax": 1,
+        "top_share": 0.3071,
+        "sigma_over_null": 4.26,
+        "margin_over_runner_up": 0.0605,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2418,
+          0.3104,
+          0.1925,
+          0.2553
+        ],
+        "argmax": 1,
+        "top_share": 0.3104,
+        "sigma_over_null": 4.49,
+        "margin_over_runner_up": 0.0551,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2383,
+          0.2773,
+          0.2266,
+          0.2578
+        ],
+        "argmax": 1,
+        "top_share": 0.2773,
+        "sigma_over_null": 2.02,
+        "margin_over_runner_up": 0.0195,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j7x_dd_only_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 670,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_fura2_trexonly_r1@j14_fura2_trexonly_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3619,
+    "mean_sigma_over_null": 7.98,
+    "min_margin_over_runner_up": 0.0069,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2745,
+          0.3415,
+          0.1862,
+          0.1978
+        ],
+        "argmax": 1,
+        "top_share": 0.3415,
+        "sigma_over_null": 8.08,
+        "margin_over_runner_up": 0.0671,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2594,
+          0.3557,
+          0.1085,
+          0.2764
+        ],
+        "argmax": 1,
+        "top_share": 0.3557,
+        "sigma_over_null": 7.94,
+        "margin_over_runner_up": 0.0792,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.3237,
+          0.3168,
+          0.1815,
+          0.178
+        ],
+        "argmax": 0,
+        "top_share": 0.3237,
+        "sigma_over_null": 5.01,
+        "margin_over_runner_up": 0.0069,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.4268,
+          0.4056,
+          0.0662,
+          0.1014
+        ],
+        "argmax": 0,
+        "top_share": 0.4268,
+        "sigma_over_null": 10.88,
+        "margin_over_runner_up": 0.0211,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_fura2_trexonly_r1",
+    "backend": "ibm_marrakesh",
+    "cx": 662,
+    "match": 1,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j14_fura2_trexonly_r2@j14_fura2_trexonly_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3919,
+    "mean_sigma_over_null": 10.18,
+    "min_margin_over_runner_up": 0.0,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.3276,
+          0.3678,
+          0.1349,
+          0.1697
+        ],
+        "argmax": 1,
+        "top_share": 0.3678,
+        "sigma_over_null": 10.6,
+        "margin_over_runner_up": 0.0401,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2785,
+          0.417,
+          0.1021,
+          0.2024
+        ],
+        "argmax": 1,
+        "top_share": 0.417,
+        "sigma_over_null": 13.11,
+        "margin_over_runner_up": 0.1384,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.3499,
+          0.3499,
+          0.1283,
+          0.1719
+        ],
+        "argmax": 0,
+        "top_share": 0.3499,
+        "sigma_over_null": 6.54,
+        "margin_over_runner_up": 0.0,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.4327,
+          0.3955,
+          0.0729,
+          0.0989
+        ],
+        "argmax": 0,
+        "top_share": 0.4327,
+        "sigma_over_null": 10.48,
+        "margin_over_runner_up": 0.0373,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_fura2_trexonly_r2",
+    "backend": "ibm_marrakesh",
+    "cx": 645,
+    "match": 0,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j14_fura2_trexonly_r3@j14_fura2_trexonly_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3366,
+    "mean_sigma_over_null": 5.44,
+    "min_margin_over_runner_up": 0.0058,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2225,
+          0.2561,
+          0.2306,
+          0.2908
+        ],
+        "argmax": 3,
+        "top_share": 0.2908,
+        "sigma_over_null": 4.05,
+        "margin_over_runner_up": 0.0347,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2015,
+          0.2957,
+          0.1446,
+          0.3582
+        ],
+        "argmax": 3,
+        "top_share": 0.3582,
+        "sigma_over_null": 7.55,
+        "margin_over_runner_up": 0.0624,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.265,
+          0.2581,
+          0.2592,
+          0.2177
+        ],
+        "argmax": 0,
+        "top_share": 0.265,
+        "sigma_over_null": 1.02,
+        "margin_over_runner_up": 0.0058,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.4322,
+          0.375,
+          0.0826,
+          0.1102
+        ],
+        "argmax": 0,
+        "top_share": 0.4322,
+        "sigma_over_null": 9.14,
+        "margin_over_runner_up": 0.0572,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_fura2_trexonly_r3",
+    "backend": "ibm_marrakesh",
+    "cx": 654,
+    "match": 1,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j14_fura2_trexonly_r4@j14_fura2_trexonly_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3221,
+    "mean_sigma_over_null": 4.61,
+    "min_margin_over_runner_up": 0.01,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2382,
+          0.2648,
+          0.2222,
+          0.2748
+        ],
+        "argmax": 3,
+        "top_share": 0.2748,
+        "sigma_over_null": 2.36,
+        "margin_over_runner_up": 0.01,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2105,
+          0.2857,
+          0.1609,
+          0.3429
+        ],
+        "argmax": 3,
+        "top_share": 0.3429,
+        "sigma_over_null": 5.53,
+        "margin_over_runner_up": 0.0571,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2715,
+          0.3033,
+          0.198,
+          0.2272
+        ],
+        "argmax": 1,
+        "top_share": 0.3033,
+        "sigma_over_null": 4.26,
+        "margin_over_runner_up": 0.0317,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.3524,
+          0.3672,
+          0.1218,
+          0.1587
+        ],
+        "argmax": 1,
+        "top_share": 0.3672,
+        "sigma_over_null": 6.3,
+        "margin_over_runner_up": 0.0148,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_fura2_trexonly_r4",
+    "backend": "ibm_marrakesh",
+    "cx": 645,
+    "match": 0,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j14_fura2_trexonly_r5@j14_fura2_trexonly_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3375,
+    "mean_sigma_over_null": 5.86,
+    "min_margin_over_runner_up": 0.0221,
+    "constant_readout_baseline": "2/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2054,
+          0.281,
+          0.2105,
+          0.3031
+        ],
+        "argmax": 3,
+        "top_share": 0.3031,
+        "sigma_over_null": 4.88,
+        "margin_over_runner_up": 0.0221,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2173,
+          0.3093,
+          0.1386,
+          0.3348
+        ],
+        "argmax": 3,
+        "top_share": 0.3348,
+        "sigma_over_null": 5.88,
+        "margin_over_runner_up": 0.0255,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 2,
+        "divzero": false,
+        "histogram": [
+          0.2479,
+          0.3106,
+          0.2021,
+          0.2395
+        ],
+        "argmax": 1,
+        "top_share": 0.3106,
+        "sigma_over_null": 4.57,
+        "margin_over_runner_up": 0.0627,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": 0,
+        "divzero": false,
+        "histogram": [
+          0.355,
+          0.4015,
+          0.0948,
+          0.1487
+        ],
+        "argmax": 1,
+        "top_share": 0.4015,
+        "sigma_over_null": 8.11,
+        "margin_over_runner_up": 0.0465,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_fura2_trexonly_r5",
+    "backend": "ibm_marrakesh",
+    "cx": 659,
+    "match": 0,
+    "dataset": "fura2",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_n2_trexonly_r1@j14_canonical_n2_trexonly_r1_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3735,
+    "mean_sigma_over_null": 8.93,
+    "min_margin_over_runner_up": 0.0365,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2738,
+          0.3791,
+          0.1388,
+          0.2083
+        ],
+        "argmax": 1,
+        "top_share": 0.3791,
+        "sigma_over_null": 13.44,
+        "margin_over_runner_up": 0.1054,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2791,
+          0.3429,
+          0.1475,
+          0.2306
+        ],
+        "argmax": 1,
+        "top_share": 0.3429,
+        "sigma_over_null": 8.32,
+        "margin_over_runner_up": 0.0638,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2757,
+          0.387,
+          0.1425,
+          0.1948
+        ],
+        "argmax": 1,
+        "top_share": 0.387,
+        "sigma_over_null": 12.29,
+        "margin_over_runner_up": 0.1113,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2608,
+          0.3882,
+          0.1392,
+          0.2118
+        ],
+        "argmax": 1,
+        "top_share": 0.3882,
+        "sigma_over_null": 10.2,
+        "margin_over_runner_up": 0.1275,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2811,
+          0.3584,
+          0.1464,
+          0.2141
+        ],
+        "argmax": 1,
+        "top_share": 0.3584,
+        "sigma_over_null": 9.57,
+        "margin_over_runner_up": 0.0773,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2452,
+          0.3828,
+          0.1386,
+          0.2335
+        ],
+        "argmax": 1,
+        "top_share": 0.3828,
+        "sigma_over_null": 9.85,
+        "margin_over_runner_up": 0.1376,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2777,
+          0.3759,
+          0.1482,
+          0.1982
+        ],
+        "argmax": 1,
+        "top_share": 0.3759,
+        "sigma_over_null": 9.73,
+        "margin_over_runner_up": 0.0982,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2868,
+          0.3723,
+          0.1459,
+          0.195
+        ],
+        "argmax": 1,
+        "top_share": 0.3723,
+        "sigma_over_null": 7.97,
+        "margin_over_runner_up": 0.0855,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2812,
+          0.3785,
+          0.1519,
+          0.1884
+        ],
+        "argmax": 1,
+        "top_share": 0.3785,
+        "sigma_over_null": 10.07,
+        "margin_over_runner_up": 0.0972,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2583,
+          0.3669,
+          0.1349,
+          0.24
+        ],
+        "argmax": 1,
+        "top_share": 0.3669,
+        "sigma_over_null": 7.98,
+        "margin_over_runner_up": 0.1086,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2753,
+          0.3299,
+          0.1779,
+          0.2169
+        ],
+        "argmax": 1,
+        "top_share": 0.3299,
+        "sigma_over_null": 5.12,
+        "margin_over_runner_up": 0.0545,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.298,
+          0.3411,
+          0.1472,
+          0.2136
+        ],
+        "argmax": 1,
+        "top_share": 0.3411,
+        "sigma_over_null": 4.97,
+        "margin_over_runner_up": 0.0431,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2919,
+          0.4075,
+          0.1317,
+          0.1689
+        ],
+        "argmax": 1,
+        "top_share": 0.4075,
+        "sigma_over_null": 10.32,
+        "margin_over_runner_up": 0.1155,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2865,
+          0.3834,
+          0.1269,
+          0.2033
+        ],
+        "argmax": 1,
+        "top_share": 0.3834,
+        "sigma_over_null": 8.34,
+        "margin_over_runner_up": 0.0969,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2948,
+          0.4138,
+          0.1276,
+          0.1638
+        ],
+        "argmax": 1,
+        "top_share": 0.4138,
+        "sigma_over_null": 9.11,
+        "margin_over_runner_up": 0.119,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3311,
+          0.3676,
+          0.1416,
+          0.1598
+        ],
+        "argmax": 1,
+        "top_share": 0.3676,
+        "sigma_over_null": 5.68,
+        "margin_over_runner_up": 0.0365,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_canonical_n2_trexonly_r1",
+    "backend": "ibm_kingston",
+    "cx": 1291,
+    "match": 10,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_n2_trexonly_r2@j14_canonical_n2_trexonly_r2_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3414,
+    "mean_sigma_over_null": 6.63,
+    "min_margin_over_runner_up": 0.0089,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2865,
+          0.345,
+          0.1491,
+          0.2193
+        ],
+        "argmax": 1,
+        "top_share": 0.345,
+        "sigma_over_null": 9.73,
+        "margin_over_runner_up": 0.0585,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2774,
+          0.3552,
+          0.1635,
+          0.2039
+        ],
+        "argmax": 1,
+        "top_share": 0.3552,
+        "sigma_over_null": 9.05,
+        "margin_over_runner_up": 0.0778,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2727,
+          0.3394,
+          0.1789,
+          0.2089
+        ],
+        "argmax": 1,
+        "top_share": 0.3394,
+        "sigma_over_null": 7.63,
+        "margin_over_runner_up": 0.0667,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.289,
+          0.3126,
+          0.1854,
+          0.213
+        ],
+        "argmax": 1,
+        "top_share": 0.3126,
+        "sigma_over_null": 4.61,
+        "margin_over_runner_up": 0.0237,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2827,
+          0.3394,
+          0.1497,
+          0.2283
+        ],
+        "argmax": 1,
+        "top_share": 0.3394,
+        "sigma_over_null": 7.51,
+        "margin_over_runner_up": 0.0567,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2866,
+          0.3431,
+          0.1413,
+          0.2291
+        ],
+        "argmax": 1,
+        "top_share": 0.3431,
+        "sigma_over_null": 6.77,
+        "margin_over_runner_up": 0.0565,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2981,
+          0.2892,
+          0.1802,
+          0.2325
+        ],
+        "argmax": 0,
+        "top_share": 0.2981,
+        "sigma_over_null": 3.33,
+        "margin_over_runner_up": 0.0089,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2965,
+          0.3199,
+          0.1424,
+          0.2412
+        ],
+        "argmax": 1,
+        "top_share": 0.3199,
+        "sigma_over_null": 3.95,
+        "margin_over_runner_up": 0.0235,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2788,
+          0.3495,
+          0.1444,
+          0.2273
+        ],
+        "argmax": 1,
+        "top_share": 0.3495,
+        "sigma_over_null": 8.6,
+        "margin_over_runner_up": 0.0708,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2726,
+          0.3517,
+          0.1686,
+          0.2071
+        ],
+        "argmax": 1,
+        "top_share": 0.3517,
+        "sigma_over_null": 7.28,
+        "margin_over_runner_up": 0.0791,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2815,
+          0.3171,
+          0.1494,
+          0.252
+        ],
+        "argmax": 1,
+        "top_share": 0.3171,
+        "sigma_over_null": 4.86,
+        "margin_over_runner_up": 0.0356,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2596,
+          0.3709,
+          0.1662,
+          0.2033
+        ],
+        "argmax": 1,
+        "top_share": 0.3709,
+        "sigma_over_null": 7.25,
+        "margin_over_runner_up": 0.1113,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2947,
+          0.3565,
+          0.1527,
+          0.1961
+        ],
+        "argmax": 1,
+        "top_share": 0.3565,
+        "sigma_over_null": 7.91,
+        "margin_over_runner_up": 0.0618,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2665,
+          0.3698,
+          0.1542,
+          0.2096
+        ],
+        "argmax": 1,
+        "top_share": 0.3698,
+        "sigma_over_null": 7.15,
+        "margin_over_runner_up": 0.1033,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2941,
+          0.3406,
+          0.1486,
+          0.2167
+        ],
+        "argmax": 1,
+        "top_share": 0.3406,
+        "sigma_over_null": 5.32,
+        "margin_over_runner_up": 0.0464,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3088,
+          0.3529,
+          0.1408,
+          0.1975
+        ],
+        "argmax": 1,
+        "top_share": 0.3529,
+        "sigma_over_null": 5.19,
+        "margin_over_runner_up": 0.0441,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_canonical_n2_trexonly_r2",
+    "backend": "ibm_kingston",
+    "cx": 1331,
+    "match": 12,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_n2_trexonly_r3@j14_canonical_n2_trexonly_r3_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.367,
+    "mean_sigma_over_null": 8.46,
+    "min_margin_over_runner_up": 0.0285,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.255,
+          0.3952,
+          0.1438,
+          0.206
+        ],
+        "argmax": 1,
+        "top_share": 0.3952,
+        "sigma_over_null": 13.64,
+        "margin_over_runner_up": 0.1402,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.274,
+          0.35,
+          0.1374,
+          0.2387
+        ],
+        "argmax": 1,
+        "top_share": 0.35,
+        "sigma_over_null": 8.33,
+        "margin_over_runner_up": 0.076,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2829,
+          0.3597,
+          0.1437,
+          0.2137
+        ],
+        "argmax": 1,
+        "top_share": 0.3597,
+        "sigma_over_null": 9.14,
+        "margin_over_runner_up": 0.0769,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2586,
+          0.4004,
+          0.1372,
+          0.2039
+        ],
+        "argmax": 1,
+        "top_share": 0.4004,
+        "sigma_over_null": 11.41,
+        "margin_over_runner_up": 0.1418,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2816,
+          0.3523,
+          0.1384,
+          0.2277
+        ],
+        "argmax": 1,
+        "top_share": 0.3523,
+        "sigma_over_null": 7.54,
+        "margin_over_runner_up": 0.0707,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2488,
+          0.324,
+          0.1638,
+          0.2633
+        ],
+        "argmax": 1,
+        "top_share": 0.324,
+        "sigma_over_null": 4.91,
+        "margin_over_runner_up": 0.0607,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2714,
+          0.3558,
+          0.1224,
+          0.2504
+        ],
+        "argmax": 1,
+        "top_share": 0.3558,
+        "sigma_over_null": 6.52,
+        "margin_over_runner_up": 0.0844,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2704,
+          0.3456,
+          0.144,
+          0.24
+        ],
+        "argmax": 1,
+        "top_share": 0.3456,
+        "sigma_over_null": 5.52,
+        "margin_over_runner_up": 0.0752,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2817,
+          0.3489,
+          0.1319,
+          0.2375
+        ],
+        "argmax": 1,
+        "top_share": 0.3489,
+        "sigma_over_null": 9.03,
+        "margin_over_runner_up": 0.0672,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2286,
+          0.3149,
+          0.17,
+          0.2864
+        ],
+        "argmax": 1,
+        "top_share": 0.3149,
+        "sigma_over_null": 5.18,
+        "margin_over_runner_up": 0.0285,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2434,
+          0.3388,
+          0.149,
+          0.2688
+        ],
+        "argmax": 1,
+        "top_share": 0.3388,
+        "sigma_over_null": 6.8,
+        "margin_over_runner_up": 0.0699,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2679,
+          0.3888,
+          0.146,
+          0.1973
+        ],
+        "argmax": 1,
+        "top_share": 0.3888,
+        "sigma_over_null": 10.31,
+        "margin_over_runner_up": 0.1209,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2932,
+          0.3845,
+          0.1275,
+          0.1948
+        ],
+        "argmax": 1,
+        "top_share": 0.3845,
+        "sigma_over_null": 9.81,
+        "margin_over_runner_up": 0.0914,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.278,
+          0.3638,
+          0.1411,
+          0.2172
+        ],
+        "argmax": 1,
+        "top_share": 0.3638,
+        "sigma_over_null": 7.06,
+        "margin_over_runner_up": 0.0858,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.296,
+          0.408,
+          0.1457,
+          0.1503
+        ],
+        "argmax": 1,
+        "top_share": 0.408,
+        "sigma_over_null": 9.32,
+        "margin_over_runner_up": 0.112,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3041,
+          0.4413,
+          0.1025,
+          0.1521
+        ],
+        "argmax": 1,
+        "top_share": 0.4413,
+        "sigma_over_null": 10.87,
+        "margin_over_runner_up": 0.1372,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_canonical_n2_trexonly_r3",
+    "backend": "ibm_kingston",
+    "cx": 1235,
+    "match": 12,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_n2_trexonly_r4@j14_canonical_n2_trexonly_r4_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3653,
+    "mean_sigma_over_null": 8.25,
+    "min_margin_over_runner_up": 0.0536,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2581,
+          0.3651,
+          0.1628,
+          0.214
+        ],
+        "argmax": 1,
+        "top_share": 0.3651,
+        "sigma_over_null": 12.27,
+        "margin_over_runner_up": 0.107,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2758,
+          0.3531,
+          0.1566,
+          0.2145
+        ],
+        "argmax": 1,
+        "top_share": 0.3531,
+        "sigma_over_null": 9.22,
+        "margin_over_runner_up": 0.0773,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2505,
+          0.3842,
+          0.1663,
+          0.199
+        ],
+        "argmax": 1,
+        "top_share": 0.3842,
+        "sigma_over_null": 12.14,
+        "margin_over_runner_up": 0.1337,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.253,
+          0.3745,
+          0.1596,
+          0.2129
+        ],
+        "argmax": 1,
+        "top_share": 0.3745,
+        "sigma_over_null": 9.07,
+        "margin_over_runner_up": 0.1215,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.272,
+          0.3565,
+          0.1457,
+          0.2257
+        ],
+        "argmax": 1,
+        "top_share": 0.3565,
+        "sigma_over_null": 9.0,
+        "margin_over_runner_up": 0.0845,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2307,
+          0.3401,
+          0.1427,
+          0.2865
+        ],
+        "argmax": 1,
+        "top_share": 0.3401,
+        "sigma_over_null": 6.35,
+        "margin_over_runner_up": 0.0536,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2575,
+          0.3643,
+          0.1432,
+          0.235
+        ],
+        "argmax": 1,
+        "top_share": 0.3643,
+        "sigma_over_null": 8.08,
+        "margin_over_runner_up": 0.1068,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2265,
+          0.3652,
+          0.1602,
+          0.2481
+        ],
+        "argmax": 1,
+        "top_share": 0.3652,
+        "sigma_over_null": 6.78,
+        "margin_over_runner_up": 0.1171,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2744,
+          0.3617,
+          0.1605,
+          0.2034
+        ],
+        "argmax": 1,
+        "top_share": 0.3617,
+        "sigma_over_null": 9.48,
+        "margin_over_runner_up": 0.0873,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2511,
+          0.3433,
+          0.1491,
+          0.2564
+        ],
+        "argmax": 1,
+        "top_share": 0.3433,
+        "sigma_over_null": 6.58,
+        "margin_over_runner_up": 0.0869,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2596,
+          0.3413,
+          0.1437,
+          0.2554
+        ],
+        "argmax": 1,
+        "top_share": 0.3413,
+        "sigma_over_null": 6.55,
+        "margin_over_runner_up": 0.0817,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2635,
+          0.3713,
+          0.1479,
+          0.2173
+        ],
+        "argmax": 1,
+        "top_share": 0.3713,
+        "sigma_over_null": 7.14,
+        "margin_over_runner_up": 0.1079,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2509,
+          0.3681,
+          0.143,
+          0.238
+        ],
+        "argmax": 1,
+        "top_share": 0.3681,
+        "sigma_over_null": 7.97,
+        "margin_over_runner_up": 0.1172,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2463,
+          0.3817,
+          0.1501,
+          0.2219
+        ],
+        "argmax": 1,
+        "top_share": 0.3817,
+        "sigma_over_null": 7.53,
+        "margin_over_runner_up": 0.1354,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2942,
+          0.3698,
+          0.127,
+          0.209
+        ],
+        "argmax": 1,
+        "top_share": 0.3698,
+        "sigma_over_null": 6.9,
+        "margin_over_runner_up": 0.0756,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2447,
+          0.4053,
+          0.1605,
+          0.1895
+        ],
+        "argmax": 1,
+        "top_share": 0.4053,
+        "sigma_over_null": 6.99,
+        "margin_over_runner_up": 0.1605,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_canonical_n2_trexonly_r4",
+    "backend": "ibm_kingston",
+    "cx": 1284,
+    "match": 12,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_n2_trexonly_r5@j14_canonical_n2_trexonly_r5_hw": {
+    "n_vals": 4,
+    "null_share": 0.25,
+    "mean_top_share": 0.3486,
+    "mean_sigma_over_null": 7.18,
+    "min_margin_over_runner_up": 0.011,
+    "constant_readout_baseline": "12/16",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2625,
+          0.3496,
+          0.1664,
+          0.2215
+        ],
+        "argmax": 1,
+        "top_share": 0.3496,
+        "sigma_over_null": 10.77,
+        "margin_over_runner_up": 0.0871,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2594,
+          0.3426,
+          0.1727,
+          0.2253
+        ],
+        "argmax": 1,
+        "top_share": 0.3426,
+        "sigma_over_null": 8.9,
+        "margin_over_runner_up": 0.0832,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2713,
+          0.3544,
+          0.1703,
+          0.204
+        ],
+        "argmax": 1,
+        "top_share": 0.3544,
+        "sigma_over_null": 9.2,
+        "margin_over_runner_up": 0.0831,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2727,
+          0.3373,
+          0.1727,
+          0.2173
+        ],
+        "argmax": 1,
+        "top_share": 0.3373,
+        "sigma_over_null": 6.68,
+        "margin_over_runner_up": 0.0645,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.303,
+          0.3384,
+          0.1333,
+          0.2253
+        ],
+        "argmax": 1,
+        "top_share": 0.3384,
+        "sigma_over_null": 6.42,
+        "margin_over_runner_up": 0.0354,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2734,
+          0.3341,
+          0.1671,
+          0.2255
+        ],
+        "argmax": 1,
+        "top_share": 0.3341,
+        "sigma_over_null": 5.68,
+        "margin_over_runner_up": 0.0607,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2593,
+          0.3501,
+          0.1686,
+          0.222
+        ],
+        "argmax": 1,
+        "top_share": 0.3501,
+        "sigma_over_null": 5.74,
+        "margin_over_runner_up": 0.0908,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2907,
+          0.3293,
+          0.1809,
+          0.1992
+        ],
+        "argmax": 1,
+        "top_share": 0.3293,
+        "sigma_over_null": 4.06,
+        "margin_over_runner_up": 0.0386,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2495,
+          0.3647,
+          0.1484,
+          0.2374
+        ],
+        "argmax": 1,
+        "top_share": 0.3647,
+        "sigma_over_null": 10.47,
+        "margin_over_runner_up": 0.1152,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          2,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2633,
+          0.3661,
+          0.1365,
+          0.2341
+        ],
+        "argmax": 1,
+        "top_share": 0.3661,
+        "sigma_over_null": 9.79,
+        "margin_over_runner_up": 0.1028,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          2
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2773,
+          0.3599,
+          0.1573,
+          0.2055
+        ],
+        "argmax": 1,
+        "top_share": 0.3599,
+        "sigma_over_null": 8.09,
+        "margin_over_runner_up": 0.0826,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          2,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2895,
+          0.3715,
+          0.1411,
+          0.1978
+        ],
+        "argmax": 1,
+        "top_share": 0.3715,
+        "sigma_over_null": 8.08,
+        "margin_over_runner_up": 0.082,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2813,
+          0.3643,
+          0.1574,
+          0.197
+        ],
+        "argmax": 1,
+        "top_share": 0.3643,
+        "sigma_over_null": 7.5,
+        "margin_over_runner_up": 0.083,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          1
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2764,
+          0.3724,
+          0.1626,
+          0.1886
+        ],
+        "argmax": 1,
+        "top_share": 0.3724,
+        "sigma_over_null": 7.01,
+        "margin_over_runner_up": 0.0959,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          3,
+          2
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3136,
+          0.3026,
+          0.1798,
+          0.2039
+        ],
+        "argmax": 0,
+        "top_share": 0.3136,
+        "sigma_over_null": 3.14,
+        "margin_over_runner_up": 0.011,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          3,
+          3
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.3049,
+          0.3293,
+          0.1768,
+          0.189
+        ],
+        "argmax": 1,
+        "top_share": 0.3293,
+        "sigma_over_null": 3.32,
+        "margin_over_runner_up": 0.0244,
+        "argmax_is_true": true
+      }
+    ],
+    "label": "j14_canonical_n2_trexonly_r5",
+    "backend": "ibm_kingston",
+    "cx": 1364,
+    "match": 11,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_q3_trexonly_r1@j14_canonical_q3_trexonly_r1_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.2338,
+    "mean_sigma_over_null": 10.29,
+    "min_margin_over_runner_up": 0.0541,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1613,
+          0.2631,
+          0.1018,
+          0.1279,
+          0.0806,
+          0.124,
+          0.0601,
+          0.0812
+        ],
+        "argmax": 1,
+        "top_share": 0.2631,
+        "sigma_over_null": 17.7,
+        "margin_over_runner_up": 0.1018,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.154,
+          0.2097,
+          0.0835,
+          0.1286,
+          0.1048,
+          0.1441,
+          0.0672,
+          0.1081
+        ],
+        "argmax": 1,
+        "top_share": 0.2097,
+        "sigma_over_null": 8.95,
+        "margin_over_runner_up": 0.0557,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1159,
+          0.2087,
+          0.0881,
+          0.1329,
+          0.1005,
+          0.1546,
+          0.0757,
+          0.1236
+        ],
+        "argmax": 1,
+        "top_share": 0.2087,
+        "sigma_over_null": 6.43,
+        "margin_over_runner_up": 0.0541,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1442,
+          0.2535,
+          0.0558,
+          0.1209,
+          0.1023,
+          0.1558,
+          0.0605,
+          0.107
+        ],
+        "argmax": 1,
+        "top_share": 0.2535,
+        "sigma_over_null": 8.06,
+        "margin_over_runner_up": 0.0977,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_canonical_q3_trexonly_r1",
+    "backend": "ibm_kingston",
+    "cx": 1145,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_q3_trexonly_r2@j14_canonical_q3_trexonly_r2_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.2479,
+    "mean_sigma_over_null": 12.05,
+    "min_margin_over_runner_up": 0.0657,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1945,
+          0.2939,
+          0.1038,
+          0.1567,
+          0.0629,
+          0.0906,
+          0.0472,
+          0.0503
+        ],
+        "argmax": 1,
+        "top_share": 0.2939,
+        "sigma_over_null": 20.36,
+        "margin_over_runner_up": 0.0994,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1447,
+          0.2219,
+          0.0947,
+          0.1474,
+          0.1,
+          0.136,
+          0.0518,
+          0.1035
+        ],
+        "argmax": 1,
+        "top_share": 0.2219,
+        "sigma_over_null": 9.9,
+        "margin_over_runner_up": 0.0746,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1407,
+          0.251,
+          0.0963,
+          0.1356,
+          0.076,
+          0.1381,
+          0.0697,
+          0.0925
+        ],
+        "argmax": 1,
+        "top_share": 0.251,
+        "sigma_over_null": 10.7,
+        "margin_over_runner_up": 0.1103,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1592,
+          0.2249,
+          0.0779,
+          0.1453,
+          0.0727,
+          0.1453,
+          0.0675,
+          0.1073
+        ],
+        "argmax": 1,
+        "top_share": 0.2249,
+        "sigma_over_null": 7.26,
+        "margin_over_runner_up": 0.0657,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_canonical_q3_trexonly_r2",
+    "backend": "ibm_kingston",
+    "cx": 1192,
+    "match": 1,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_q3_trexonly_r3@j14_canonical_q3_trexonly_r3_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.2077,
+    "mean_sigma_over_null": 8.6,
+    "min_margin_over_runner_up": 0.0126,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2202,
+          0.279,
+          0.1044,
+          0.1392,
+          0.0587,
+          0.0756,
+          0.0468,
+          0.0761
+        ],
+        "argmax": 1,
+        "top_share": 0.279,
+        "sigma_over_null": 19.96,
+        "margin_over_runner_up": 0.0587,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1534,
+          0.1834,
+          0.1023,
+          0.1614,
+          0.0873,
+          0.1076,
+          0.0855,
+          0.119
+        ],
+        "argmax": 1,
+        "top_share": 0.1834,
+        "sigma_over_null": 5.95,
+        "margin_over_runner_up": 0.022,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1681,
+          0.1877,
+          0.105,
+          0.1751,
+          0.0826,
+          0.0966,
+          0.0812,
+          0.1036
+        ],
+        "argmax": 1,
+        "top_share": 0.1877,
+        "sigma_over_null": 5.06,
+        "margin_over_runner_up": 0.0126,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1663,
+          0.1809,
+          0.1076,
+          0.1198,
+          0.0856,
+          0.0954,
+          0.0831,
+          0.1614
+        ],
+        "argmax": 1,
+        "top_share": 0.1809,
+        "sigma_over_null": 3.42,
+        "margin_over_runner_up": 0.0147,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_canonical_q3_trexonly_r3",
+    "backend": "ibm_kingston",
+    "cx": 1081,
+    "match": 4,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_q3_trexonly_r4@j14_canonical_q3_trexonly_r4_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.2367,
+    "mean_sigma_over_null": 10.93,
+    "min_margin_over_runner_up": 0.0209,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.2287,
+          0.2659,
+          0.0882,
+          0.1075,
+          0.0925,
+          0.1104,
+          0.0523,
+          0.0545
+        ],
+        "argmax": 1,
+        "top_share": 0.2659,
+        "sigma_over_null": 15.92,
+        "margin_over_runner_up": 0.0373,
+        "argmax_is_true": true
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1729,
+          0.232,
+          0.0965,
+          0.0892,
+          0.1356,
+          0.1347,
+          0.0573,
+          0.0819
+        ],
+        "argmax": 1,
+        "top_share": 0.232,
+        "sigma_over_null": 10.73,
+        "margin_over_runner_up": 0.0591,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1772,
+          0.2342,
+          0.072,
+          0.1063,
+          0.1128,
+          0.1622,
+          0.0623,
+          0.073
+        ],
+        "argmax": 1,
+        "top_share": 0.2342,
+        "sigma_over_null": 10.07,
+        "margin_over_runner_up": 0.0569,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.2146,
+          0.1937,
+          0.0671,
+          0.0909,
+          0.1311,
+          0.1639,
+          0.0641,
+          0.0745
+        ],
+        "argmax": 0,
+        "top_share": 0.2146,
+        "sigma_over_null": 7.02,
+        "margin_over_runner_up": 0.0209,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_canonical_q3_trexonly_r4",
+    "backend": "ibm_kingston",
+    "cx": 1205,
+    "match": 1,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  },
+  "j14_canonical_q3_trexonly_r5@j14_canonical_q3_trexonly_r5_hw": {
+    "n_vals": 8,
+    "null_share": 0.125,
+    "mean_top_share": 0.1835,
+    "mean_sigma_over_null": 5.68,
+    "min_margin_over_runner_up": 0.002,
+    "constant_readout_baseline": "3/4",
+    "pixels": [
+      {
+        "pixel": [
+          0,
+          0
+        ],
+        "true": 1,
+        "divzero": false,
+        "histogram": [
+          0.1326,
+          0.1663,
+          0.0771,
+          0.1033,
+          0.13,
+          0.204,
+          0.0816,
+          0.1052
+        ],
+        "argmax": 5,
+        "top_share": 0.204,
+        "sigma_over_null": 9.46,
+        "margin_over_runner_up": 0.0376,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          0,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1073,
+          0.1734,
+          0.1011,
+          0.1527,
+          0.128,
+          0.1589,
+          0.0877,
+          0.0908
+        ],
+        "argmax": 1,
+        "top_share": 0.1734,
+        "sigma_over_null": 4.55,
+        "margin_over_runner_up": 0.0144,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          0
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1067,
+          0.17,
+          0.0988,
+          0.1285,
+          0.1206,
+          0.168,
+          0.08,
+          0.1275
+        ],
+        "argmax": 1,
+        "top_share": 0.17,
+        "sigma_over_null": 4.32,
+        "margin_over_runner_up": 0.002,
+        "argmax_is_true": false
+      },
+      {
+        "pixel": [
+          1,
+          1
+        ],
+        "true": null,
+        "divzero": true,
+        "histogram": [
+          0.1264,
+          0.1374,
+          0.1044,
+          0.1392,
+          0.0989,
+          0.1868,
+          0.0696,
+          0.1374
+        ],
+        "argmax": 5,
+        "top_share": 0.1868,
+        "sigma_over_null": 4.37,
+        "margin_over_runner_up": 0.0476,
+        "argmax_is_true": false
+      }
+    ],
+    "label": "j14_canonical_q3_trexonly_r5",
+    "backend": "ibm_kingston",
+    "cx": 1179,
+    "match": 3,
+    "dataset": "canonical",
+    "divider": "nonrestoring"
+  }
+}

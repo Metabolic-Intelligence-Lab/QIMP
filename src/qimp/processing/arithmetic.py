@@ -52,6 +52,9 @@ __all__ = [
     "q_add_sub_ctrl_inv",
     "q_div",
     "q_div_general",
+    "q_div_lookup",
+    "synth_pixel_map",
+    "q_div_lookup_inv",
     "q_div_nonrestoring",
     "q_div_nonrestoring_inv",
     "q_div_restoring",
@@ -957,3 +960,130 @@ def q_div_nonrestoring_inv(
     for d in divisor_qubits:
         qc.x(d)
     return qc
+
+
+# ---------------------------------------------------------------------------
+# Truth-table-synthesised divider (garbage-free, self-inverse)
+# ---------------------------------------------------------------------------
+
+#: CNOT cost used to rank fixed-polarity Reed-Muller expansions: the number of
+#: CNOTs of an ancilla-free multi-controlled X with ``k`` controls after
+#: transpilation. Only the ranking matters, not the exact values.
+_MCX_RANK_COST = {0: 0, 1: 1, 2: 6, 3: 14, 4: 30, 5: 60, 6: 120}
+
+def _fprm_terms(bits: list[int], nvar: int, polarity: int) -> list[int]:
+    """Fixed-polarity Reed-Muller product terms of a boolean function.
+
+    ``bits[x]`` is the function value on input ``x``; ``polarity`` bit ``i``
+    set means variable ``i`` enters complemented. Returns the monomials as
+    bit masks over the ``nvar`` variables (binary Moebius transform).
+    """
+    size = 1 << nvar
+    v = [bits[x ^ polarity] for x in range(size)]
+    for i in range(nvar):
+        step = 1 << i
+        for x in range(size):
+            if x & step:
+                v[x] ^= v[x ^ step]
+    return [m for m in range(size) if v[m]]
+
+
+def synth_pixel_map(
+    qc: QuantumCircuit,
+    in_qubits: Sequence[int],
+    out_qubits: Sequence[int],
+    table: Sequence[int],
+) -> QuantumCircuit:
+    """Write an arbitrary per-pixel map into fresh output qubits.
+
+    ``|x⟩|0⟩ → |x⟩|table[x]⟩`` where ``x`` is the integer held by
+    ``in_qubits`` (LSB first) and ``table[x]`` the integer written into
+    ``out_qubits`` (LSB first). The inputs are preserved and no ancilla is
+    used, so the circuit is garbage-free and its own inverse.
+
+    Each output bit is emitted as the fixed-polarity Reed-Muller expansion
+    of lowest multi-controlled-X cost, the polarity being chosen by
+    exhaustive search over the ``2^{len(in_qubits)}`` polarities. The
+    construction is generic in the register widths and exact at every
+    width; its cost grows as ``2^{len(in_qubits)}`` in the worst case, so
+    it is a compilation device for narrow registers, not a scalable
+    arithmetic construction.
+
+    This is the synthesis behind :func:`q_div_lookup` and behind the
+    Class-A and Class-C per-pixel maps of
+    :mod:`qimp.processing.ratiometric_circuit`.
+    """
+    nvar = len(in_qubits)
+    if len(table) != (1 << nvar):
+        raise ValueError(f"table must have 2^{nvar} = {1 << nvar} entries, got {len(table)}")
+    for j, out in enumerate(out_qubits):
+        bits = [(v >> j) & 1 for v in table]
+        best: tuple[int, int, list[int]] | None = None
+        for pol in range(1 << nvar):
+            terms = _fprm_terms(bits, nvar, pol)
+            cost = sum(_MCX_RANK_COST.get(bin(m).count("1"), 250) for m in terms)
+            if best is None or cost < best[0]:
+                best = (cost, pol, terms)
+        assert best is not None
+        _, pol, terms = best
+        flip = [in_qubits[i] for i in range(nvar) if (pol >> i) & 1]
+        for w in flip:
+            qc.x(w)
+        for m in terms:
+            ctrl = [in_qubits[i] for i in range(nvar) if (m >> i) & 1]
+            if not ctrl:
+                qc.x(out)
+            elif len(ctrl) == 1:
+                qc.cx(ctrl[0], out)
+            else:
+                qc.mcx(ctrl, out)
+        for w in flip:
+            qc.x(w)
+    return qc
+
+
+def q_div_lookup(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Out-of-place integer divider synthesised from its truth table.
+
+    ``|a⟩|d⟩|0⟩|0⟩ → |a⟩|d⟩|a // d⟩|0⟩`` for ``d > 0`` and
+    ``|a⟩|0⟩|0⟩|0⟩ → |a⟩|0⟩|2^q − 1⟩|1⟩`` (quotient and flag convention of
+    :func:`q_div_nonrestoring`). Both operands are preserved and no ancilla
+    is used, so the circuit is garbage-free and its own inverse.
+
+    A thin wrapper over :func:`synth_pixel_map`. The synthesis is generic
+    in ``q`` and exact at every width; its cost grows as ``2^{2q}``, so it
+    is the cheaper divider only at small widths. At ``q = 2`` it compiles
+    to 48 CNOTs on 7 qubits, against 189 CNOTs on 22 qubits for
+    :func:`q_div_nonrestoring`; the long-division construction takes over
+    at ``q = 4`` (1250 against 445).
+    """
+    q = len(dividend_qubits)
+    if len(divisor_qubits) != q or len(quotient_qubits) != q:
+        raise ValueError("dividend, divisor and quotient registers must have the same width")
+    full = (1 << q) - 1
+    table = []
+    for x in range(1 << (2 * q)):
+        a, d = x & full, x >> q
+        quot, flag = ((a // d), 0) if d else (full, 1)
+        table.append(quot | (flag << q))
+    return synth_pixel_map(
+        qc, list(dividend_qubits) + list(divisor_qubits), list(quotient_qubits) + [div_zero_flag], table
+    )
+
+
+def q_div_lookup_inv(
+    qc: QuantumCircuit,
+    dividend_qubits: Sequence[int],
+    divisor_qubits: Sequence[int],
+    quotient_qubits: Sequence[int],
+    div_zero_flag: int,
+) -> QuantumCircuit:
+    """Inverse of :func:`q_div_lookup`, which is self-inverse."""
+    return q_div_lookup(qc, dividend_qubits, divisor_qubits, quotient_qubits, div_zero_flag)
+

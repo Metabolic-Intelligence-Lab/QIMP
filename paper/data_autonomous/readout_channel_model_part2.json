@@ -1,0 +1,191 @@
+{
+  "ibm_marrakesh": [
+    0.5887592721352921,
+    0.3924358804705646,
+    0.3204590778215144,
+    0.5896700801881485,
+    0.0001
+  ],
+  "ibm_kingston": [
+    0.5273542822339445,
+    0.39035519767758636,
+    0.2983149822954423,
+    0.5124064803449374,
+    0.0001
+  ],
+  "ibm_fez": [
+    0.5997764140796978,
+    0.3810679164702999,
+    0.33478383290295016,
+    0.6390318879279003,
+    0.0001
+  ],
+  "em_balanced 2x2 marrakesh (20)": {
+    "argmax": [
+      44,
+      80
+    ],
+    "flat-field": [
+      50,
+      80
+    ],
+    "EM channel": [
+      43,
+      80
+    ]
+  },
+  "em_Fura-2 2x2 marrakesh (5)": {
+    "argmax": [
+      3,
+      15
+    ],
+    "flat-field": [
+      15,
+      15
+    ],
+    "EM channel": [
+      4,
+      15
+    ]
+  },
+  "em_four-value 2x2 kingston (8)": {
+    "argmax": [
+      19,
+      32
+    ],
+    "flat-field": [
+      32,
+      32
+    ],
+    "EM channel": [
+      16,
+      32
+    ]
+  },
+  "em_four-value 2x2 fez (3)": {
+    "argmax": [
+      3,
+      12
+    ],
+    "flat-field": [
+      5,
+      12
+    ],
+    "EM channel": [
+      3,
+      12
+    ]
+  },
+  "em_4x4 tiled marrakesh (6)": {
+    "argmax": [
+      30,
+      96
+    ],
+    "flat-field": [
+      68,
+      96
+    ],
+    "EM channel": [
+      32,
+      96
+    ]
+  },
+  "em_4x4 random marrakesh (3)": {
+    "argmax": [
+      23,
+      48
+    ],
+    "flat-field": [
+      38,
+      48
+    ],
+    "EM channel": [
+      21,
+      48
+    ]
+  },
+  "em_4x4 tiled fez (3)": {
+    "argmax": [
+      12,
+      48
+    ],
+    "flat-field": [
+      38,
+      48
+    ],
+    "EM channel": [
+      12,
+      48
+    ]
+  },
+  "em_4x4 random kingston (4)": {
+    "argmax": [
+      41,
+      64
+    ],
+    "flat-field": [
+      54,
+      64
+    ],
+    "EM channel": [
+      48,
+      64
+    ]
+  },
+  "em_4x4 Laurdan kingston (6)": {
+    "argmax": [
+      52,
+      72
+    ],
+    "flat-field": [
+      65,
+      72
+    ],
+    "EM channel": [
+      48,
+      72
+    ]
+  },
+  "em_8x8 random kingston (5)": {
+    "argmax": [
+      136,
+      320
+    ],
+    "flat-field": [
+      159,
+      320
+    ],
+    "EM channel": [
+      154,
+      320
+    ]
+  },
+  "em_8x8 Laurdan kingston (3)": {
+    "argmax": [
+      55,
+      105
+    ],
+    "flat-field": [
+      57,
+      105
+    ],
+    "EM channel": [
+      59,
+      105
+    ]
+  },
+  "em_balanced 2x2 restoring marrakesh (5)": {
+    "argmax": [
+      10,
+      20
+    ],
+    "flat-field": [
+      5,
+      20
+    ],
+    "EM channel": [
+      10,
+      20
+    ]
+  }
+}

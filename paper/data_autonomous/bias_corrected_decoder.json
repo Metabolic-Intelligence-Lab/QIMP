@@ -1,0 +1,226 @@
+{
+  "balanced_n1_nonrestoring": {
+    "n_runs": 15,
+    "constant_readout_null": "2/4",
+    "cx_range": [
+      625,
+      679
+    ],
+    "argmax": {
+      "match_mean": 2.267,
+      "match_sd": 0.594,
+      "match_hist": {
+        "2": 12,
+        "3": 2,
+        "4": 1
+      },
+      "runs_above_null": 3,
+      "n_runs": 15,
+      "sign_test_p": 0.9963,
+      "pixel_accuracy": 0.567,
+      "pixels": 60,
+      "separation": 0.083,
+      "separation_sigma": 5.6,
+      "global_bias": 0.1095
+    },
+    "A_flatfield": {
+      "match_mean": 2.533,
+      "match_sd": 0.64,
+      "match_hist": {
+        "1": 1,
+        "2": 5,
+        "3": 9
+      },
+      "runs_above_null": 9,
+      "n_runs": 15,
+      "sign_test_p": 0.3036,
+      "pixel_accuracy": 0.633,
+      "pixels": 60,
+      "separation": 0.083,
+      "separation_sigma": 6.88,
+      "global_bias": -0.0
+    },
+    "B_heldout_offset": {
+      "match_mean": 1.933,
+      "match_sd": 1.335,
+      "match_hist": {
+        "0": 4,
+        "1": 1,
+        "2": 2,
+        "3": 8
+      },
+      "runs_above_null": 8,
+      "n_runs": 15,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.483,
+      "pixels": 60,
+      "separation": 0.083,
+      "separation_sigma": 5.46,
+      "global_bias": -0.0
+    }
+  },
+  "fura2_n1_nonrestoring": {
+    "n_runs": 5,
+    "constant_readout_null": "2/4",
+    "cx_range": [
+      645,
+      662
+    ],
+    "argmax": {
+      "match_mean": 0.6,
+      "match_sd": 0.548,
+      "match_hist": {
+        "0": 2,
+        "1": 3
+      },
+      "runs_above_null": 0,
+      "n_runs": 5,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.2,
+      "pixels": 15
+    },
+    "A_flatfield": {
+      "match_mean": 3.0,
+      "match_sd": 0.0,
+      "match_hist": {
+        "3": 5
+      },
+      "runs_above_null": 5,
+      "n_runs": 5,
+      "sign_test_p": 0.0312,
+      "pixel_accuracy": 1.0,
+      "pixels": 15
+    },
+    "B_heldout_offset": {
+      "match_mean": 2.0,
+      "match_sd": 1.0,
+      "match_hist": {
+        "1": 2,
+        "2": 1,
+        "3": 2
+      },
+      "runs_above_null": 2,
+      "n_runs": 5,
+      "sign_test_p": 0.8125,
+      "pixel_accuracy": 0.667,
+      "pixels": 15
+    }
+  },
+  "balanced_n2_nonrestoring": {
+    "n_runs": 5,
+    "constant_readout_null": "6/16",
+    "cx_range": [
+      1199,
+      1303
+    ],
+    "argmax": {
+      "match_mean": 6.0,
+      "match_sd": 0.0,
+      "match_hist": {
+        "6": 5
+      },
+      "runs_above_null": 0,
+      "n_runs": 5,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.5,
+      "pixels": 60,
+      "separation": 0.0071,
+      "separation_sigma": 0.8,
+      "global_bias": 0.1187
+    },
+    "A_flatfield": {
+      "match_mean": 3.8,
+      "match_sd": 1.924,
+      "match_hist": {
+        "1": 1,
+        "3": 1,
+        "4": 1,
+        "5": 1,
+        "6": 1
+      },
+      "runs_above_null": 0,
+      "n_runs": 5,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.317,
+      "pixels": 60,
+      "separation": 0.0071,
+      "separation_sigma": 1.28,
+      "global_bias": 0.0005
+    },
+    "B_heldout_offset": {
+      "match_mean": 2.4,
+      "match_sd": 2.302,
+      "match_hist": {
+        "0": 2,
+        "3": 1,
+        "4": 1,
+        "5": 1
+      },
+      "runs_above_null": 0,
+      "n_runs": 5,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.2,
+      "pixels": 60,
+      "separation": 0.0071,
+      "separation_sigma": 0.69,
+      "global_bias": 0.0005
+    }
+  },
+  "balanced_n1_restoring_control": {
+    "n_runs": 5,
+    "constant_readout_null": "2/4",
+    "cx_range": [
+      1035,
+      1155
+    ],
+    "argmax": {
+      "match_mean": 2.0,
+      "match_sd": 0.0,
+      "match_hist": {
+        "2": 5
+      },
+      "runs_above_null": 0,
+      "n_runs": 5,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.5,
+      "pixels": 20,
+      "separation": 0.0212,
+      "separation_sigma": 0.83,
+      "global_bias": -0.1659
+    },
+    "A_flatfield": {
+      "match_mean": 1.0,
+      "match_sd": 1.414,
+      "match_hist": {
+        "0": 3,
+        "2": 1,
+        "3": 1
+      },
+      "runs_above_null": 1,
+      "n_runs": 5,
+      "sign_test_p": 0.9688,
+      "pixel_accuracy": 0.25,
+      "pixels": 20,
+      "separation": 0.0212,
+      "separation_sigma": 1.29,
+      "global_bias": 0.0
+    },
+    "B_heldout_offset": {
+      "match_mean": 1.2,
+      "match_sd": 1.789,
+      "match_hist": {
+        "0": 3,
+        "2": 1,
+        "4": 1
+      },
+      "runs_above_null": 1,
+      "n_runs": 5,
+      "sign_test_p": 0.9688,
+      "pixel_accuracy": 0.3,
+      "pixels": 20,
+      "separation": 0.0212,
+      "separation_sigma": 0.72,
+      "global_bias": 0.0
+    }
+  }
+}

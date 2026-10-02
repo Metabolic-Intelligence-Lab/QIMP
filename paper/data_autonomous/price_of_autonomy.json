@@ -1,0 +1,54 @@
+[
+  {
+    "dataset": "canonical_shared",
+    "n": 1,
+    "q": 2,
+    "autonomous_qubits": 24,
+    "parametric_qubits": 4,
+    "autonomous_cx": 237,
+    "parametric_cx": 12,
+    "autonomous_depth": 352,
+    "parametric_depth": 25,
+    "autonomous_cx_hw": 613,
+    "parametric_cx_hw": 19
+  },
+  {
+    "dataset": "canonical",
+    "n": 1,
+    "q": 3,
+    "autonomous_qubits": 36,
+    "parametric_qubits": 5,
+    "autonomous_cx": 329,
+    "parametric_cx": 6,
+    "autonomous_depth": 435,
+    "parametric_depth": 14,
+    "autonomous_cx_hw": 1225,
+    "parametric_cx_hw": 7
+  },
+  {
+    "dataset": "canonical",
+    "n": 2,
+    "q": 2,
+    "autonomous_qubits": 26,
+    "parametric_qubits": 6,
+    "autonomous_cx": 525,
+    "parametric_cx": 216,
+    "autonomous_depth": 909,
+    "parametric_depth": 446,
+    "autonomous_cx_hw": 1297,
+    "parametric_cx_hw": 333
+  },
+  {
+    "dataset": "canonical",
+    "n": 3,
+    "q": 2,
+    "autonomous_qubits": 28,
+    "parametric_qubits": 8,
+    "autonomous_cx": 1437,
+    "parametric_cx": 1086,
+    "autonomous_depth": 2470,
+    "parametric_depth": 2042,
+    "autonomous_cx_hw": 3883,
+    "parametric_cx_hw": 1882
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "label": "c17_fourvalue_n2_lookup_kingston_r2",
+  "campaign": 17,
+  "dataset": "fourvalue",
+  "n": 2,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "backend": "ibm_kingston",
+  "shots": 16384,
+  "mitigation": "trex",
+  "job_id": "darapp3ojkfs738nsjkg",
+  "two_q_gate_count": 116,
+  "seed_transpiler": 0,
+  "transpiled_sha256": "e4128beaa0c308950aef95cdba2278ed8e6fb882f4ca08ae252f8fea33ed0259",
+  "physical_qubits": [
+    10,
+    25,
+    37,
+    45,
+    46,
+    47,
+    48,
+    49,
+    57,
+    67,
+    117
+  ],
+  "round": 2,
+  "remaining_before": 146,
+  "wallclock_seconds": 45.4
+}

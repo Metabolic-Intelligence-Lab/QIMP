@@ -1,0 +1,18 @@
+Classical reference: fraction of pixels with R > 2 = 0.2500 (1 / 4)
+
+Running QAE with shots=128 per k, max_k=1
+  (AerSimulator(method='mps'); each k may take minutes)
+  k=0: building circuit and sampling...
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+    P(good=1 | k=0) = 0.2578   (expected sin²((2k+1)·θ) where θ = arcsin(√0.250) = 0.524)
+  k=1: building circuit and sampling...
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+    P(good=1 | k=1) = 1.0000   (expected sin²((2k+1)·θ) where θ = arcsin(√0.250) = 0.524)
+
+Maximum-likelihood QAE estimate: â = 0.2509
+Classical truth:                  a = 0.2500
+Absolute error:                   |â - a| = 0.0009
+Total queries to A: 256
+For reference, classical MC with 256 samples would have stderr ~ 0.0271

@@ -1,0 +1,16 @@
+{
+  "label": "c18sim_blocks_n3_kingston_r2",
+  "backend": "ibm_kingston noise model (calibration of 2026-10-02 11:08:52+02:00) + fitted CZ depolarizing",
+  "simulated": true,
+  "p_extra": 0.002455112352570262,
+  "dataset": "blocks",
+  "n": 3,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "shots": 65536,
+  "two_q_gate_count": 213,
+  "transpiled_sha256": "20f5ed41e6bef19b39d4909eb4bf363d4d5fedd0ec2a14784fb9b260fc67bed8",
+  "seed_simulator": 1801,
+  "method": "automatic (Aer's choice, not recorded)"
+}

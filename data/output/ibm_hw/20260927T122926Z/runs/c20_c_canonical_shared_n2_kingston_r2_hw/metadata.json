@@ -1,0 +1,79 @@
+{
+  "label": "c20_c_canonical_shared_n2_kingston_r2",
+  "campaign": 20,
+  "operator_class": "c",
+  "dataset": "canonical_shared",
+  "n": 2,
+  "q": 2,
+  "q_frac": 2,
+  "R_red_fp": 1,
+  "load": "ucry",
+  "divider": "lookup",
+  "backend": "ibm_kingston",
+  "shots": 16384,
+  "mitigation": "trex",
+  "job_id": "dasgpfrg95ks73efhsu0",
+  "two_q_gate_count": 393,
+  "seed_transpiler": 4,
+  "transpiled_sha256": "c180d1f9c247d3c51273cd0d3ed03f497891d15e4faceae70f7b97f83caf2632",
+  "n_valid": 12,
+  "match_count": 12,
+  "sign_match": null,
+  "mean_abs_error": 0.0,
+  "divzero_match": 13,
+  "decoded": [
+    [
+      3.5,
+      3.5,
+      -0.25,
+      0.75
+    ],
+    [
+      3.5,
+      0.75,
+      0.25,
+      0.75
+    ],
+    [
+      0.25,
+      0.25,
+      0.25,
+      0.75
+    ],
+    [
+      -0.25,
+      0.75,
+      0.75,
+      3.5
+    ]
+  ],
+  "classical": [
+    [
+      3.5,
+      3.5,
+      -0.25,
+      0.75
+    ],
+    [
+      3.5,
+      0.75,
+      0.25,
+      0.75
+    ],
+    [
+      0.25,
+      0.25,
+      0.25,
+      0.75
+    ],
+    [
+      -0.25,
+      0.75,
+      0.75,
+      3.5
+    ]
+  ],
+  "round": 2,
+  "remaining_before": 18,
+  "wallclock_seconds": 35.6
+}

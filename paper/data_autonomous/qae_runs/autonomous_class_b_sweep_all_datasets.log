@@ -1,0 +1,135 @@
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+
+=== canonical n=2  (4×4) =================================
+  data prep: 0.03 s  (4 divzero / 16)
+  build: 0.01 s  (26 qubits, 253 logical gates)
+  transpile: 3.02 s  (2529 transpiled gates)
+  MPS run: 0.50 s  (16 unique bitstrings)
+  match: 16 / 16  (100.0%)
+  saved canonical_4x4.npz
+
+=== canonical n=3  (8×8) =================================
+  data prep: 0.00 s  (34 divzero / 64)
+  build: 0.01 s  (28 qubits, 584 logical gates)
+  transpile: 0.13 s  (8620 transpiled gates)
+  MPS run: 1.16 s  (64 unique bitstrings)
+  match: 64 / 64  (100.0%)
+  saved canonical_8x8.npz
+
+=== canonical n=4  (16×16) =================================
+  data prep: 0.00 s  (177 divzero / 256)
+  build: 0.02 s  (30 qubits, 1523 logical gates)
+  transpile: 0.32 s  (24031 transpiled gates)
+  MPS run: 11.60 s  (256 unique bitstrings)
+  match: 256 / 256  (100.0%)
+  saved canonical_16x16.npz
+
+=== canonical n=5  (32×32) =================================
+  data prep: 0.00 s  (787 divzero / 1024)
+  build: 0.06 s  (32 qubits, 5180 logical gates)
+  transpile: 1.06 s  (85500 transpiled gates)
+  MPS run: 160.02 s  (1006 unique bitstrings)
+  match: 1009 / 1024  (98.5%)
+  saved canonical_32x32.npz
+
+=== fura2 n=2  (4×4) =================================
+  data prep: 0.01 s  (4 divzero / 16)
+  build: 0.01 s  (26 qubits, 259 logical gates)
+  transpile: 0.07 s  (2847 transpiled gates)
+  MPS run: 0.44 s  (16 unique bitstrings)
+  match: 16 / 16  (100.0%)
+  saved fura2_4x4.npz
+
+=== fura2 n=3  (8×8) =================================
+  data prep: 0.00 s  (10 divzero / 64)
+  build: 0.02 s  (28 qubits, 895 logical gates)
+  transpile: 0.21 s  (13341 transpiled gates)
+  MPS run: 1.71 s  (64 unique bitstrings)
+  match: 64 / 64  (100.0%)
+  saved fura2_8x8.npz
+
+=== fura2 n=4  (16×16) =================================
+  data prep: 0.00 s  (27 divzero / 256)
+  build: 0.06 s  (30 qubits, 4157 logical gates)
+  transpile: 0.87 s  (71645 transpiled gates)
+  MPS run: 28.61 s  (256 unique bitstrings)
+  match: 256 / 256  (100.0%)
+  saved fura2_16x16.npz
+
+=== fura2 n=5  (32×32) =================================
+  data prep: 0.00 s  (107 divzero / 1024)
+  build: 0.31 s  (32 qubits, 20279 logical gates)
+  transpile: 3.85 s  (369369 transpiled gates)
+  MPS run: 567.21 s  (1009 unique bitstrings)
+  match: 1016 / 1024  (99.2%)
+  saved fura2_32x32.npz
+
+=== rogfp2 n=2  (4×4) =================================
+  data prep: 0.00 s  (4 divzero / 16)
+  build: 0.01 s  (26 qubits, 259 logical gates)
+  transpile: 0.23 s  (2847 transpiled gates)
+  MPS run: 0.52 s  (16 unique bitstrings)
+  match: 16 / 16  (100.0%)
+  saved rogfp2_4x4.npz
+
+=== rogfp2 n=3  (8×8) =================================
+  data prep: 0.00 s  (14 divzero / 64)
+  build: 0.02 s  (28 qubits, 905 logical gates)
+  transpile: 0.28 s  (13531 transpiled gates)
+  MPS run: 1.69 s  (64 unique bitstrings)
+  match: 64 / 64  (100.0%)
+  saved rogfp2_8x8.npz
+
+=== rogfp2 n=4  (16×16) =================================
+  data prep: 0.00 s  (46 divzero / 256)
+  build: 0.08 s  (30 qubits, 4078 logical gates)
+  transpile: 1.16 s  (71696 transpiled gates)
+  MPS run: 24.58 s  (256 unique bitstrings)
+  match: 256 / 256  (100.0%)
+  saved rogfp2_16x16.npz
+
+=== rogfp2 n=5  (32×32) =================================
+  data prep: 0.00 s  (153 divzero / 1024)
+  build: 0.45 s  (32 qubits, 19633 logical gates)
+  transpile: 5.86 s  (366683 transpiled gates)
+  MPS run: 292.93 s  (1001 unique bitstrings)
+  match: 1014 / 1024  (99.0%)
+  saved rogfp2_32x32.npz
+
+
+=== Sweep summary written to C:\Users\giuseppe.maulucci\OneDrive - Università Cattolica del Sacro Cuore\Metabolic Intelligence - Projects-MI\2024_QIMP\repo\paper\data_autonomous\scaling_sweep.csv ===
+   canonical n= 2:  26 qubits,     0.5 s MPS, 16/16 match
+   canonical n= 3:  28 qubits,    1.16 s MPS, 64/64 match
+   canonical n= 4:  30 qubits,    11.6 s MPS, 256/256 match
+   canonical n= 5:  32 qubits,  160.02 s MPS, 1009/1024 match
+       fura2 n= 2:  26 qubits,    0.44 s MPS, 16/16 match
+       fura2 n= 3:  28 qubits,    1.71 s MPS, 64/64 match
+       fura2 n= 4:  30 qubits,   28.61 s MPS, 256/256 match
+       fura2 n= 5:  32 qubits,  567.21 s MPS, 1016/1024 match
+      rogfp2 n= 2:  26 qubits,    0.52 s MPS, 16/16 match
+      rogfp2 n= 3:  28 qubits,    1.69 s MPS, 64/64 match
+      rogfp2 n= 4:  30 qubits,   24.58 s MPS, 256/256 match
+      rogfp2 n= 5:  32 qubits,  292.93 s MPS, 1014/1024 match

@@ -1,0 +1,139 @@
+{
+  "backend": "ibm_marrakesh",
+  "rates": {
+    "e_1q": 0.00024526597803002236,
+    "e_2q": 0.0029853825799091988,
+    "t1_s": 0.00017190560286008594,
+    "t2_s": 6.649717429359947e-05
+  },
+  "rows": [
+    {
+      "dataset": "canonical_shared",
+      "n": 1,
+      "q": 2,
+      "logical_qubits": 24,
+      "two_q_gate_count": 636,
+      "depth": 1232,
+      "alap": {
+        "dd_pulses": 1532,
+        "dd_error_cost": 0.37574747834199423,
+        "dephasing_recoverable": 8.047104865008546,
+        "cost_benefit_ratio": 0.04669349842523709,
+        "n_active_qubits": 24,
+        "n_live_idle_windows": 367,
+        "idle_live_s": 0.000661864,
+        "idle_leading_s": 0.00026615599999999987,
+        "circuit_duration_s": 4.4212e-05,
+        "live_idle_fraction": 0.6237597635634368
+      },
+      "asap": {
+        "dd_pulses": 1564,
+        "dd_error_cost": 0.38359598963895497,
+        "dephasing_recoverable": 9.072792754905242,
+        "cost_benefit_ratio": 0.04227981394500191,
+        "n_active_qubits": 24,
+        "n_live_idle_windows": 379,
+        "idle_live_s": 0.000762348,
+        "idle_leading_s": 0.00016567199999999987,
+        "circuit_duration_s": 4.4212e-05,
+        "live_idle_fraction": 0.7184587894689225
+      }
+    },
+    {
+      "dataset": "canonical",
+      "n": 1,
+      "q": 2,
+      "logical_qubits": 24,
+      "two_q_gate_count": 649,
+      "depth": 1311,
+      "alap": {
+        "dd_pulses": 1524,
+        "dd_error_cost": 0.3737853505177541,
+        "dephasing_recoverable": 9.14092401402458,
+        "cost_benefit_ratio": 0.040891418629480904,
+        "n_active_qubits": 26,
+        "n_live_idle_windows": 370,
+        "idle_live_s": 0.0007605,
+        "idle_leading_s": 0.0003489800000000002,
+        "circuit_duration_s": 4.7652000000000004e-05,
+        "live_idle_fraction": 0.6138252329388062
+      },
+      "asap": {
+        "dd_pulses": 1548,
+        "dd_error_cost": 0.3796717339904746,
+        "dephasing_recoverable": 10.79902744555884,
+        "cost_benefit_ratio": 0.035157956205270756,
+        "n_active_qubits": 26,
+        "n_live_idle_windows": 387,
+        "idle_live_s": 0.0009332520000000001,
+        "idle_leading_s": 0.0001762280000000002,
+        "circuit_duration_s": 4.7652000000000004e-05,
+        "live_idle_fraction": 0.7532592061677934
+      }
+    },
+    {
+      "dataset": "canonical",
+      "n": 1,
+      "q": 3,
+      "logical_qubits": 36,
+      "two_q_gate_count": 1154,
+      "depth": 1833,
+      "alap": {
+        "dd_pulses": 2156,
+        "dd_error_cost": 0.5287934486327281,
+        "dephasing_recoverable": 20.06010529631517,
+        "cost_benefit_ratio": 0.02636045229183627,
+        "n_active_qubits": 39,
+        "n_live_idle_windows": 585,
+        "idle_live_s": 0.0019107360000000001,
+        "idle_leading_s": 0.0006184720000000001,
+        "circuit_duration_s": 7.346e-05,
+        "live_idle_fraction": 0.6669375274874866
+      },
+      "asap": {
+        "dd_pulses": 2152,
+        "dd_error_cost": 0.5278123847206081,
+        "dephasing_recoverable": 23.497925418176436,
+        "cost_benefit_ratio": 0.022462084432029367,
+        "n_active_qubits": 39,
+        "n_live_idle_windows": 594,
+        "idle_live_s": 0.002401264,
+        "idle_leading_s": 0.0001279440000000001,
+        "circuit_duration_s": 7.0776e-05,
+        "live_idle_fraction": 0.8699399767558466
+      }
+    },
+    {
+      "dataset": "canonical",
+      "n": 2,
+      "q": 2,
+      "logical_qubits": 26,
+      "two_q_gate_count": 1344,
+      "depth": 2951,
+      "alap": {
+        "dd_pulses": 3824,
+        "dd_error_cost": 0.9378970999868055,
+        "dephasing_recoverable": 13.035068490706363,
+        "cost_benefit_ratio": 0.07195183520941986,
+        "n_active_qubits": 29,
+        "n_live_idle_windows": 864,
+        "idle_live_s": 0.0012617120000000001,
+        "idle_leading_s": 0.0013969800000000045,
+        "circuit_duration_s": 0.000101292,
+        "live_idle_fraction": 0.4295236577896338
+      },
+      "asap": {
+        "dd_pulses": 3848,
+        "dd_error_cost": 0.943783483459526,
+        "dephasing_recoverable": 15.571991011330876,
+        "cost_benefit_ratio": 0.060607759327165486,
+        "n_active_qubits": 29,
+        "n_live_idle_windows": 878,
+        "idle_live_s": 0.0016193800000000001,
+        "idle_leading_s": 0.001039312000000003,
+        "circuit_duration_s": 0.000101292,
+        "live_idle_fraction": 0.551284303352411
+      }
+    }
+  ]
+}

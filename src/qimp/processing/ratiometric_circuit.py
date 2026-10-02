@@ -43,7 +43,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from qiskit import QuantumCircuit
+from qiskit import QuantumCircuit, transpile
 
 from qimp.processing.arithmetic import (
     q_add,
@@ -54,6 +54,9 @@ from qimp.processing.arithmetic import (
     q_div_restoring,
     q_div_restoring_inv,
     q_sub,
+    q_div_lookup,
+    q_div_lookup_inv,
+    synth_pixel_map,
 )
 
 __all__ = [
@@ -125,6 +128,110 @@ def _encode_intensity_at_pixel(
         qc.x(qbit)
 
 
+def _ucry_plane_angles(image: np.ndarray, n: int, bit: int) -> list[float]:
+    """Angles (0 or pi) of the uniformly controlled Ry that writes one bit-plane.
+
+    Index ``p`` of the list is the position basis state with the same qubit
+    convention as :func:`_encode_intensity_at_pixel`: the low ``n`` bits of
+    ``p`` are the column, the high ``n`` bits the row (both LSB first).
+    """
+    side = 1 << n
+    angles: list[float] = []
+    for p in range(1 << (2 * n)):
+        col = p & (side - 1)
+        row = p >> n
+        angles.append(np.pi if (int(image[row, col]) >> bit) & 1 else 0.0)
+    return angles
+
+
+def _ucry_compressed(
+    qc: QuantumCircuit, target: int, controls: list[int], angles: list[float], inverse: bool = False
+) -> None:
+    """Uniformly controlled Ry with the zero-angle rotations removed (QPIXL).
+
+    Qiskit's own decomposition of :class:`UCRYGate` is a ladder of ``Ry`` rotations
+    on the target separated by CNOTs that all share that target, so the CNOTs
+    commute. Dropping a zero rotation therefore leaves its two neighbouring CNOTs
+    adjacent, and between two surviving rotations only the controls of odd
+    multiplicity remain. This is the compression of Amankwah et al. (2022), applied
+    here to the decomposition itself, so the convention is Qiskit's and the circuit
+    is exact by construction rather than by re-derivation.
+
+    NEQR bit-planes have angles in {0, pi}, and the number of zero coefficients is a
+    property of the image: a real 8x8 microscopy plane leaves 94 to 100 per cent of
+    them non-zero and gains nothing, while a tiled or block-constant target collapses
+    to a handful of CNOTs at any size.
+    """
+    from qiskit.circuit.library import UCRYGate
+
+    tmp = QuantumCircuit(1 + len(controls))
+    gate = UCRYGate(list(angles))
+    if inverse:
+        gate = gate.inverse()
+    tmp.append(gate, list(range(1 + len(controls))))
+    flat = transpile(tmp, basis_gates=["ry", "cx"], optimization_level=0)
+    wires = [target] + list(controls)
+    pending: list[int] = []
+
+    def flush() -> None:
+        counts: dict[int, int] = {}
+        for w in pending:
+            counts[w] = counts.get(w, 0) + 1
+        for w, c in counts.items():
+            if c % 2:
+                qc.cx(w, target)
+        pending.clear()
+
+    for inst in flat.data:
+        name = inst.operation.name
+        idx = [flat.find_bit(qb).index for qb in inst.qubits]
+        if name == "cx":
+            pending.append(wires[idx[0]])
+        elif name == "ry":
+            theta = float(inst.operation.params[0])
+            if abs(theta) > 1e-12:
+                flush()
+                qc.ry(theta, target)
+        else:  # pragma: no cover - the basis has only ry and cx
+            raise ValueError(f"unexpected gate {name} in the uniformly controlled decomposition")
+    flush()
+
+
+def _ucry_load_planes(
+    qc: QuantumCircuit,
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    n: int,
+    position_qubits: list[int],
+    intensity_a_qubits: list[int],
+    intensity_b_qubits: list[int],
+    inverse: bool = False,
+    compress: bool = False,
+) -> None:
+    """Write (or unwrite) every bit-plane of both images with one uniformly
+    controlled Ry per plane: 2^(2n) CNOTs per plane instead of one
+    multi-controlled X per set pixel bit (Möttönen et al. 2004).
+
+    With ``compress=True`` the zero-angle rotations and the CNOTs they separate are
+    removed (:func:`_ucry_compressed`), which is exact and image-dependent."""
+    from qiskit.circuit.library import UCRYGate
+
+    planes = [(image_a, intensity_a_qubits, b) for b in range(q)] + \
+             [(image_b, intensity_b_qubits, b) for b in range(q)]
+    if inverse:
+        planes = planes[::-1]
+    for img, reg, bit in planes:
+        angles = _ucry_plane_angles(img.astype(np.int64), n, bit)
+        if compress:
+            _ucry_compressed(qc, reg[bit], list(position_qubits), angles, inverse=inverse)
+            continue
+        gate = UCRYGate(angles)
+        if inverse:
+            gate = gate.inverse()
+        qc.append(gate, [reg[bit]] + list(position_qubits))
+
+
 def dual_neqr_load(
     qc: QuantumCircuit,
     image_a: np.ndarray,
@@ -133,9 +240,15 @@ def dual_neqr_load(
     position_qubits: list[int],
     intensity_a_qubits: list[int],
     intensity_b_qubits: list[int],
+    mode: str = "mcx",
+    compress: bool = False,
 ) -> None:
     """Load two co-registered intensity images into NEQR registers
     sharing a single position register.
+
+    ``mode="mcx"`` (default) writes each set pixel bit with a multi-controlled
+    X; ``mode="ucry"`` writes each bit-plane with one uniformly controlled Ry
+    (2^(2n) CNOTs per plane), which is far cheaper from n = 2 upward.
 
     The position register is placed into uniform superposition via H on
     every position qubit. For each pixel ``(row, col)`` with non-zero
@@ -168,6 +281,13 @@ def dual_neqr_load(
 
     qc.h(position_qubits)
     qc.barrier()
+    if mode == "ucry":
+        _ucry_load_planes(qc, image_a, image_b, q, n, position_qubits,
+                          intensity_a_qubits, intensity_b_qubits, compress=compress)
+        qc.barrier()
+        return
+    if mode != "mcx":
+        raise ValueError(f"unknown load mode {mode!r}")
 
     img_a = image_a.astype(np.int64)
     img_b = image_b.astype(np.int64)
@@ -192,6 +312,8 @@ def dual_neqr_load_inv(
     position_qubits: list[int],
     intensity_a_qubits: list[int],
     intensity_b_qubits: list[int],
+    mode: str = "mcx",
+    compress: bool = False,
 ) -> None:
     """Inverse of :func:`dual_neqr_load`.
 
@@ -218,6 +340,14 @@ def dual_neqr_load_inv(
             f"{len(intensity_a_qubits)} and {len(intensity_b_qubits)}"
         )
 
+    if mode == "ucry":
+        _ucry_load_planes(qc, image_a, image_b, q, n, position_qubits,
+                          intensity_a_qubits, intensity_b_qubits, inverse=True, compress=compress)
+        qc.barrier()
+        qc.h(position_qubits)
+        return
+    if mode != "mcx":
+        raise ValueError(f"unknown load mode {mode!r}")
     img_a = image_a.astype(np.int64)
     img_b = image_b.astype(np.int64)
     for row in range(1 << n):
@@ -239,6 +369,7 @@ def class_b_ratio(
     image_b: np.ndarray,
     q: int,
     divider: str = "restoring",
+    load: str = "mcx",
 ) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
     """Build an autonomous Class-B integer-quotient ratio circuit.
 
@@ -276,9 +407,11 @@ def class_b_ratio(
       - Toffolis: O(q²) for the division × 1 per pixel branch (the
         division acts uniformly on the position superposition).
     """
-    if divider not in ("restoring", "nonrestoring"):
-        raise ValueError(f"divider must be 'restoring' or 'nonrestoring', got {divider!r}")
+    if divider not in ("restoring", "nonrestoring", "lookup"):
+        raise ValueError(f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}")
     n = _validate_dual_images(image_a, image_b, q)
+    if divider == "lookup":
+        return _class_b_ratio_lookup(image_a, image_b, q, n, load)
     n_pos = 2 * n
     n_c = (q + 1) * (q + 2)
 
@@ -327,6 +460,7 @@ def class_b_ratio(
         position_qubits=pos,
         intensity_a_qubits=Ia,
         intensity_b_qubits=Ib,
+        mode=load,
     )
 
     # Class B integer ratio: I_a // I_b. Divider overwrites I_a register
@@ -415,6 +549,171 @@ def decode_class_b_ratio(
     return quotient_img, divzero_mask
 
 
+def _class_b_ratio_lookup(
+    image_a: np.ndarray, image_b: np.ndarray, q: int, n: int, load: str
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+    """Class-B circuit with the truth-table divider :func:`q_div_lookup`.
+
+    Layout: ``position`` (2n), ``I_a`` (q, preserved), ``I_b`` (q,
+    preserved), ``quotient`` (q), ``flag`` (1); ``2n + 3q + 1`` qubits and no
+    ancilla. ``work`` and ``c`` are empty lists, kept so that callers that
+    iterate over the layout keys of the other dividers keep working.
+    """
+    n_pos = 2 * n
+    layout: dict[str, list[int] | int] = {}
+    layout["position"] = list(range(0, n_pos))
+    layout["I_a"] = list(range(n_pos, n_pos + q))
+    layout["I_b"] = list(range(n_pos + q, n_pos + 2 * q))
+    layout["quotient"] = list(range(n_pos + 2 * q, n_pos + 3 * q))
+    layout["flag"] = n_pos + 3 * q
+    layout["work"] = []
+    layout["c"] = []
+    qc = QuantumCircuit(n_pos + 3 * q + 1)
+    dual_neqr_load(
+        qc,
+        image_a,
+        image_b,
+        q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
+        intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
+        mode=load,
+    )
+    q_div_lookup(
+        qc,
+        dividend_qubits=layout["I_a"],  # type: ignore[arg-type]
+        divisor_qubits=layout["I_b"],  # type: ignore[arg-type]
+        quotient_qubits=layout["quotient"],  # type: ignore[arg-type]
+        div_zero_flag=layout["flag"],  # type: ignore[arg-type]
+    )
+    return qc, layout
+
+
+def class_a_gp_lookup(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    q_frac: int = 2,
+    load: str = "ucry",
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+    """Class-A Laurdan GP circuit whose per-pixel map is synthesised.
+
+    Same observable and same read-out convention as :func:`class_a_gp_full`,
+
+        magnitude(p) = floor(|I_a(p) − I_b(p)| · 2^q_frac / (I_a(p) + I_b(p)))
+        sign(p)      = 1  iff  I_b(p) > I_a(p)
+        div_flag(p)  = 1  iff  I_a(p) + I_b(p) = 0
+
+    so :func:`decode_class_a_full` decodes it unchanged. The arithmetic
+    cascade of :func:`class_a_gp_full` (subtract, absolute value, shift,
+    divide) is replaced by one :func:`synth_pixel_map` over the two
+    intensity registers. Both operands are preserved and no ancilla is
+    used: ``2n + 2q + q_frac + 3`` qubits against 71 at ``n = 1, q = 2,
+    q_frac = 2``, which is what brings the observable within reach of
+    present hardware. The synthesis is generic in ``q`` and exact, and its
+    cost grows as ``2^{2q}``.
+
+    Layout keys: ``position``, ``I_a``, ``I_b``, ``quotient`` (magnitude,
+    ``q_frac + 1`` bits), ``sign``, ``div_flag``.
+    """
+    n = _validate_dual_images(image_a, image_b, q)
+    n_pos, mag_w = 2 * n, q_frac + 1
+    layout: dict[str, list[int] | int] = {}
+    cur = 0
+    layout["position"] = list(range(cur, cur + n_pos)); cur += n_pos
+    layout["I_a"] = list(range(cur, cur + q)); cur += q
+    layout["I_b"] = list(range(cur, cur + q)); cur += q
+    layout["quotient"] = list(range(cur, cur + mag_w)); cur += mag_w
+    layout["sign"] = cur; cur += 1
+    layout["div_flag"] = cur; cur += 1
+    qc = QuantumCircuit(cur)
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
+        intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
+        mode=load,
+    )
+    table = []
+    for x in range(1 << (2 * q)):
+        a, b = x & ((1 << q) - 1), x >> q
+        den = a + b
+        if den == 0:
+            mag, sign, flag = 0, 0, 1
+        else:
+            mag, sign, flag = (abs(a - b) << q_frac) // den, (1 if b > a else 0), 0
+        table.append(mag | (sign << mag_w) | (flag << (mag_w + 1)))
+    synth_pixel_map(
+        qc,
+        list(layout["I_a"]) + list(layout["I_b"]),  # type: ignore[arg-type]
+        list(layout["quotient"]) + [layout["sign"], layout["div_flag"]],  # type: ignore[arg-type]
+        table,
+    )
+    return qc, layout
+
+
+def class_c_rogfp_lookup(
+    image_a: np.ndarray,
+    image_b: np.ndarray,
+    q: int,
+    q_frac: int,
+    R_red_fp: int,
+    load: str = "ucry",
+) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+    """Class-C roGFP circuit whose per-pixel map is synthesised.
+
+    Same observable and same read-out convention as
+    :func:`class_c_rogfp_full`,
+
+        ratio(p)     = floor(I_a(p) · 2^q_frac / I_b(p))
+        rc_signed(p) = ratio(p) − R_red_fp        (two's complement)
+        div_flag(p)  = 1  iff  I_b(p) = 0
+
+    so :func:`decode_class_c_rogfp` decodes it unchanged. At ``I_b = 0``
+    the fixed-point ratio takes the all-ones convention of the library's
+    divider before the subtraction. The cascade of
+    :func:`class_c_rogfp_full` is replaced by one :func:`synth_pixel_map`;
+    ``2n + 2q + (q + q_frac + 1) + 1`` qubits against 114 at ``n = 1,
+    q = q_frac = 4``.
+
+    Layout keys: ``position``, ``I_a``, ``I_b``, ``rc_signed``, ``div_flag``.
+    """
+    n = _validate_dual_images(image_a, image_b, q)
+    n_pos, rc_w = 2 * n, q + q_frac + 1
+    layout: dict[str, list[int] | int] = {}
+    cur = 0
+    layout["position"] = list(range(cur, cur + n_pos)); cur += n_pos
+    layout["I_a"] = list(range(cur, cur + q)); cur += q
+    layout["I_b"] = list(range(cur, cur + q)); cur += q
+    layout["rc_signed"] = list(range(cur, cur + rc_w)); cur += rc_w
+    layout["div_flag"] = cur; cur += 1
+    qc = QuantumCircuit(cur)
+    dual_neqr_load(
+        qc, image_a, image_b, q,
+        position_qubits=layout["position"],  # type: ignore[arg-type]
+        intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
+        intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
+        mode=load,
+    )
+    ratio_full = (1 << (q + q_frac)) - 1
+    table = []
+    for x in range(1 << (2 * q)):
+        a, b = x & ((1 << q) - 1), x >> q
+        if b == 0:
+            ratio, flag = ratio_full, 1
+        else:
+            ratio, flag = (a << q_frac) // b, 0
+        rc = (ratio - R_red_fp) & ((1 << rc_w) - 1)
+        table.append(rc | (flag << rc_w))
+    synth_pixel_map(
+        qc,
+        list(layout["I_a"]) + list(layout["I_b"]),  # type: ignore[arg-type]
+        list(layout["rc_signed"]) + [layout["div_flag"]],  # type: ignore[arg-type]
+        table,
+    )
+    return qc, layout
+
+
 def class_b_ratio_inv(
     qc: QuantumCircuit,
     image_a: np.ndarray,
@@ -422,6 +721,7 @@ def class_b_ratio_inv(
     q: int,
     layout: dict[str, list[int] | int],
     divider: str = "restoring",
+    load: str = "mcx",
 ) -> None:
     """Exact inverse of :func:`class_b_ratio`.
 
@@ -454,8 +754,27 @@ def class_b_ratio_inv(
         indices direct the inverse onto the right registers.
     """
     # First undo the divider step.
-    if divider not in ("restoring", "nonrestoring"):
-        raise ValueError(f"divider must be 'restoring' or 'nonrestoring', got {divider!r}")
+    if divider not in ("restoring", "nonrestoring", "lookup"):
+        raise ValueError(f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}")
+    if divider == "lookup":
+        q_div_lookup_inv(
+            qc,
+            dividend_qubits=layout["I_a"],  # type: ignore[arg-type]
+            divisor_qubits=layout["I_b"],  # type: ignore[arg-type]
+            quotient_qubits=layout["quotient"],  # type: ignore[arg-type]
+            div_zero_flag=layout["flag"],  # type: ignore[arg-type]
+        )
+        dual_neqr_load_inv(
+            qc,
+            image_a,
+            image_b,
+            q,
+            position_qubits=layout["position"],  # type: ignore[arg-type]
+            intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
+            intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
+            mode=load,
+        )
+        return
     inv_fn = q_div_restoring_inv if divider == "restoring" else q_div_nonrestoring_inv
     inv_fn(
         qc,
@@ -476,6 +795,7 @@ def class_b_ratio_inv(
         position_qubits=layout["position"],  # type: ignore[arg-type]
         intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
         intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
+        mode=load,
     )
 
 

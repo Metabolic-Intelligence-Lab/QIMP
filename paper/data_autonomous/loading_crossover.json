@@ -1,0 +1,73 @@
+{
+  "q": 2,
+  "C_A": 297,
+  "divider_cx": 213,
+  "predicate_cx": 84,
+  "rows": [
+    {
+      "n": 1,
+      "side": 2,
+      "pixels": 4,
+      "load_cx": 60,
+      "load_cx_vchain": 60,
+      "arith_cx": 297,
+      "M_star": 0.20202020202020202,
+      "M_star_vchain": 0.20202020202020202
+    },
+    {
+      "n": 2,
+      "side": 4,
+      "pixels": 16,
+      "load_cx": 688,
+      "load_cx_vchain": 504,
+      "arith_cx": 297,
+      "M_star": 2.3164983164983166,
+      "M_star_vchain": 1.696969696969697
+    },
+    {
+      "n": 3,
+      "side": 8,
+      "pixels": 64,
+      "load_cx": 7758,
+      "load_cx_vchain": 4350,
+      "arith_cx": 297,
+      "M_star": 26.12121212121212,
+      "M_star_vchain": 14.646464646464647
+    },
+    {
+      "n": 4,
+      "side": 16,
+      "pixels": 256,
+      "load_cx": 41124,
+      "load_cx_vchain": 22260,
+      "arith_cx": 297,
+      "M_star": 138.46464646464648,
+      "M_star_vchain": 74.94949494949495
+    },
+    {
+      "n": 5,
+      "side": 32,
+      "pixels": 1024,
+      "load_cx": 212376,
+      "load_cx_vchain": 112536,
+      "arith_cx": 297,
+      "M_star": 715.070707070707,
+      "M_star_vchain": 378.90909090909093
+    },
+    {
+      "n": 6,
+      "side": 64,
+      "pixels": 4096,
+      "load_cx": 1026162,
+      "load_cx_vchain": 537702,
+      "arith_cx": 297,
+      "M_star": 3455.090909090909,
+      "M_star_vchain": 1810.4444444444443
+    }
+  ],
+  "mlqae_below_mc_from_M": {
+    "synthetic_a0.25": 256,
+    "laurdan_a0.75": 64,
+    "fura2_a0.50": 256
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "label": "c20_a_random4_n2_kingston_r2",
+  "campaign": 20,
+  "operator_class": "a",
+  "dataset": "random4",
+  "n": 2,
+  "q": 2,
+  "q_frac": 2,
+  "R_red_fp": 1,
+  "load": "ucry",
+  "divider": "lookup",
+  "backend": "ibm_kingston",
+  "shots": 16384,
+  "mitigation": "trex",
+  "job_id": "dasgon3ojkfs738pb3k0",
+  "two_q_gate_count": 439,
+  "seed_transpiler": 10,
+  "transpiled_sha256": "8d1ffed693061ffb213108724fb456d900408a35c537914d7e25fd036ca4aaea",
+  "n_valid": 16,
+  "match_count": 12,
+  "sign_match": 12,
+  "mean_abs_error": 0.140625,
+  "divzero_match": 16,
+  "decoded": [
+    [
+      0.0,
+      0.0,
+      0.5,
+      0.0
+    ],
+    [
+      -1.0,
+      -1.0,
+      -0.0,
+      0.0
+    ],
+    [
+      -0.0,
+      0.0,
+      0.0,
+      -0.0
+    ],
+    [
+      0.0,
+      0.5,
+      0.0,
+      -0.25
+    ]
+  ],
+  "classical": [
+    [
+      -0.25,
+      0.0,
+      0.5,
+      0.5
+    ],
+    [
+      -1.0,
+      -1.0,
+      0.0,
+      0.0
+    ],
+    [
+      -1.0,
+      0.0,
+      0.0,
+      -0.5
+    ],
+    [
+      0.0,
+      0.5,
+      0.0,
+      -0.25
+    ]
+  ],
+  "round": 2,
+  "remaining_before": 56,
+  "wallclock_seconds": 21.0
+}

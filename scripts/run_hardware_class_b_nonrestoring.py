@@ -78,6 +78,97 @@ def load_dataset(dataset: str, n: int, q: int) -> tuple[np.ndarray, np.ndarray]:
         # offset (94,60) of the canonical frame, q=2. See §6.5.9.
         d = np.load(REPO / "paper" / "data_autonomous" / "canonical_2x2_nd.npz")
         return d["I_a"].astype(np.int64), d["I_b"].astype(np.int64)
+    if dataset == "fourvalue":
+        # Campaign-3 target (10 Sep 2026, paper/HW_CAMPAIGN_3_PROTOCOL.md):
+        # every quotient value of the q=2 codomain appears exactly once,
+        # R = [[0,1],[2,3]] from I_a=[[1,3],[2,3]], I_b=[[2,3],[1,1]], no
+        # divide-by-zero pixel, constant-read-out null 1/4. Non-trivial
+        # divisions at every pixel (1//2, 3//3, 2//1, 3//1).
+        base_a = np.array([[1, 3], [2, 3]], dtype=np.int64)
+        base_b = np.array([[2, 3], [1, 1]], dtype=np.int64)
+        return (np.tile(base_a, (side // 2, side // 2)),
+                np.tile(base_b, (side // 2, side // 2)))
+    if dataset in ("fourvalue_p2", "fourvalue_p3", "fourvalue_p4"):
+        # Campaign 6 cyclic-calibration targets (paper/HW_CAMPAIGN_6_PROTOCOL.md):
+        # together with `fourvalue` (R = [[0,1],[2,3]]) every pixel takes each
+        # q=2 quotient value exactly once across the four targets.
+        pats = {"fourvalue_p2": ([[2, 2], [3, 1]], [[2, 1], [1, 2]]),   # R = [[1,2],[3,0]]
+                "fourvalue_p3": ([[2, 3], [1, 3]], [[1, 1], [3, 2]]),   # R = [[2,3],[0,1]]
+                "fourvalue_p4": ([[3, 1], [3, 2]], [[1, 3], [2, 1]])}   # R = [[3,0],[1,2]]
+        base_a, base_b = (np.array(x, dtype=np.int64) for x in pats[dataset])
+        return (np.tile(base_a, (side // 2, side // 2)),
+                np.tile(base_b, (side // 2, side // 2)))
+    if dataset == "random4":
+        # Campaign 7: non-periodic content, seeded. I_a in [0,3], I_b in [1,3]
+        # (no divide-by-zero pixel, every pixel a genuine quotient match).
+        rng = np.random.default_rng(1)
+        return (rng.integers(0, 2**q, (side, side)).astype(np.int64),
+                rng.integers(1, 2**q, (side, side)).astype(np.int64))
+    if dataset == "blocks":
+        # Campaign 18: block-constant content on 2x2 blocks, with the quotient
+        # values balanced over the frame (one quarter of the blocks per value) and
+        # the operand pair of each block drawn among those realising its value.
+        # Balanced values keep the flat-field decoder's assumption and put the
+        # constant-read-out null at 1/4; the block structure keeps the load's angle
+        # spectrum sparse, which is what brings 256 pixels into the gate budget.
+        rng = np.random.default_rng(18)
+        nb = (side // 2) ** 2
+        by_value: dict[int, list[tuple[int, int]]] = {}
+        for a_val in range(2**q):
+            for b_val in range(1, 2**q):
+                by_value.setdefault(a_val // b_val, []).append((a_val, b_val))
+        values = np.repeat(np.arange(2**q), nb // (2**q))
+        rng.shuffle(values)
+        blk_a = np.zeros(nb, dtype=np.int64); blk_b = np.zeros(nb, dtype=np.int64)
+        for k, v in enumerate(values):
+            options = by_value[int(v)]
+            blk_a[k], blk_b[k] = options[rng.integers(len(options))]
+        half = side // 2
+        I_a = np.kron(blk_a.reshape(half, half), np.ones((2, 2), dtype=np.int64))
+        I_b = np.kron(blk_b.reshape(half, half), np.ones((2, 2), dtype=np.int64))
+        return I_a.astype(np.int64), I_b.astype(np.int64)
+    if dataset == "gp_balanced":
+        # Projection target for the Class-A circuit (calibrated noise model, not run on the
+        # device): Laurdan GP at q = 2, q_frac = 2 balanced over the four values -1, -1/4, +1/4,
+        # +1 (a quarter of the pixels each, seeded), so that both signs and two magnitudes are
+        # present, no divide-by-zero pixel, and the constant-read-out null is 1/4. The Laurdan
+        # patch of campaign 20 has every informative pixel on one sign, which a read-out biased
+        # toward the relaxed state cannot be told apart from.
+        rng = np.random.default_rng(20)
+        options = {0: [(0, 1), (0, 2), (0, 3)], 1: [(1, 2)], 2: [(2, 1)], 3: [(1, 0), (2, 0), (3, 0)]}
+        npx = side * side
+        vals = np.repeat(np.arange(4), npx // 4); rng.shuffle(vals)
+        I_a = np.zeros(npx, dtype=np.int64); I_b = np.zeros(npx, dtype=np.int64)
+        for k, v in enumerate(vals):
+            a_v, b_v = options[int(v)][rng.integers(len(options[int(v)]))]
+            I_a[k], I_b[k] = a_v, b_v
+        return I_a.reshape(side, side), I_b.reshape(side, side)
+    if dataset == "tiled":
+        # Campaign 18 control: the four-value 2x2 pattern replicated to the full
+        # frame. Four distinct operand pairs at any size, the cheapest possible
+        # load; it bounds what image size alone buys.
+        base_a = np.array([[1, 3], [2, 3]], dtype=np.int64)
+        base_b = np.array([[2, 3], [1, 1]], dtype=np.int64)
+        r = side // 2
+        return np.tile(base_a, (r, r)), np.tile(base_b, (r, r))
+    if dataset == "balanced8":
+        # Campaign 12: 8x8 with each quotient value on exactly 16 pixels (seeded
+        # permutation), no divide-by-zero pixel; constant null 16/64. Built so
+        # that the flat-field decoder's balance assumption holds at 64 pixels.
+        rng = np.random.default_rng(12)
+        vals = np.repeat(np.arange(4), (side * side) // 4); rng.shuffle(vals)
+        R = vals.reshape(side, side)
+        pairs = {0: (1, 2), 1: (3, 3), 2: (2, 1), 3: (3, 1)}   # (I_a, I_b) with I_a // I_b = R
+        I_a = np.vectorize(lambda v: pairs[v][0])(R).astype(np.int64)
+        I_b = np.vectorize(lambda v: pairs[v][1])(R).astype(np.int64)
+        return I_a, I_b
+    if dataset == "fourvalue_q3":
+        # Campaign 6: q = 3, four distinct 3-bit quotients R = [[0,3],[5,7]]
+        # from I_a=[[2,7],[5,7]], I_b=[[3,2],[1,1]]; null 1/4, chance 1/8.
+        base_a = np.array([[2, 7], [5, 7]], dtype=np.int64)
+        base_b = np.array([[3, 2], [1, 1]], dtype=np.int64)
+        return (np.tile(base_a, (side // 2, side // 2)),
+                np.tile(base_b, (side // 2, side // 2)))
     if dataset == "fura2":
         f340, f380, _ = synthesise_fura2(side=side, seed=1)
         return (quantise_to_q(f340, q).astype(np.int64),
@@ -94,11 +185,15 @@ def main(argv: list[str] | None = None) -> int:
                                  description=__doc__)
     ap.add_argument("--dataset", type=str, default="canonical",
                     choices=["canonical", "canonical_shared", "canonical_nd",
-                             "synthetic", "fura2", "rogfp2"])
+                             "synthetic", "fura2", "rogfp2", "fourvalue",
+                             "fourvalue_p2", "fourvalue_p3", "fourvalue_p4", "fourvalue_q3", "blocks", "tiled", "gp_balanced", "random4", "balanced8"])
     ap.add_argument("--n", type=int, default=1)
     ap.add_argument("--q", type=int, default=2)
     ap.add_argument("--divider", type=str, default="nonrestoring",
-                    choices=["restoring", "nonrestoring"])
+                    choices=["restoring", "nonrestoring", "lookup"])
+    ap.add_argument("--load", type=str, default="mcx", choices=["mcx", "ucry"],
+                    help="NEQR load: per-pixel multi-controlled X (mcx) or one uniformly "
+                         "controlled Ry per bit-plane (ucry, 2^(2n) CNOTs per plane)")
     ap.add_argument("--label", type=str, default=None)
     ap.add_argument("--backend", type=str, default=None)
     ap.add_argument("--shots", type=int, default=None,
@@ -143,7 +238,7 @@ def main(argv: list[str] | None = None) -> int:
     R_classical = np.where(I_b > 0, I_a // np.maximum(I_b, 1), 0)
     divzero_classical = (I_b == 0)
 
-    qc, layout = class_b_ratio(I_a, I_b, q=q, divider=args.divider)
+    qc, layout = class_b_ratio(I_a, I_b, q=q, divider=args.divider, load=args.load)
     print(f"\n--- {label} ---")
     print(f"  dataset={args.dataset} n={n} q={q} pixels={n_pixels} shots={shots}")
     print(f"  logical qubits = {qc.num_qubits}, logical size = {qc.size()}")
@@ -205,6 +300,7 @@ def main(argv: list[str] | None = None) -> int:
             "wallclock_seconds": round(elapsed, 1),
             "n_unique_bitstrings": len(counts),
             "divider": args.divider,
+            "load": args.load,
             "quantum_quotient": quotient.tolist(),
             "quantum_divzero": divzero.tolist(),
             "classical_R": R_classical.tolist(),

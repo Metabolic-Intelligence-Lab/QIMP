@@ -1,0 +1,47 @@
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+
+=== n=2  (4×4) =================================
+  data prep: 0.03 s  (4 divzero / 16)
+  build: 0.01 s  (26 qubits, 253 logical gates)
+  transpile: 2.04 s  (2529 transpiled gates)
+  MPS run: 0.51 s  (16 unique bitstrings)
+  match: 16 / 16  (100.0%)
+  saved canonical_4x4.npz
+
+=== n=3  (8×8) =================================
+  data prep: 0.00 s  (34 divzero / 64)
+  build: 0.01 s  (28 qubits, 584 logical gates)
+  transpile: 0.14 s  (8620 transpiled gates)
+  MPS run: 1.22 s  (64 unique bitstrings)
+  match: 64 / 64  (100.0%)
+  saved canonical_8x8.npz
+
+=== n=4  (16×16) =================================
+  data prep: 0.00 s  (177 divzero / 256)
+  build: 0.02 s  (30 qubits, 1523 logical gates)
+  transpile: 0.30 s  (24031 transpiled gates)
+  MPS run: 11.28 s  (256 unique bitstrings)
+  match: 256 / 256  (100.0%)
+  saved canonical_16x16.npz
+
+=== n=5  (32×32) =================================
+  data prep: 0.00 s  (787 divzero / 1024)
+  build: 0.06 s  (32 qubits, 5180 logical gates)
+  transpile: 0.93 s  (85500 transpiled gates)
+  MPS run: 174.88 s  (998 unique bitstrings)
+  match: 999 / 1024  (97.6%)
+  saved canonical_32x32.npz
+
+
+=== Sweep summary written to C:\Users\giuseppe.maulucci\OneDrive - Università Cattolica del Sacro Cuore\Metabolic Intelligence - Projects-MI\2024_QIMP\repo\paper\data_autonomous\scaling_sweep.csv ===
+  n= 2:  26 qubits,    0.51 s MPS, 16/16 match
+  n= 3:  28 qubits,    1.22 s MPS, 64/64 match
+  n= 4:  30 qubits,   11.28 s MPS, 256/256 match
+  n= 5:  32 qubits,  174.88 s MPS, 999/1024 match

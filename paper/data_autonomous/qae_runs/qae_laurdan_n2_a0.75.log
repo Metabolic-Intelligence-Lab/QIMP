@@ -1,0 +1,22 @@
+Dataset: canonical microscopy frame, 4×4 q=2 (n=2) — MPS oracle ~33 qubits, expected runtime is in the hours.
+I_a = [[0, 1, 3, 1], [3, 3, 2, 3], [1, 1, 1, 1], [0, 3, 1, 0]]
+I_b = [[0, 0, 2, 1], [3, 3, 2, 3], [1, 1, 1, 1], [0, 2, 1, 0]]
+R = [[0, 0, 1, 1], [1, 1, 1, 1], [1, 1, 1, 1], [0, 1, 1, 0]]  (divzero pixels masked to 0)
+Classical reference: fraction of pixels with R > 0 = 0.7500 (12 / 16)
+
+Running QAE with shots=128 per k, max_k=1
+  (AerSimulator(method='mps'); each k may take minutes)
+  k=0: building circuit and sampling...
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+    P(good=1 | k=0) = 0.7969   (expected sin²((2k+1)·θ) where θ = arcsin(√0.750) = 1.047)
+  k=1: building circuit and sampling...
+C:\Users\giuseppe.maulucci\.conda\envs\qimp\Lib\site-packages\qiskit\compiler\transpiler.py:276: UserWarning: Providing `coupling_map` and/or `basis_gates` along with `backend` is not recommended, as this will invalidate the backend's gate durations and error rates.
+  pm = generate_preset_pass_manager(
+    P(good=1 | k=1) = 0.0000   (expected sin²((2k+1)·θ) where θ = arcsin(√0.750) = 1.047)
+
+Maximum-likelihood QAE estimate: â = 0.7586
+Classical truth:                  a = 0.7500
+Absolute error:                   |â - a| = 0.0086
+Total queries to A: 256
+For reference, classical MC with 256 samples would have stderr ~ 0.0271

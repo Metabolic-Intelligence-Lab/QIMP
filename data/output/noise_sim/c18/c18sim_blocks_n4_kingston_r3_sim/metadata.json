@@ -1,0 +1,16 @@
+{
+  "label": "c18sim_blocks_n4_kingston_r3",
+  "backend": "ibm_kingston noise model (calibration of 2026-10-02 11:08:52+02:00) + fitted CZ depolarizing",
+  "simulated": true,
+  "p_extra": 0.002455112352570262,
+  "dataset": "blocks",
+  "n": 4,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "shots": 65536,
+  "two_q_gate_count": 552,
+  "transpiled_sha256": "25001d19bf2914d1fd16f324e8712b6e70f1c2dc9b30e5200358708d49d3237b",
+  "seed_simulator": 1802,
+  "method": "density_matrix (single precision), block 1 of 1 of one 65536-shot job"
+}

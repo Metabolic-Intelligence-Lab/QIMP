@@ -1,0 +1,182 @@
+{
+  "ibm_marrakesh:nodd": {
+    "n_runs": 4,
+    "top_share": 0.49775,
+    "sigma_over_null": 17.8725,
+    "flatfield_match": 3.75,
+    "separation": 0.13399999999999998,
+    "spectator_p1_mean": 0.0374755859375,
+    "spectator_p1_sd_runs": 0.0016822951099949724,
+    "pulses": 23
+  },
+  "ibm_marrakesh:dd_active": {
+    "n_runs": 4,
+    "top_share": 0.315125,
+    "sigma_over_null": 4.8,
+    "flatfield_match": 1.75,
+    "separation": 0.029637499999999997,
+    "spectator_p1_mean": 0.055287679036458336,
+    "spectator_p1_sd_runs": 0.0011939038684765757,
+    "pulses": 585
+  },
+  "ibm_marrakesh:dd_spect": {
+    "n_runs": 4,
+    "top_share": 0.482975,
+    "sigma_over_null": 16.7325,
+    "flatfield_match": 3.75,
+    "separation": 0.13235000000000002,
+    "spectator_p1_mean": 0.05085245768229167,
+    "spectator_p1_sd_runs": 0.004974784738039432,
+    "pulses": 47
+  },
+  "ibm_marrakesh:dd_all": {
+    "n_runs": 4,
+    "top_share": 0.31675,
+    "sigma_over_null": 4.93,
+    "flatfield_match": 2.25,
+    "separation": 0.019199999999999995,
+    "spectator_p1_mean": 0.07410685221354167,
+    "spectator_p1_sd_runs": 0.008124811259954866,
+    "pulses": 609
+  },
+  "ibm_marrakesh:dd_spect_matched": {
+    "n_runs": 4,
+    "top_share": 0.57615,
+    "sigma_over_null": 20.7575,
+    "flatfield_match": 2.25,
+    "separation": 0.06724999999999998,
+    "spectator_p1_mean": 0.198333740234375,
+    "spectator_p1_sd_runs": 0.004540837571919658,
+    "pulses": 167
+  },
+  "ibm_marrakesh:dd_active_bunched": {
+    "n_runs": 4,
+    "top_share": 0.47240000000000004,
+    "sigma_over_null": 15.3975,
+    "flatfield_match": 2.5,
+    "separation": 0.10619999999999999,
+    "spectator_p1_mean": 0.053965250651041664,
+    "spectator_p1_sd_runs": 0.0021794543073825755,
+    "pulses": 585
+  },
+  "ibm_marrakesh:dd_spect_matched_bunched": {
+    "n_runs": 4,
+    "top_share": 0.552225,
+    "sigma_over_null": 21.1875,
+    "flatfield_match": 2.75,
+    "separation": 0.07523750000000001,
+    "spectator_p1_mean": 0.06324259440104167,
+    "spectator_p1_sd_runs": 0.0010864461007124998,
+    "pulses": 167
+  },
+  "ibm_marrakesh:dd_active_f025": {
+    "n_runs": 4,
+    "top_share": 0.4348,
+    "sigma_over_null": 13.3775,
+    "flatfield_match": 2.5,
+    "separation": 0.07619999999999999,
+    "spectator_p1_mean": 0.05294799804687499,
+    "spectator_p1_sd_runs": 0.0017978626798596494,
+    "pulses": 585
+  },
+  "ibm_marrakesh:dd_active_f050": {
+    "n_runs": 4,
+    "top_share": 0.354025,
+    "sigma_over_null": 7.6875,
+    "flatfield_match": 2.75,
+    "separation": 0.05270000000000001,
+    "spectator_p1_mean": 0.051035563151041664,
+    "spectator_p1_sd_runs": 0.003384603908170039,
+    "pulses": 585
+  },
+  "ibm_marrakesh:dd_active_f075": {
+    "n_runs": 4,
+    "top_share": 0.267825,
+    "sigma_over_null": 1.325,
+    "flatfield_match": 1.25,
+    "separation": 0.01832500000000001,
+    "spectator_p1_mean": 0.05750528971354167,
+    "spectator_p1_sd_runs": 0.003764274502731743,
+    "pulses": 585
+  },
+  "ibm_marrakesh:dd_active_f100": {
+    "n_runs": 4,
+    "top_share": 0.3997,
+    "sigma_over_null": 10.93,
+    "flatfield_match": 0.75,
+    "separation": 0.002975000000000007,
+    "spectator_p1_mean": 0.06479899088541666,
+    "spectator_p1_sd_runs": 0.006584383088126873,
+    "pulses": 585
+  },
+  "ibm_kingston:nodd": {
+    "n_runs": 4,
+    "top_share": 0.49175,
+    "sigma_over_null": 17.3825,
+    "flatfield_match": 4.0,
+    "separation": 0.32395,
+    "spectator_p1_mean": 0.016743977864583336,
+    "spectator_p1_sd_runs": 0.0011934993218096234,
+    "pulses": 22
+  },
+  "ibm_kingston:dd_active": {
+    "n_runs": 4,
+    "top_share": 0.39755,
+    "sigma_over_null": 10.8675,
+    "flatfield_match": 3.75,
+    "separation": 0.14318750000000002,
+    "spectator_p1_mean": 0.032948811848958336,
+    "spectator_p1_sd_runs": 0.004022133268437597,
+    "pulses": 598
+  },
+  "ibm_kingston:dd_active_bunched": {
+    "n_runs": 4,
+    "top_share": 0.473175,
+    "sigma_over_null": 16.095,
+    "flatfield_match": 4.0,
+    "separation": 0.27778749999999997,
+    "spectator_p1_mean": 0.020792643229166664,
+    "spectator_p1_sd_runs": 0.0013649897597015105,
+    "pulses": 598
+  },
+  "ibm_kingston:dd_active_f025": {
+    "n_runs": 4,
+    "top_share": 0.42115,
+    "sigma_over_null": 12.44,
+    "flatfield_match": 3.0,
+    "separation": 0.1371875,
+    "spectator_p1_mean": 0.032694498697916664,
+    "spectator_p1_sd_runs": 0.005782148274237081,
+    "pulses": 598
+  },
+  "ibm_kingston:dd_active_f050": {
+    "n_runs": 4,
+    "top_share": 0.38985000000000003,
+    "sigma_over_null": 10.295,
+    "flatfield_match": 2.25,
+    "separation": 0.08345,
+    "spectator_p1_mean": 0.0430908203125,
+    "spectator_p1_sd_runs": 0.008601378577448767,
+    "pulses": 598
+  },
+  "ibm_kingston:dd_active_f075": {
+    "n_runs": 4,
+    "top_share": 0.37074999999999997,
+    "sigma_over_null": 8.93,
+    "flatfield_match": 3.0,
+    "separation": 0.076625,
+    "spectator_p1_mean": 0.045338948567708336,
+    "spectator_p1_sd_runs": 0.010440871145011963,
+    "pulses": 598
+  },
+  "ibm_kingston:dd_active_f100": {
+    "n_runs": 4,
+    "top_share": 0.34685,
+    "sigma_over_null": 7.1625000000000005,
+    "flatfield_match": 2.25,
+    "separation": 0.046537499999999996,
+    "spectator_p1_mean": 0.057830810546875,
+    "spectator_p1_sd_runs": 0.005036417540497131,
+    "pulses": 598
+  }
+}

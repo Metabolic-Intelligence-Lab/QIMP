@@ -65,6 +65,8 @@ def two_q(circ) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(prog="price_of_autonomy", description=__doc__)
+    ap.add_argument("--divider", type=str, default="nonrestoring",
+                    choices=["restoring", "nonrestoring", "lookup"])
     ap.add_argument("--json", type=Path, default=None)
     ap.add_argument("--hardware", action="store_true",
                     help="also transpile against a real backend Target, so the "
@@ -85,7 +87,7 @@ def main(argv: list[str] | None = None) -> int:
         I_a, I_b = load_dataset(dataset, n, q)
         R = np.where(I_b > 0, I_a // np.maximum(I_b, 1), 0)
 
-        auto, _ = class_b_ratio(I_a, I_b, q=q, divider="nonrestoring")
+        auto, _ = class_b_ratio(I_a, I_b, q=q, divider=args.divider)
         para = neqr_circuit(R.astype(int), q=q)
 
         a_t = transpile(_ensure_measured(auto), basis_gates=BASIS,

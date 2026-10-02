@@ -1,0 +1,41 @@
+{
+  "shots": 4096,
+  "ks": [
+    256,
+    512
+  ],
+  "seed_base": 20260610,
+  "datasets": {
+    "synthetic": {
+      "dataset": "synthetic",
+      "label": "hand-tuned synthetic (a=0.25)",
+      "tau": 2,
+      "q": 2,
+      "a_true": 0.25,
+      "theta": 0.5235987755982988,
+      "shots": 4096,
+      "seed_base": 20260610,
+      "rows": [
+        {
+          "k": 256,
+          "p_theory": 1.0,
+          "p_emp": 1.0,
+          "abs_err": 0.0,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 86.7
+        },
+        {
+          "k": 512,
+          "p_theory": 0.2500000000000361,
+          "p_emp": 0.25537109375,
+          "abs_err": 0.005371093749963918,
+          "sigma": 0.006813587539105869,
+          "within_3sigma": true,
+          "seconds": 156.1
+        }
+      ],
+      "all_within_3sigma": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "label": "c17x_random4_n3_lookup_kingston_altcompile_r1",
+  "campaign": 17,
+  "dataset": "random4",
+  "n": 3,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "backend": "ibm_kingston",
+  "shots": 65536,
+  "mitigation": "trex",
+  "job_id": "darajkrojkfs738nsbog",
+  "two_q_gate_count": 573,
+  "seed_transpiler": 6,
+  "transpiled_sha256": "d8f6a7afdb729a40b19a5783001cf309cf9eb130b7c24676c963e2ba928e1388",
+  "round": null,
+  "note": "accidental run from a mis-pointed relaunch: the 11 September transpilation of this target. Reported as a second compilation, excluded from the bands."
+}

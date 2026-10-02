@@ -73,6 +73,25 @@ data/output/*
 !data/output/ibm_hw/
 !data/output/ibm_hw/**
 
-# Manuscript and paper build scripts: kept local, not published
-paper/
+# Manuscript and paper build scripts: kept local, not published.
+# The pre-registered protocols and the derived data the manuscript cites are published.
+paper/*
+!paper/HW_CAMPAIGN_*_PROTOCOL.md
+!paper/data_autonomous/
+!paper/data_autonomous/**
 scripts/*paper*
+scripts/_*
+scripts/build_si_v2.py
+scripts/renumber_manuscript.py
+scripts/sync_submission_figures.py
+scripts/assemble_submission.sh
+scripts/apply_v*.py
+scripts/insert_figures_and_tables.py
+scripts/gen_joss_docx.py
+
+# Simulated runs on the calibrated noise model (§6.9)
+!data/output/noise_sim/
+!data/output/noise_sim/**
+
+# Run logs stay local
+data/output/ibm_hw/_logs/

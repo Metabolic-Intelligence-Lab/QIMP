@@ -1,0 +1,299 @@
+{
+  "shots": 4096,
+  "ks": [
+    0,
+    1,
+    2,
+    4,
+    8,
+    16,
+    32,
+    64,
+    128
+  ],
+  "seed_base": 20260610,
+  "datasets": {
+    "synthetic": {
+      "dataset": "synthetic",
+      "label": "hand-tuned synthetic (a=0.25)",
+      "tau": 2,
+      "q": 2,
+      "a_true": 0.25,
+      "theta": 0.5235987755982988,
+      "shots": 4096,
+      "seed_base": 20260610,
+      "rows": [
+        {
+          "k": 0,
+          "p_theory": 0.24999999999999994,
+          "p_emp": 0.2490234375,
+          "abs_err": 0.0009765624999999445,
+          "sigma": 0.006756990829304533,
+          "within_3sigma": true,
+          "seconds": 0.9
+        },
+        {
+          "k": 1,
+          "p_theory": 1.0,
+          "p_emp": 1.0,
+          "abs_err": 0.0,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 0.3
+        },
+        {
+          "k": 2,
+          "p_theory": 0.25000000000000033,
+          "p_emp": 0.250732421875,
+          "abs_err": 0.0007324218749996669,
+          "sigma": 0.006772417824339106,
+          "within_3sigma": true,
+          "seconds": 0.6
+        },
+        {
+          "k": 4,
+          "p_theory": 1.0,
+          "p_emp": 1.0,
+          "abs_err": 0.0,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 0.9
+        },
+        {
+          "k": 8,
+          "p_theory": 0.25000000000000133,
+          "p_emp": 0.255859375,
+          "abs_err": 0.005859374999998668,
+          "sigma": 0.006817861909838975,
+          "within_3sigma": true,
+          "seconds": 2.0
+        },
+        {
+          "k": 16,
+          "p_theory": 1.0,
+          "p_emp": 1.0,
+          "abs_err": 0.0,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 3.7
+        },
+        {
+          "k": 32,
+          "p_theory": 0.25000000000000067,
+          "p_emp": 0.263427734375,
+          "abs_err": 0.013427734374999334,
+          "sigma": 0.006882693903934522,
+          "within_3sigma": true,
+          "seconds": 7.2
+        },
+        {
+          "k": 64,
+          "p_theory": 1.0,
+          "p_emp": 1.0,
+          "abs_err": 0.0,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 14.3
+        },
+        {
+          "k": 128,
+          "p_theory": 0.25000000000002254,
+          "p_emp": 0.251220703125,
+          "abs_err": 0.0012207031249774625,
+          "sigma": 0.00677679976106405,
+          "within_3sigma": true,
+          "seconds": 29.1
+        }
+      ],
+      "all_within_3sigma": true
+    },
+    "laurdan": {
+      "dataset": "laurdan",
+      "label": "canonical Laurdan frame (a=0.75)",
+      "tau": 0,
+      "q": 2,
+      "a_true": 0.75,
+      "theta": 1.0471975511965976,
+      "shots": 4096,
+      "seed_base": 20260610,
+      "rows": [
+        {
+          "k": 0,
+          "p_theory": 0.7499999999999999,
+          "p_emp": 0.747314453125,
+          "abs_err": 0.002685546874999889,
+          "sigma": 0.006789877167668205,
+          "within_3sigma": true,
+          "seconds": 0.1
+        },
+        {
+          "k": 1,
+          "p_theory": 1.4997597826618576e-32,
+          "p_emp": 0.0,
+          "abs_err": 1.4997597826618576e-32,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 0.3
+        },
+        {
+          "k": 2,
+          "p_theory": 0.7500000000000007,
+          "p_emp": 0.741455078125,
+          "abs_err": 0.008544921875000666,
+          "sigma": 0.0068411711259779625,
+          "within_3sigma": true,
+          "seconds": 0.6
+        },
+        {
+          "k": 4,
+          "p_theory": 1.3497838043956716e-31,
+          "p_emp": 0.0,
+          "abs_err": 1.3497838043956716e-31,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 0.9
+        },
+        {
+          "k": 8,
+          "p_theory": 0.7500000000000026,
+          "p_emp": 0.752197265625,
+          "abs_err": 0.0021972656249974465,
+          "sigma": 0.006745885233301649,
+          "within_3sigma": true,
+          "seconds": 1.9
+        },
+        {
+          "k": 16,
+          "p_theory": 2.4008286577623145e-29,
+          "p_emp": 0.0,
+          "abs_err": 2.4008286577623145e-29,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 3.5
+        },
+        {
+          "k": 32,
+          "p_theory": 0.7500000000000012,
+          "p_emp": 0.757568359375,
+          "abs_err": 0.007568359374998779,
+          "sigma": 0.0066961564201373745,
+          "within_3sigma": true,
+          "seconds": 7.0
+        },
+        {
+          "k": 64,
+          "p_theory": 7.776938000621238e-29,
+          "p_emp": 0.0,
+          "abs_err": 7.776938000621238e-29,
+          "sigma": 1.5625e-08,
+          "within_3sigma": true,
+          "seconds": 13.9
+        },
+        {
+          "k": 128,
+          "p_theory": 0.750000000000045,
+          "p_emp": 0.75537109375,
+          "abs_err": 0.005371093749955036,
+          "sigma": 0.006716671271396284,
+          "within_3sigma": true,
+          "seconds": 27.9
+        }
+      ],
+      "all_within_3sigma": true
+    },
+    "fura2": {
+      "dataset": "fura2",
+      "label": "synthetic Fura-2 (a=0.5)",
+      "tau": 1,
+      "q": 2,
+      "a_true": 0.5,
+      "theta": 0.7853981633974484,
+      "shots": 4096,
+      "seed_base": 20260610,
+      "rows": [
+        {
+          "k": 0,
+          "p_theory": 0.5000000000000001,
+          "p_emp": 0.499755859375,
+          "abs_err": 0.000244140625000111,
+          "sigma": 0.00781249906867737,
+          "within_3sigma": true,
+          "seconds": 0.1
+        },
+        {
+          "k": 1,
+          "p_theory": 0.4999999999999996,
+          "p_emp": 0.51513671875,
+          "abs_err": 0.015136718750000389,
+          "sigma": 0.007808919175395668,
+          "within_3sigma": true,
+          "seconds": 0.3
+        },
+        {
+          "k": 2,
+          "p_theory": 0.5000000000000002,
+          "p_emp": 0.495849609375,
+          "abs_err": 0.004150390625000222,
+          "sigma": 0.00781223084313943,
+          "within_3sigma": true,
+          "seconds": 0.5
+        },
+        {
+          "k": 4,
+          "p_theory": 0.5000000000000006,
+          "p_emp": 0.4951171875,
+          "abs_err": 0.004882812500000555,
+          "sigma": 0.007812127462087946,
+          "within_3sigma": true,
+          "seconds": 0.9
+        },
+        {
+          "k": 8,
+          "p_theory": 0.5000000000000021,
+          "p_emp": 0.493408203125,
+          "abs_err": 0.006591796875002109,
+          "sigma": 0.00781182103633964,
+          "within_3sigma": true,
+          "seconds": 1.6
+        },
+        {
+          "k": 16,
+          "p_theory": 0.5000000000000033,
+          "p_emp": 0.509033203125,
+          "abs_err": 0.00903320312499667,
+          "sigma": 0.007811224915341535,
+          "within_3sigma": true,
+          "seconds": 3.1
+        },
+        {
+          "k": 32,
+          "p_theory": 0.5000000000000024,
+          "p_emp": 0.498779296875,
+          "abs_err": 0.0012207031250024425,
+          "sigma": 0.00781247671690094,
+          "within_3sigma": true,
+          "seconds": 6.0
+        },
+        {
+          "k": 64,
+          "p_theory": 0.5000000000000075,
+          "p_emp": 0.501708984375,
+          "abs_err": 0.0017089843749924505,
+          "sigma": 0.007812454365060561,
+          "within_3sigma": true,
+          "seconds": 12.1
+        },
+        {
+          "k": 128,
+          "p_theory": 0.500000000000018,
+          "p_emp": 0.5009765625,
+          "abs_err": 0.0009765624999820144,
+          "sigma": 0.007812485098824595,
+          "within_3sigma": true,
+          "seconds": 24.4
+        }
+      ],
+      "all_within_3sigma": true
+    }
+  }
+}

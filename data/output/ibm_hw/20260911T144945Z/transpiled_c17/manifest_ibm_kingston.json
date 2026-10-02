@@ -1,0 +1,195 @@
+{
+  "random4_n3": {
+    "ds": "random4",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 573,
+    "seed": 6,
+    "sha256": "d8f6a7afdb729a40b19a5783001cf309cf9eb130b7c24676c963e2ba928e1388",
+    "layout": [
+      96,
+      97,
+      103,
+      104,
+      105,
+      106,
+      107,
+      117,
+      122,
+      123,
+      124,
+      125,
+      126
+    ]
+  },
+  "canonical_shared_n3": {
+    "ds": "canonical_shared",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 571,
+    "seed": 1,
+    "sha256": "a6f9668e3446effe2d27d88ade73823c4a4479050dbca692a2ebe626030305d6",
+    "layout": [
+      78,
+      79,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      98,
+      110,
+      111
+    ]
+  },
+  "fura2_n3": {
+    "ds": "fura2",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 573,
+    "seed": 6,
+    "sha256": "a9c4d3f26108053aa01fd85d76d66baae46233bba7c6bfcd2195adb5b0d6e4a5",
+    "layout": [
+      96,
+      97,
+      103,
+      104,
+      105,
+      106,
+      107,
+      117,
+      122,
+      123,
+      124,
+      125,
+      126
+    ]
+  },
+  "balanced8_n3": {
+    "ds": "balanced8",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 564,
+    "seed": 0,
+    "sha256": "1de138e7418b73414c9ee939c84fc1abb237355459eb9484173b9e6c1b48de3a",
+    "layout": [
+      105,
+      117,
+      118,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      137,
+      147
+    ]
+  },
+  "fourvalue_n2": {
+    "ds": "fourvalue",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 116,
+    "seed": 0,
+    "sha256": "a5771ec51a7b69e03844bbc8ea4edeafd7cafecc6bd45c11f962611284251145",
+    "layout": [
+      10,
+      25,
+      37,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      53
+    ]
+  },
+  "random4_n2": {
+    "ds": "random4",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 206,
+    "seed": 12,
+    "sha256": "444c54f1bb9febc4e526e197b3771de9ecbf5313bb3fe110bbe846afbfe4f13a",
+    "layout": [
+      79,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      98,
+      111
+    ]
+  },
+  "canonical_shared_n2": {
+    "ds": "canonical_shared",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 202,
+    "seed": 8,
+    "sha256": "fd08eeb5703f7ed39757cf05d1dd8d37c26e96221e9115781a67b665bb02c3e0",
+    "layout": [
+      2,
+      3,
+      16,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      36,
+      41
+    ]
+  },
+  "fourvalue_n1": {
+    "ds": "fourvalue",
+    "n": 1,
+    "shots": 4096,
+    "two_q": 111,
+    "seed": 10,
+    "sha256": "b0a8bdc0c509c23fa9c9ec2f8c2c2c58d4d6f1aa759dfb3ec9ff7a67ee9fefc0",
+    "layout": [
+      2,
+      3,
+      4,
+      16,
+      21,
+      22,
+      23,
+      24,
+      36
+    ]
+  },
+  "canonical_shared_n1": {
+    "ds": "canonical_shared",
+    "n": 1,
+    "shots": 4096,
+    "two_q": 111,
+    "seed": 14,
+    "sha256": "a82a82c4661074c75c22e7b89815099de5132d66e6a2b37ffb36a54c0212414a",
+    "layout": [
+      2,
+      3,
+      16,
+      21,
+      22,
+      23,
+      24,
+      25,
+      36
+    ]
+  }
+}

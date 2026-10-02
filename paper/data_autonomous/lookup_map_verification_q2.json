@@ -1,0 +1,13 @@
+{
+  "q": 2,
+  "q_frac": 2,
+  "class_a": {
+    "pairs": 16,
+    "mismatch": 0,
+    "divzero_pixels": 1
+  },
+  "class_c": {
+    "pairs": 16,
+    "mismatch": 0
+  }
+}

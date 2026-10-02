@@ -1,0 +1,30 @@
+{
+  "label": "c17_canonical_shared_n1_lookup_kingston_r2",
+  "campaign": 17,
+  "dataset": "canonical_shared",
+  "n": 1,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "backend": "ibm_kingston",
+  "shots": 4096,
+  "mitigation": "trex",
+  "job_id": "daraqmjg95ks73ee3d8g",
+  "two_q_gate_count": 111,
+  "seed_transpiler": 14,
+  "transpiled_sha256": "dd46c8520428c27ec0cd6bb4fe6658c14c213b2de0563d68c2dea8a1f7e87350",
+  "physical_qubits": [
+    39,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    58,
+    71
+  ],
+  "round": 2,
+  "remaining_before": 122,
+  "wallclock_seconds": 16.1
+}

@@ -1,0 +1,26 @@
+[
+  {
+    "dataset": "canonical_shared",
+    "n": 1,
+    "autonomous_mcx": 261,
+    "autonomous_ucry": 229,
+    "parametric_ucry": 8,
+    "price_ucry": 28.625
+  },
+  {
+    "dataset": "canonical",
+    "n": 2,
+    "autonomous_mcx": 681,
+    "autonomous_ucry": 277,
+    "parametric_ucry": 32,
+    "price_ucry": 8.65625
+  },
+  {
+    "dataset": "canonical",
+    "n": 3,
+    "autonomous_mcx": 2583,
+    "autonomous_ucry": 469,
+    "parametric_ucry": 128,
+    "price_ucry": 3.6640625
+  }
+]

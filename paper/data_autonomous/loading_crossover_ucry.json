@@ -1,0 +1,38 @@
+[
+  {
+    "n": 1,
+    "side": 2,
+    "load_cx_ucry": 16,
+    "M_star_ucry": 0.05387205387205387
+  },
+  {
+    "n": 2,
+    "side": 4,
+    "load_cx_ucry": 64,
+    "M_star_ucry": 0.21548821548821548
+  },
+  {
+    "n": 3,
+    "side": 8,
+    "load_cx_ucry": 256,
+    "M_star_ucry": 0.8619528619528619
+  },
+  {
+    "n": 4,
+    "side": 16,
+    "load_cx_ucry": 1024,
+    "M_star_ucry": 3.4478114478114477
+  },
+  {
+    "n": 5,
+    "side": 32,
+    "load_cx_ucry": 4096,
+    "M_star_ucry": 13.79124579124579
+  },
+  {
+    "n": 6,
+    "side": 64,
+    "load_cx_ucry": 16384,
+    "M_star_ucry": 55.16498316498316
+  }
+]

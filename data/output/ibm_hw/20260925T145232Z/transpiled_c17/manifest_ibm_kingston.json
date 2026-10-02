@@ -1,0 +1,195 @@
+{
+  "random4_n3": {
+    "ds": "random4",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 573,
+    "seed": 6,
+    "sha256": "90cff4fbf91cce25c85f12d85463b793ae98ea5854496a9254b85d2df63aaa0c",
+    "layout": [
+      39,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      59,
+      70,
+      71
+    ]
+  },
+  "canonical_shared_n3": {
+    "ds": "canonical_shared",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 571,
+    "seed": 1,
+    "sha256": "e524f43dc1477c6baba33c5dc0c56c4f34c9bd5e582e39825403a0ab7aae46dd",
+    "layout": [
+      38,
+      39,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      70,
+      71
+    ]
+  },
+  "fura2_n3": {
+    "ds": "fura2",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 573,
+    "seed": 6,
+    "sha256": "f068dadcb75623512599e912c548081a527a3df2192c418e4798e791567484f8",
+    "layout": [
+      39,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      59,
+      70,
+      71
+    ]
+  },
+  "balanced8_n3": {
+    "ds": "balanced8",
+    "n": 3,
+    "shots": 65536,
+    "two_q": 564,
+    "seed": 0,
+    "sha256": "6a8acfdc150accdefd4e0357444a94ff0483e1922acbb34cffe0ccbd17c8edfc",
+    "layout": [
+      33,
+      38,
+      39,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      59,
+      71
+    ]
+  },
+  "fourvalue_n2": {
+    "ds": "fourvalue",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 116,
+    "seed": 0,
+    "sha256": "e4128beaa0c308950aef95cdba2278ed8e6fb882f4ca08ae252f8fea33ed0259",
+    "layout": [
+      10,
+      25,
+      37,
+      45,
+      46,
+      47,
+      48,
+      49,
+      57,
+      67,
+      117
+    ]
+  },
+  "random4_n2": {
+    "ds": "random4",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 206,
+    "seed": 12,
+    "sha256": "4bc284a6f9373f98787949b86aefd48cc896b959d7bf0ff50e6274e01d3cf526",
+    "layout": [
+      39,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      70,
+      71
+    ]
+  },
+  "canonical_shared_n2": {
+    "ds": "canonical_shared",
+    "n": 2,
+    "shots": 16384,
+    "two_q": 202,
+    "seed": 8,
+    "sha256": "d4e4e663031755e33e6ee05ad7e7701cd53c3347d41f47d118f9680a87d0c1f7",
+    "layout": [
+      39,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      58,
+      71
+    ]
+  },
+  "fourvalue_n1": {
+    "ds": "fourvalue",
+    "n": 1,
+    "shots": 4096,
+    "two_q": 111,
+    "seed": 10,
+    "sha256": "f87af5318da522a76d399e3268b3f2662c0c2b16e9a7782151bbef2175332129",
+    "layout": [
+      38,
+      48,
+      49,
+      50,
+      51,
+      52,
+      58,
+      70,
+      71
+    ]
+  },
+  "canonical_shared_n1": {
+    "ds": "canonical_shared",
+    "n": 1,
+    "shots": 4096,
+    "two_q": 111,
+    "seed": 14,
+    "sha256": "dd46c8520428c27ec0cd6bb4fe6658c14c213b2de0563d68c2dea8a1f7e87350",
+    "layout": [
+      39,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      58,
+      71
+    ]
+  }
+}

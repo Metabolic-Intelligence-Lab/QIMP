@@ -1,0 +1,162 @@
+[
+  {
+    "label": "$2\\times2$ four-value",
+    "dataset": "fourvalue",
+    "n": 1,
+    "old_acc": 1.0,
+    "old_cx": 701.4,
+    "old_cx_range": [
+      679,
+      728
+    ],
+    "new_acc": 1.0,
+    "new_cx": 111.0,
+    "new_cx_range": [
+      111,
+      111
+    ],
+    "null": 0.25,
+    "old_runs": 5,
+    "new_runs": 2
+  },
+  {
+    "label": "$4\\times4$ tiled",
+    "dataset": "fourvalue",
+    "n": 2,
+    "old_acc": 0.984375,
+    "old_cx": 587.75,
+    "old_cx_range": [
+      576,
+      605
+    ],
+    "new_acc": 1.0,
+    "new_cx": 116.0,
+    "new_cx_range": [
+      116,
+      116
+    ],
+    "null": 0.25,
+    "old_runs": 4,
+    "new_runs": 3
+  },
+  {
+    "label": "$4\\times4$ random",
+    "dataset": "random4",
+    "n": 2,
+    "old_acc": 0.84375,
+    "old_cx": 699.0,
+    "old_cx_range": [
+      678,
+      722
+    ],
+    "new_acc": 1.0,
+    "new_cx": 206.0,
+    "new_cx_range": [
+      206,
+      206
+    ],
+    "null": 0.4375,
+    "old_runs": 4,
+    "new_runs": 2
+  },
+  {
+    "label": "$4\\times4$ Laurdan",
+    "dataset": "canonical_shared",
+    "n": 2,
+    "old_acc": 0.9027777777777778,
+    "old_cx": 691.8333333333334,
+    "old_cx_range": [
+      663,
+      724
+    ],
+    "new_acc": 1.0,
+    "new_cx": 202.0,
+    "new_cx_range": [
+      202,
+      202
+    ],
+    "null": 0.5,
+    "old_runs": 6,
+    "new_runs": 2
+  },
+  {
+    "label": "$8\\times8$ random",
+    "dataset": "random4",
+    "n": 3,
+    "old_acc": 0.496875,
+    "old_cx": 1210.4,
+    "old_cx_range": [
+      1086,
+      1256
+    ],
+    "new_acc": 0.84375,
+    "new_cx": 573.0,
+    "new_cx_range": [
+      573,
+      573
+    ],
+    "null": 0.546875,
+    "old_runs": 5,
+    "new_runs": 3
+  },
+  {
+    "label": "$8\\times8$ Laurdan",
+    "dataset": "canonical_shared",
+    "n": 3,
+    "old_acc": 0.5428571428571428,
+    "old_cx": 1159.6666666666667,
+    "old_cx_range": [
+      1095,
+      1200
+    ],
+    "new_acc": 0.8380952380952381,
+    "new_cx": 571.0,
+    "new_cx_range": [
+      571,
+      571
+    ],
+    "null": 0.5428571428571428,
+    "old_runs": 3,
+    "new_runs": 3
+  },
+  {
+    "label": "$8\\times8$ Fura-2",
+    "dataset": "fura2",
+    "n": 3,
+    "old_acc": 0.5246913580246914,
+    "old_cx": 1156.3333333333333,
+    "old_cx_range": [
+      1097,
+      1253
+    ],
+    "new_acc": 0.7777777777777778,
+    "new_cx": 573.0,
+    "new_cx_range": [
+      573,
+      573
+    ],
+    "null": 0.7222222222222222,
+    "old_runs": 3,
+    "new_runs": 3
+  },
+  {
+    "label": "$8\\times8$ balanced",
+    "dataset": "balanced8",
+    "n": 3,
+    "old_acc": 0.375,
+    "old_cx": 1109.3333333333333,
+    "old_cx_range": [
+      1091,
+      1133
+    ],
+    "new_acc": 0.8802083333333334,
+    "new_cx": 564.0,
+    "new_cx_range": [
+      564,
+      564
+    ],
+    "null": 0.25,
+    "old_runs": 3,
+    "new_runs": 3
+  }
+]

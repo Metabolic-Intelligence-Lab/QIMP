@@ -1,0 +1,54 @@
+{
+  "q": 2,
+  "divider": "lookup",
+  "C_A": 133,
+  "divider_cx": 49,
+  "predicate_cx": 84,
+  "rows": [
+    {
+      "n": 1,
+      "side": 2,
+      "pixels": 4,
+      "load_cx": 60,
+      "load_cx_vchain": 60,
+      "arith_cx": 133,
+      "M_star": 0.45112781954887216,
+      "M_star_vchain": 0.45112781954887216
+    },
+    {
+      "n": 2,
+      "side": 4,
+      "pixels": 16,
+      "load_cx": 688,
+      "load_cx_vchain": 504,
+      "arith_cx": 133,
+      "M_star": 5.172932330827067,
+      "M_star_vchain": 3.789473684210526
+    },
+    {
+      "n": 3,
+      "side": 8,
+      "pixels": 64,
+      "load_cx": 7758,
+      "load_cx_vchain": 4350,
+      "arith_cx": 133,
+      "M_star": 58.330827067669176,
+      "M_star_vchain": 32.70676691729323
+    },
+    {
+      "n": 4,
+      "side": 16,
+      "pixels": 256,
+      "load_cx": 41124,
+      "load_cx_vchain": 22260,
+      "arith_cx": 133,
+      "M_star": 309.203007518797,
+      "M_star_vchain": 167.3684210526316
+    }
+  ],
+  "mlqae_below_mc_from_M": {
+    "synthetic_a0.25": 256,
+    "laurdan_a0.75": 64,
+    "fura2_a0.50": 256
+  }
+}

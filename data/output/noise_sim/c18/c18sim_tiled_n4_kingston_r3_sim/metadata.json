@@ -1,0 +1,16 @@
+{
+  "label": "c18sim_tiled_n4_kingston_r3",
+  "backend": "ibm_kingston noise model (calibration of 2026-10-02 11:08:52+02:00) + fitted CZ depolarizing",
+  "simulated": true,
+  "p_extra": 0.002455112352570262,
+  "dataset": "tiled",
+  "n": 4,
+  "q": 2,
+  "divider": "lookup",
+  "load": "ucry",
+  "shots": 65536,
+  "two_q_gate_count": 114,
+  "transpiled_sha256": "f140836d695bfca0f790bddd617e0853920bfb23b915f1d6d75a99d64a5708dd",
+  "seed_simulator": 1802,
+  "method": "automatic (Aer's choice, not recorded)"
+}

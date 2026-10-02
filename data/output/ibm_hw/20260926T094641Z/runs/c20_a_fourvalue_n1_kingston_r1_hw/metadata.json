@@ -1,0 +1,47 @@
+{
+  "label": "c20_a_fourvalue_n1_kingston_r1",
+  "campaign": 20,
+  "operator_class": "a",
+  "dataset": "fourvalue",
+  "n": 1,
+  "q": 2,
+  "q_frac": 2,
+  "R_red_fp": 1,
+  "load": "ucry",
+  "divider": "lookup",
+  "backend": "ibm_kingston",
+  "shots": 4096,
+  "mitigation": "trex",
+  "job_id": "darp91ihcrkc73drvhpg",
+  "two_q_gate_count": 324,
+  "seed_transpiler": 3,
+  "transpiled_sha256": "ec0043eeb00336388c4a091262bcad52b0938972512bf130f0ec4899faf1056e",
+  "n_valid": 4,
+  "match_count": 4,
+  "sign_match": 4,
+  "mean_abs_error": 0.0,
+  "divzero_match": 4,
+  "decoded": [
+    [
+      -0.25,
+      -0.0
+    ],
+    [
+      0.25,
+      0.5
+    ]
+  ],
+  "classical": [
+    [
+      -0.25,
+      0.0
+    ],
+    [
+      0.25,
+      0.5
+    ]
+  ],
+  "round": 1,
+  "remaining_before": 8,
+  "wallclock_seconds": 8.8
+}

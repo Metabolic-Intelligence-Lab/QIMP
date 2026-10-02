@@ -14,8 +14,8 @@ floating-point ceiling characterised in Section 5.2 (75-100 dB across n=2..5)
 is independent of the choice of target and is the same numeric envelope here.
 
 Two figures are saved:
-    paper/figures/fig_fura2_validation.png   (Class B, Fura-2 calcium)
-    paper/figures/fig_rogfp_validation.png   (Class C, roGFP redox)
+    paper/qmi_frqi_paper/figures/fig_fura2_validation.png   (Class B, Fura-2 calcium)
+    paper/qmi_frqi_paper/figures/fig_rogfp_validation.png   (Class C, roGFP redox)
 
 Each figure has three panels: the two input intensity channels, the classical
 ratiometric target, and the closed-form reconstruction error (pixelwise
@@ -36,7 +36,7 @@ REPO = Path(
     "/mnt/c/Users/Giuseppe/OneDrive - Università Cattolica del Sacro Cuore/"
     "Metabolic Intelligence - Projects-MI/2024_QIMP/repo"
 )
-OUT = REPO / "paper" / "figures"
+OUT = REPO / "paper" / "qmi_frqi_paper" / "figures"
 
 
 # ----- closed-form solver (pure NumPy mirror of qimp.processing.gp_ratio) --

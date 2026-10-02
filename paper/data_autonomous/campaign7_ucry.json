@@ -1,0 +1,1144 @@
+{
+  "c7_a_fourvalue_n2_ucry_kingston": {
+    "n_runs": 4,
+    "constant_readout_null": "4/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      576,
+      605
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 12.5,
+      "match_sd": 3.109,
+      "match_hist": {
+        "9": 1,
+        "11": 1,
+        "14": 1,
+        "16": 1
+      },
+      "runs_above_null": 4,
+      "n_runs": 4,
+      "sign_test_p": 0.0625,
+      "pixel_accuracy": 0.781,
+      "correct": 50,
+      "pixels": 64,
+      "confusion_true_x_decoded": [
+        [
+          9,
+          7,
+          0,
+          0
+        ],
+        [
+          0,
+          16,
+          0,
+          0
+        ],
+        [
+          0,
+          3,
+          9,
+          4
+        ],
+        [
+          0,
+          0,
+          0,
+          16
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.3648,
+        0.0634
+      ],
+      "binomial_p_vs_chance": 7.4e-19
+    },
+    "A_flatfield": {
+      "match_mean": 15.75,
+      "match_sd": 0.5,
+      "match_hist": {
+        "15": 1,
+        "16": 3
+      },
+      "runs_above_null": 4,
+      "n_runs": 4,
+      "sign_test_p": 0.0625,
+      "pixel_accuracy": 0.984,
+      "correct": 63,
+      "pixels": 64,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          16,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          15,
+          1
+        ],
+        [
+          0,
+          0,
+          0,
+          16
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.1148,
+        0.023
+      ],
+      "binomial_p_vs_chance": 5.67e-37
+    }
+  },
+  "c7_b_random4_n2_ucry_kingston": {
+    "n_runs": 4,
+    "constant_readout_null": "7/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      678,
+      722
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 10.25,
+      "match_sd": 1.708,
+      "match_hist": {
+        "8": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1
+      },
+      "runs_above_null": 4,
+      "n_runs": 4,
+      "sign_test_p": 0.0625,
+      "pixel_accuracy": 0.641,
+      "correct": 41,
+      "pixels": 64,
+      "confusion_true_x_decoded": [
+        [
+          12,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          28,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          11,
+          0,
+          1
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.388,
+        0.0763
+      ],
+      "binomial_p_vs_chance": 4.95e-11
+    },
+    "A_flatfield": {
+      "match_mean": 13.5,
+      "match_sd": 1.291,
+      "match_hist": {
+        "12": 1,
+        "13": 1,
+        "14": 1,
+        "15": 1
+      },
+      "runs_above_null": 4,
+      "n_runs": 4,
+      "sign_test_p": 0.0625,
+      "pixel_accuracy": 0.844,
+      "correct": 54,
+      "pixels": 64,
+      "confusion_true_x_decoded": [
+        [
+          22,
+          1,
+          1,
+          0
+        ],
+        [
+          1,
+          20,
+          2,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          12
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0559,
+        0.04
+      ],
+      "binomial_p_vs_chance": 2.8e-23
+    }
+  },
+  "c7_c_laurdan_n2_ucry_kingston": {
+    "n_runs": 3,
+    "constant_readout_null": "6/16",
+    "valid_pixels": 12,
+    "cx_range": [
+      663,
+      724
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 8.333,
+      "match_sd": 3.215,
+      "match_hist": {
+        "6": 1,
+        "7": 1,
+        "12": 1
+      },
+      "runs_above_null": 2,
+      "n_runs": 3,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.694,
+      "correct": 25,
+      "pixels": 36,
+      "confusion_true_x_decoded": [
+        [
+          7,
+          11,
+          0,
+          0
+        ],
+        [
+          0,
+          18,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.4033,
+        0.0486
+      ],
+      "binomial_p_vs_chance": 2.62e-08
+    },
+    "A_flatfield": {
+      "match_mean": 10.0,
+      "match_sd": 2.646,
+      "match_hist": {
+        "7": 1,
+        "11": 1,
+        "12": 1
+      },
+      "runs_above_null": 3,
+      "n_runs": 3,
+      "sign_test_p": 0.125,
+      "pixel_accuracy": 0.833,
+      "correct": 30,
+      "pixels": 36,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          2,
+          0,
+          0
+        ],
+        [
+          1,
+          14,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0582,
+        0.0328
+      ],
+      "binomial_p_vs_chance": 3.21e-13
+    }
+  },
+  "c7_d_random4_n3_ucry_kingston": {
+    "n_runs": 2,
+    "constant_readout_null": "35/64",
+    "valid_pixels": 64,
+    "cx_range": [
+      1086,
+      1234
+    ],
+    "shots": [
+      65536
+    ],
+    "argmax": {
+      "match_mean": 30.0,
+      "match_sd": 5.657,
+      "match_hist": {
+        "26": 1,
+        "34": 1
+      },
+      "runs_above_null": 0,
+      "n_runs": 2,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.469,
+      "correct": 60,
+      "pixels": 128,
+      "confusion_true_x_decoded": [
+        [
+          22,
+          48,
+          0,
+          0
+        ],
+        [
+          2,
+          38,
+          0,
+          0
+        ],
+        [
+          0,
+          4,
+          0,
+          0
+        ],
+        [
+          0,
+          14,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.3352,
+        0.0558
+      ],
+      "binomial_p_vs_chance": 7.07e-08
+    },
+    "A_flatfield": {
+      "match_mean": 37.0,
+      "match_sd": 4.243,
+      "match_hist": {
+        "34": 1,
+        "40": 1
+      },
+      "runs_above_null": 1,
+      "n_runs": 2,
+      "sign_test_p": 0.75,
+      "pixel_accuracy": 0.578,
+      "correct": 74,
+      "pixels": 128,
+      "confusion_true_x_decoded": [
+        [
+          40,
+          15,
+          7,
+          8
+        ],
+        [
+          5,
+          20,
+          4,
+          11
+        ],
+        [
+          0,
+          1,
+          2,
+          1
+        ],
+        [
+          0,
+          1,
+          1,
+          12
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0192,
+        0.0285
+      ],
+      "binomial_p_vs_chance": 3.33e-15
+    }
+  },
+  "c9_fourvalue_n2_ucry_marrakesh": {
+    "n_runs": 3,
+    "constant_readout_null": "4/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      561,
+      604
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 5.667,
+      "match_sd": 1.528,
+      "match_hist": {
+        "4": 1,
+        "6": 1,
+        "7": 1
+      },
+      "runs_above_null": 2,
+      "n_runs": 3,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.354,
+      "correct": 17,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          6,
+          0,
+          6
+        ],
+        [
+          0,
+          7,
+          0,
+          5
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.3031,
+        0.0957
+      ],
+      "binomial_p_vs_chance": 0.0704
+    },
+    "A_flatfield": {
+      "match_mean": 10.333,
+      "match_sd": 6.028,
+      "match_hist": {
+        "4": 1,
+        "11": 1,
+        "16": 1
+      },
+      "runs_above_null": 2,
+      "n_runs": 3,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.646,
+      "correct": 31,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          5,
+          3,
+          2,
+          2
+        ],
+        [
+          2,
+          9,
+          1,
+          0
+        ],
+        [
+          1,
+          1,
+          8,
+          2
+        ],
+        [
+          1,
+          0,
+          2,
+          9
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0531,
+        0.0402
+      ],
+      "binomial_p_vs_chance": 8.37e-09
+    }
+  },
+  "c10_a_fourvalue_n2_ucry_fez": {
+    "n_runs": 3,
+    "constant_readout_null": "4/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      565,
+      624
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 4.0,
+      "match_sd": 0.0,
+      "match_hist": {
+        "4": 3
+      },
+      "runs_above_null": 0,
+      "n_runs": 3,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.25,
+      "correct": 12,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.2896,
+        0.1117
+      ],
+      "binomial_p_vs_chance": 0.555
+    },
+    "A_flatfield": {
+      "match_mean": 12.667,
+      "match_sd": 1.155,
+      "match_hist": {
+        "12": 2,
+        "14": 1
+      },
+      "runs_above_null": 3,
+      "n_runs": 3,
+      "sign_test_p": 0.125,
+      "pixel_accuracy": 0.792,
+      "correct": 38,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          7,
+          5,
+          0,
+          0
+        ],
+        [
+          0,
+          12,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          9,
+          3
+        ],
+        [
+          0,
+          0,
+          2,
+          10
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0396,
+        0.0206
+      ],
+      "binomial_p_vs_chance": 5.32e-15
+    }
+  },
+  "c9+c10b_fourvalue_n2_ucry_marrakesh": {
+    "n_runs": 6,
+    "constant_readout_null": "4/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      561,
+      607
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 5.0,
+      "match_sd": 1.265,
+      "match_hist": {
+        "4": 3,
+        "5": 1,
+        "6": 1,
+        "7": 1
+      },
+      "runs_above_null": 3,
+      "n_runs": 6,
+      "sign_test_p": 0.6562,
+      "pixel_accuracy": 0.312,
+      "correct": 30,
+      "pixels": 96,
+      "confusion_true_x_decoded": [
+        [
+          1,
+          23,
+          0,
+          0
+        ],
+        [
+          0,
+          24,
+          0,
+          0
+        ],
+        [
+          0,
+          18,
+          0,
+          6
+        ],
+        [
+          0,
+          19,
+          0,
+          5
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.2969,
+        0.0951
+      ],
+      "binomial_p_vs_chance": 0.0994
+    },
+    "A_flatfield": {
+      "match_mean": 11.333,
+      "match_sd": 4.274,
+      "match_hist": {
+        "4": 1,
+        "10": 1,
+        "11": 1,
+        "12": 1,
+        "15": 1,
+        "16": 1
+      },
+      "runs_above_null": 5,
+      "n_runs": 6,
+      "sign_test_p": 0.1094,
+      "pixel_accuracy": 0.708,
+      "correct": 68,
+      "pixels": 96,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          4,
+          2,
+          2
+        ],
+        [
+          3,
+          19,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          16,
+          6
+        ],
+        [
+          1,
+          0,
+          6,
+          17
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0469,
+        0.0322
+      ],
+      "binomial_p_vs_chance": 5.52e-21
+    }
+  },
+  "c7c+c10c_laurdan_n2_ucry_kingston": {
+    "n_runs": 6,
+    "constant_readout_null": "6/16",
+    "valid_pixels": 12,
+    "cx_range": [
+      663,
+      724
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 8.667,
+      "match_sd": 2.805,
+      "match_hist": {
+        "6": 2,
+        "7": 1,
+        "9": 1,
+        "12": 2
+      },
+      "runs_above_null": 4,
+      "n_runs": 6,
+      "sign_test_p": 0.3438,
+      "pixel_accuracy": 0.722,
+      "correct": 52,
+      "pixels": 72,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          20,
+          0,
+          0
+        ],
+        [
+          0,
+          36,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.4061,
+        0.0438
+      ],
+      "binomial_p_vs_chance": 5.57e-17
+    },
+    "A_flatfield": {
+      "match_mean": 10.833,
+      "match_sd": 1.941,
+      "match_hist": {
+        "7": 1,
+        "11": 2,
+        "12": 3
+      },
+      "runs_above_null": 6,
+      "n_runs": 6,
+      "sign_test_p": 0.0156,
+      "pixel_accuracy": 0.903,
+      "correct": 65,
+      "pixels": 72,
+      "confusion_true_x_decoded": [
+        [
+          33,
+          3,
+          0,
+          0
+        ],
+        [
+          1,
+          32,
+          1,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.06,
+        0.0291
+      ],
+      "binomial_p_vs_chance": 1.5e-31
+    }
+  },
+  "c10_d_laurdan_n3_ucry_kingston": {
+    "n_runs": 3,
+    "constant_readout_null": "29/64",
+    "valid_pixels": 35,
+    "cx_range": [
+      1095,
+      1200
+    ],
+    "shots": [
+      65536
+    ],
+    "argmax": {
+      "match_mean": 18.333,
+      "match_sd": 2.082,
+      "match_hist": {
+        "16": 1,
+        "19": 1,
+        "20": 1
+      },
+      "runs_above_null": 0,
+      "n_runs": 3,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.524,
+      "correct": 55,
+      "pixels": 105,
+      "confusion_true_x_decoded": [
+        [
+          7,
+          49,
+          0,
+          1
+        ],
+        [
+          0,
+          48,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.3315,
+        0.0545
+      ],
+      "binomial_p_vs_chance": 1.73e-09
+    },
+    "A_flatfield": {
+      "match_mean": 19.0,
+      "match_sd": 5.196,
+      "match_hist": {
+        "13": 1,
+        "22": 2
+      },
+      "runs_above_null": 0,
+      "n_runs": 3,
+      "sign_test_p": 1.0,
+      "pixel_accuracy": 0.543,
+      "correct": 57,
+      "pixels": 105,
+      "confusion_true_x_decoded": [
+        [
+          32,
+          17,
+          2,
+          6
+        ],
+        [
+          12,
+          25,
+          6,
+          5
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0228,
+        0.0303
+      ],
+      "binomial_p_vs_chance": 1.43e-10
+    }
+  },
+  "c10_e_random4_n2_ucry_marrakesh": {
+    "n_runs": 3,
+    "constant_readout_null": "7/16",
+    "valid_pixels": 16,
+    "cx_range": [
+      689,
+      729
+    ],
+    "shots": [
+      16384
+    ],
+    "argmax": {
+      "match_mean": 7.667,
+      "match_sd": 0.577,
+      "match_hist": {
+        "7": 1,
+        "8": 2
+      },
+      "runs_above_null": 2,
+      "n_runs": 3,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.479,
+      "correct": 23,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          2,
+          16,
+          0,
+          0
+        ],
+        [
+          0,
+          21,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          9,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.3672,
+        0.0627
+      ],
+      "binomial_p_vs_chance": 0.000498
+    },
+    "A_flatfield": {
+      "match_mean": 12.667,
+      "match_sd": 0.577,
+      "match_hist": {
+        "12": 1,
+        "13": 2
+      },
+      "runs_above_null": 3,
+      "n_runs": 3,
+      "sign_test_p": 0.125,
+      "pixel_accuracy": 0.792,
+      "correct": 38,
+      "pixels": 48,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          14,
+          5,
+          2
+        ],
+        [
+          0,
+          0,
+          0,
+          0
+        ],
+        [
+          0,
+          0,
+          1,
+          8
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0445,
+        0.032
+      ],
+      "binomial_p_vs_chance": 5.32e-15
+    }
+  },
+  "c12_b_balanced8_n3_ucry_kingston": {
+    "n_runs": 3,
+    "constant_readout_null": "16/64",
+    "valid_pixels": 64,
+    "cx_range": [
+      1091,
+      1133
+    ],
+    "shots": [
+      65536
+    ],
+    "argmax": {
+      "match_mean": 16.333,
+      "match_sd": 0.577,
+      "match_hist": {
+        "16": 2,
+        "17": 1
+      },
+      "runs_above_null": 1,
+      "n_runs": 3,
+      "sign_test_p": 0.875,
+      "pixel_accuracy": 0.255,
+      "correct": 49,
+      "pixels": 192,
+      "confusion_true_x_decoded": [
+        [
+          3,
+          45,
+          0,
+          0
+        ],
+        [
+          2,
+          46,
+          0,
+          0
+        ],
+        [
+          3,
+          45,
+          0,
+          0
+        ],
+        [
+          1,
+          47,
+          0,
+          0
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.2634,
+        0.1069
+      ],
+      "binomial_p_vs_chance": 0.461
+    },
+    "A_flatfield": {
+      "match_mean": 24.0,
+      "match_sd": 7.937,
+      "match_hist": {
+        "15": 1,
+        "27": 1,
+        "30": 1
+      },
+      "runs_above_null": 2,
+      "n_runs": 3,
+      "sign_test_p": 0.5,
+      "pixel_accuracy": 0.375,
+      "correct": 72,
+      "pixels": 192,
+      "confusion_true_x_decoded": [
+        [
+          16,
+          17,
+          5,
+          10
+        ],
+        [
+          21,
+          20,
+          4,
+          3
+        ],
+        [
+          3,
+          3,
+          12,
+          30
+        ],
+        [
+          3,
+          11,
+          10,
+          24
+        ]
+      ],
+      "residual_on_true_bin": [
+        0.0134,
+        0.0229
+      ],
+      "binomial_p_vs_chance": 8.5e-05
+    }
+  }
+}

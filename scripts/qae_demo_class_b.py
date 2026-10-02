@@ -55,6 +55,8 @@ def build_A(
     image_b: np.ndarray,
     q: int,
     threshold: int,
+    divider: str = "restoring",
+    load: str = "mcx",
 ) -> tuple[QuantumCircuit, dict, dict]:
     """Build the QAE state-prep A = class_b_ratio + mark_good_oracle +
     divzero-aware correction.
@@ -77,7 +79,7 @@ def build_A(
     measure ``extra_layout["good_corrected"]`` rather than the raw
     "good" qubit.
     """
-    qc, b_layout = class_b_ratio(image_a, image_b, q=q)
+    qc, b_layout = class_b_ratio(image_a, image_b, q=q, divider=divider, load=load)
     start = qc.num_qubits
     q_w = q + 1
     # Allocate mark-good ancillae + correction ancilla
@@ -120,6 +122,8 @@ def apply_A_inv(
     threshold: int,
     b_layout: dict,
     extra_layout: dict,
+    divider: str = "restoring",
+    load: str = "mcx",
 ) -> None:
     """Apply A^†: reverse of build_A's body in reverse order.
 
@@ -141,7 +145,7 @@ def apply_A_inv(
         sub_carry_qubits=extra_layout["sub_c"],
         value_pad_qubit=extra_layout["val_pad"],
     )
-    class_b_ratio_inv(qc, image_a, image_b, q=q, layout=b_layout)
+    class_b_ratio_inv(qc, image_a, image_b, q=q, layout=b_layout, divider=divider, load=load)
 
 
 # ---------------------------------------------------------------------------
@@ -152,6 +156,21 @@ def apply_A_inv(
 def apply_S_good(qc: QuantumCircuit, good_qubit: int) -> None:
     """Oracle phase flip: |good⟩ → -|good⟩."""
     qc.z(good_qubit)
+
+
+def active_qubits(b_layout: dict, extra_layout: dict) -> list[int]:
+    """The qubits the state preparation leaves entangled.
+
+    With the truth-table divider the mark-good ancillae (``thr``, ``sub_c``,
+    ``val_pad``) are uncomputed and the divider keeps no carry register, so after
+    ``A†`` every qubit outside this list is back in |0⟩. Reflecting about |0…0⟩ on
+    this subset therefore acts as the full reflection does on the reachable
+    subspace, and costs a multi-controlled X with 10 controls instead of 18
+    (270 against 6272 routed two-qubit gates at k = 1 on `ibm_kingston`).
+    """
+    return (list(b_layout["position"]) + list(b_layout["I_a"]) + list(b_layout["I_b"])
+            + list(b_layout["quotient"]) + [b_layout["flag"], extra_layout["good"],
+                                            extra_layout["good_corrected"]])
 
 
 def apply_S_0(qc: QuantumCircuit, all_qubits: list[int]) -> None:
@@ -181,28 +200,40 @@ def apply_A_forward(
     threshold: int,
     b_layout: dict,
     extra_layout: dict,
+    divider: str = "restoring",
+    load: str = "mcx",
 ) -> None:
     """Re-apply A in place (the same gates as build_A, but on an existing
     circuit with the qubits already allocated). Used by the Grover
     operator's last step."""
-    from qimp.processing.arithmetic import q_div_restoring
+    from qimp.processing.arithmetic import q_div_lookup, q_div_restoring
     from qimp.processing.ratiometric_circuit import dual_neqr_load
     dual_neqr_load(
         qc, image_a, image_b, q,
         position_qubits=b_layout["position"],
         intensity_a_qubits=b_layout["I_a"],
         intensity_b_qubits=b_layout["I_b"],
+        mode=load,
     )
-    q_div_restoring(
-        qc,
-        dividend_qubits=b_layout["I_a"],
-        divisor_qubits=b_layout["I_b"],
-        quotient_qubits=b_layout["quotient"],
-        work_qubits=b_layout["work"],
-        divisor_pad_qubit=b_layout["pad"],
-        c_qubits=b_layout["c"],
-        div_zero_flag=b_layout["flag"],
-    )
+    if divider == "lookup":
+        q_div_lookup(
+            qc,
+            dividend_qubits=b_layout["I_a"],
+            divisor_qubits=b_layout["I_b"],
+            quotient_qubits=b_layout["quotient"],
+            div_zero_flag=b_layout["flag"],
+        )
+    else:
+        q_div_restoring(
+            qc,
+            dividend_qubits=b_layout["I_a"],
+            divisor_qubits=b_layout["I_b"],
+            quotient_qubits=b_layout["quotient"],
+            work_qubits=b_layout["work"],
+            divisor_pad_qubit=b_layout["pad"],
+            c_qubits=b_layout["c"],
+            div_zero_flag=b_layout["flag"],
+        )
     mark_good_oracle(
         qc,
         value_qubits=b_layout["quotient"],
@@ -225,16 +256,25 @@ def apply_Q_once(
     threshold: int,
     b_layout: dict,
     extra_layout: dict,
+    divider: str = "restoring",
+    load: str = "mcx",
+    reflection: str = "all",
 ) -> None:
     """Apply one Grover iteration Q = A · S_0 · A^† · S_good in place.
 
-    The phase oracle ``S_good`` reflects about |good_corrected = 1⟩;
-    the zero-state reflection acts on every qubit.
+    The phase oracle ``S_good`` reflects about |good_corrected = 1⟩. The
+    zero-state reflection acts on every qubit when ``reflection="all"`` and on
+    the qubits of :func:`active_qubits` when ``reflection="active"``; the two
+    agree on the reachable subspace whenever ``A`` returns every other qubit to
+    |0⟩, which the truth-table divider does.
     """
+    if reflection not in ("all", "active"):
+        raise ValueError(f"reflection must be 'all' or 'active', got {reflection!r}")
     apply_S_good(qc, extra_layout["good_corrected"])
-    apply_A_inv(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
-    apply_S_0(qc, list(range(qc.num_qubits)))
-    apply_A_forward(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
+    apply_A_inv(qc, image_a, image_b, q, threshold, b_layout, extra_layout, divider=divider, load=load)
+    refl = active_qubits(b_layout, extra_layout) if reflection == "active" else list(range(qc.num_qubits))
+    apply_S_0(qc, refl)
+    apply_A_forward(qc, image_a, image_b, q, threshold, b_layout, extra_layout, divider=divider, load=load)
 
 
 # ---------------------------------------------------------------------------
@@ -250,15 +290,19 @@ def measure_good_probability(
     grover_k: int,
     shots: int,
     seed: int | None = None,
+    divider: str = "restoring",
+    load: str = "mcx",
+    reflection: str = "all",
 ) -> float:
     """Build A · Q^k, measure good_qubit, return empirical P(good=1).
 
     ``seed`` seeds the Aer sampler so the shot noise is reproducible; leave
     it ``None`` for a fresh draw.
     """
-    qc, b_layout, extra_layout = build_A(image_a, image_b, q, threshold)
+    qc, b_layout, extra_layout = build_A(image_a, image_b, q, threshold, divider=divider, load=load)
     for _ in range(grover_k):
-        apply_Q_once(qc, image_a, image_b, q, threshold, b_layout, extra_layout)
+        apply_Q_once(qc, image_a, image_b, q, threshold, b_layout, extra_layout,
+                     divider=divider, load=load, reflection=reflection)
     # Add a classical bit and measure the divzero-corrected good qubit.
     from qiskit import ClassicalRegister
     creg = ClassicalRegister(1, "c_good")
