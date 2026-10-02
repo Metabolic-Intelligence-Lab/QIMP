@@ -15,9 +15,34 @@ Metabolic-Intelligence Lab's Green-Purple ratio pipeline (`qimp.processing.gp_ra
 
 ## Status
 
-Under active development. v0.1.0 will ship the core (FRQI/NEQR/QPIE + processing +
-testing + metrics) as described in the thesis. The GP-ratio application and QML
-extensions are available as optional sub-modules.
+The core (FRQI/NEQR/QPIE + processing + testing + metrics) is released; the GP-ratio
+application and QML extensions are optional sub-modules. The repository is public and
+is the archive of record for the manuscript described under [Paper](#paper).
+
+## Paper
+
+*Autonomous Quantum Ratiometric Image Processing: Reversible NEQR Arithmetic from
+Bit-Exact Simulation to Superconducting Hardware* (G. Maulucci, 2026, submitted). The
+tag `v2-submission` pins the code, the derived data and the hardware outputs the
+manuscript reports. The manuscript itself is not in the repository.
+
+- `src/qimp/processing/arithmetic.py` — the reversible-arithmetic primitives (adders,
+  constant multiplier, restoring and non-restoring dividers with exact inverses,
+  truth-table synthesis `synth_pixel_map`, `q_div_lookup`).
+- `src/qimp/processing/ratiometric_circuit.py` — the Class-A/B/C ratiometric circuits
+  (`class_b_ratio(..., load="ucry")`, `class_a_gp_lookup`, `class_c_rogfp_lookup`) and the
+  amplitude-estimation oracle.
+- `paper/HW_CAMPAIGN_3_PROTOCOL.md` … `_20_` — the pre-registered hardware campaigns, with
+  SHA-256 fingerprints and deviation logs.
+- `paper/data_autonomous/` — the derived datasets, resource tables and analysis outputs
+  the manuscript cites (including the per-job manifest of its Supplementary Table S1).
+- `data/output/ibm_hw/<UTC-timestamp>/runs/<label>/` — raw counts, transpiled circuit
+  (QPY) and job metadata of every IBM Quantum job; `data/output/noise_sim/` — the runs on
+  the calibrated noise model.
+- `scripts/` — every analysis is a script that regenerates its table or figure from the
+  archived data without a device (`analyse_hw_signal.py`, `decode_bias_corrected.py`,
+  `arithmetic_identity.py`, `score_campaign17.py`, `calibrate_noise_model.py`, …); the
+  hardware drivers are `run_hardware_class_b_nonrestoring.py` and `run_campaign_*.{py,sh}`.
 
 ## Design constraints
 
@@ -30,29 +55,16 @@ extensions are available as optional sub-modules.
 
 ## Install
 
-The repository is currently **private**. Installation requires a GitHub
-Personal Access Token with `repo` scope:
+The package is not on PyPI; install it from the repository (Python ≥ 3.10):
 
 ```bash
 # Editable install from a clone (recommended for development)
-git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git
+git clone https://github.com/Metabolic-Intelligence-Lab/QIMP.git
 cd QIMP
 pip install -e ".[dev]"
 
 # Or install a pinned tag directly with pip (no clone needed)
-pip install "git+https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.1.0"
-```
-
-Substitute `<TOKEN>` with a fresh PAT (https://github.com/settings/tokens →
-*Fine-grained* → grant *Contents: Read* on this repo). Don't paste your token
-into shell history or chat logs — use a `.netrc` file or `GH_TOKEN`
-environment variable instead.
-
-When the project is released publicly (target: v0.2.0), the install will
-simplify to:
-
-```bash
-pip install qimp-mi
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v2-submission"
 ```
 
 ### Optional extras
@@ -77,10 +89,12 @@ repo/
 │   ├── config.py     # ProcessingConfig dataclass
 │   └── cli.py        # `qimp` command-line tool
 ├── tests/            # pytest, parametrized over n and q
+├── scripts/          # analyses, figure generators and hardware drivers of the paper
+├── paper/            # pre-registered campaign protocols and the derived data (data_autonomous/)
 ├── docs/             # mkdocs site
-└── data/             # GITIGNORED: raw images & outputs
-    ├── immagini/     # input dataset (microscopy 16-bit TIFFs)
-    └── output/       # processing outputs
+└── data/             # raw images & outputs; gitignored except the paper's hardware
+    ├── immagini/     #   outputs (output/ibm_hw/), the noise-model runs (output/noise_sim/)
+    └── output/       #   and the single Laurdan frame the manuscript's patches derive from
 ```
 
 ## Quick start
@@ -157,7 +171,11 @@ Requires the `[ibm]` extra (`pip install -e ".[ibm]"`) and an IBM Quantum API to
 
 ## Citation
 
-If you use this library in academic work, please cite the underlying thesis:
+If you use this library in academic work, please cite the paper and the underlying thesis:
+
+> Maulucci, G. (2026). *Autonomous Quantum Ratiometric Image Processing: Reversible NEQR
+> Arithmetic from Bit-Exact Simulation to Superconducting Hardware*. Submitted.
+> Companion repository: https://github.com/Metabolic-Intelligence-Lab/QIMP, tag `v2-submission`.
 
 > Dolciami, C. (2022). *A quantum circuit library for image processing*.
 > M.Sc. thesis, Politecnico di Torino.
