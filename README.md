@@ -21,8 +21,7 @@ is the archive of record for the manuscript described under [Paper](#paper).
 
 ## Paper
 
-*Autonomous Quantum Ratiometric Image Processing: Reversible NEQR Arithmetic from
-Bit-Exact Simulation to Superconducting Hardware* (G. Maulucci, 2026, submitted). The
+*Autonomous Ratiometric Image Processing on a Superconducting Quantum Processor* (G. Maulucci, 2026, submitted). The
 tag `v2-submission` pins the code, the derived data and the hardware outputs the
 manuscript reports. The manuscript itself is not in the repository.
 
@@ -173,8 +172,7 @@ Requires the `[ibm]` extra (`pip install -e ".[ibm]"`) and an IBM Quantum API to
 
 If you use this library in academic work, please cite the paper and the underlying thesis:
 
-> Maulucci, G. (2026). *Autonomous Quantum Ratiometric Image Processing: Reversible NEQR
-> Arithmetic from Bit-Exact Simulation to Superconducting Hardware*. Submitted.
+> Maulucci, G. (2026). *Autonomous Ratiometric Image Processing on a Superconducting Quantum Processor*. Submitted.
 > Companion repository: https://github.com/Metabolic-Intelligence-Lab/QIMP, tag `v2-submission`.
 
 > Dolciami, C. (2022). *A quantum circuit library for image processing*.
