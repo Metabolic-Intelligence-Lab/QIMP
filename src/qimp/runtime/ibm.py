@@ -84,14 +84,16 @@ def get_service(instance: str | None = None) -> Any:
         try:
             _SERVICE = qrs_cls(instance=instance) if instance else qrs_cls()
             return _SERVICE
-        except Exception as exc:  # noqa: BLE001 — re-raised below
+        except Exception as exc:
             last = exc
             if attempt + 1 < _SERVICE_RETRIES:
                 delay = _SERVICE_BACKOFF_S * (2**attempt)
                 logger.warning(
-                    "QiskitRuntimeService init failed (attempt %d/%d), "
-                    "retrying in %.0fs: %s",
-                    attempt + 1, _SERVICE_RETRIES, delay, exc,
+                    "QiskitRuntimeService init failed (attempt %d/%d), retrying in %.0fs: %s",
+                    attempt + 1,
+                    _SERVICE_RETRIES,
+                    delay,
+                    exc,
                 )
                 time.sleep(delay)
 

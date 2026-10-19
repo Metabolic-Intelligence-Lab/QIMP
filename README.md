@@ -63,7 +63,7 @@ cd QIMP
 pip install -e ".[dev]"
 
 # Or install a pinned tag directly with pip (no clone needed)
-pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v2-submission"
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.0"
 ```
 
 ### Optional extras
@@ -108,7 +108,7 @@ image = np.random.randint(0, 256, (4, 4), dtype=np.uint8)
 encoder = FrqiEncoder()
 qc = encoder.encode(image)             # 2n+1 = 5 qubits for n=2
 counts = ideal_simulation(qc, shots=8192)
-reconstructed = encoder.decode(counts, n=2)
+reconstructed = encoder.decode(counts)
 print("PSNR:", psnr(image, reconstructed))
 ```
 
@@ -174,6 +174,8 @@ If you use this library in academic work, please cite the paper and the underlyi
 
 > Maulucci, G. (2026). *Autonomous Ratiometric Image Processing on a Superconducting Quantum Processor*. Submitted.
 > Companion repository: https://github.com/Metabolic-Intelligence-Lab/QIMP, tag `v2-submission`.
+
+> Maulucci, G. *qimp-mi: a tested, size-parametric Python library for quantum image processing on Qiskit*. Submitted to SoftwareX.
 
 > Dolciami, C. (2022). *A quantum circuit library for image processing*.
 > M.Sc. thesis, Politecnico di Torino.

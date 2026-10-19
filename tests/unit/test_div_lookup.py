@@ -3,6 +3,7 @@
 Parametrised over q (intensity width) and n (spatial qubits per axis), per the
 scalability constraint of the library.
 """
+
 from __future__ import annotations
 
 import numpy as np
@@ -60,7 +61,7 @@ def test_class_b_ratio_lookup_bit_exact(n: int, q: int, load: str) -> None:
     for s, p in probs.items():
         if p < 1e-9:
             continue
-        bit = lambda i: int(s[qc.num_qubits - 1 - i])  # noqa: E731
+        bit = lambda i, s=s: int(s[qc.num_qubits - 1 - i])  # noqa: E731
         col = sum(bit(lay["position"][i]) << i for i in range(n))
         row = sum(bit(lay["position"][n + i]) << i for i in range(n))
         a, d = int(Ia[row, col]), int(Ib[row, col])

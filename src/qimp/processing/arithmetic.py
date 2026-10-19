@@ -53,7 +53,6 @@ __all__ = [
     "q_div",
     "q_div_general",
     "q_div_lookup",
-    "synth_pixel_map",
     "q_div_lookup_inv",
     "q_div_nonrestoring",
     "q_div_nonrestoring_inv",
@@ -69,6 +68,7 @@ __all__ = [
     "qc_add_1_ctrl",
     "qc_add_1_ctrl_inv",
     "qc_add_1_inv",
+    "synth_pixel_map",
 ]
 
 
@@ -971,6 +971,7 @@ def q_div_nonrestoring_inv(
 #: transpilation. Only the ranking matters, not the exact values.
 _MCX_RANK_COST = {0: 0, 1: 1, 2: 6, 3: 14, 4: 30, 5: 60, 6: 120}
 
+
 def _fprm_terms(bits: list[int], nvar: int, polarity: int) -> list[int]:
     """Fixed-polarity Reed-Muller product terms of a boolean function.
 
@@ -1073,7 +1074,10 @@ def q_div_lookup(
         quot, flag = ((a // d), 0) if d else (full, 1)
         table.append(quot | (flag << q))
     return synth_pixel_map(
-        qc, list(dividend_qubits) + list(divisor_qubits), list(quotient_qubits) + [div_zero_flag], table
+        qc,
+        list(dividend_qubits) + list(divisor_qubits),
+        [*list(quotient_qubits), div_zero_flag],
+        table,
     )
 
 
@@ -1086,4 +1090,3 @@ def q_div_lookup_inv(
 ) -> QuantumCircuit:
     """Inverse of :func:`q_div_lookup`, which is self-inverse."""
     return q_div_lookup(qc, dividend_qubits, divisor_qubits, quotient_qubits, div_zero_flag)
-
