@@ -42,7 +42,9 @@ jobs:
             python-version: "3.10"
           - os: windows-latest
             python-version: "3.11"
-    timeout-minutes: 30
+    # The statevector checks of the ratiometric circuits (24 qubits) dominate
+    # the run time; spread them over the runner's cores and allow headroom.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -50,7 +52,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
           cache: pip
       - run: pip install -e ".[dev]"
-      - run: pytest -v --cov=qimp --cov-report=term-missing
+      - run: pytest -v -n auto --cov=qimp --cov-report=term-missing
 
   test-slow:
     # Slow round-trip tests with 40k+ shots; run separately so they don't block the
@@ -65,7 +67,7 @@ jobs:
       - run: pip install -e ".[dev]"
       # `-m` replaces the addopts default, so `not hardware` has to be repeated
       # here or the QPU smoke test gets selected on a runner with no credentials.
-      - run: pytest -v -m "(slow or not slow) and not hardware" --cov=qimp --cov-report=term-missing
+      - run: pytest -v -n auto -m "(slow or not slow) and not hardware" --cov=qimp --cov-report=term-missing
 
   examples:
     runs-on: ubuntu-latest
