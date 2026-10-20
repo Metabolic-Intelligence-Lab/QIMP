@@ -1,41 +1,40 @@
 """Autonomous quantum circuits for per-pixel ratiometric image operators.
 
-Each operator builder takes two NEQR-encoded intensity images and
-constructs a circuit that **computes** the ratio (or normalised
-difference, or calibrated ratio) on the quantum device — no
-classically pre-computed target is loaded into the circuit. The
-intended use of these circuits is twofold: (1) as a state-prep oracle
-for downstream QAE / Grover quantum-advantage demonstrations on
-aggregate image statistics (planned, see project plan)
-(2) as a
-reference autonomous primitive that answers the "target loading"
-critique of the parameter-synthesis FRQI route in
-``qimp.processing.gp_ratio``.
+Each builder takes two NEQR-encoded intensity images and constructs a
+circuit that computes the ratio, normalised difference or calibrated
+ratio on the quantum device. No classically pre-computed target is
+loaded into the circuit; the per-pixel value is produced by reversible
+arithmetic (or by an exact synthesised pixel map in the lookup
+variants) acting uniformly on the position superposition.
 
-The three classes supported (in order of implementation):
+The module provides:
 
-  - **Class B** — simple ratio R = I_a / I_b (integer quotient form).
-    Implemented in :func:`class_b_ratio` (this file).
-  - **Class A** — Generalised Polarization
-    GP = (I_a − G · I_b)/(I_a + G · I_b) with a classical G factor.
-    Planned: :func:`class_a_gp` (extends Class B with a constant
-    multiplier and signed numerator).
-  - **Class C** — roGFP calibrated ratio
-    R_C = (R − R_red)/(R_ox − R_red) with classical R_red, R_ox.
-    Implemented end-to-end in :func:`class_c_rogfp_full` (fractional
-    ratio via shift + non-square divide, then affine subtract).
+  - Class B, simple integer ratio R = I_a // I_b:
+    :func:`class_b_ratio` (restoring, non-restoring or lookup divider),
+    its inverse :func:`class_b_ratio_inv` and the decoder
+    :func:`decode_class_b_ratio`.
+  - Class A, Laurdan generalised polarisation
+    GP = (I_a - G * I_b) / (I_a + G * I_b) for a classical G > 0:
+    the numerator/denominator stage :func:`class_a_gp_prefix`, the full
+    fractional pipeline :func:`class_a_gp_full`, the synthesised variant
+    :func:`class_a_gp_lookup`, and the decoders
+    :func:`decode_class_a_prefix` and :func:`decode_class_a_full`.
+    G is represented in fixed point as K / 2^f (see
+    :func:`gp_g_fixed_point`); G = 1 uses the plain add/subtract path.
+  - Class C, roGFP calibrated ratio R_C = (R - R_red) / (R_ox - R_red):
+    :func:`class_c_rogfp_full`, :func:`class_c_rogfp_lookup`, the
+    primitive :func:`affine_subtract_constant` and the decoder
+    :func:`decode_class_c_rogfp`.
+  - Shared pieces: the dual-channel NEQR loader :func:`dual_neqr_load`
+    and its inverse, and the threshold marking oracle
+    :func:`mark_good_oracle` and its inverse, used as building blocks for
+    amplitude estimation or Grover search over the computed image.
 
-All builders share the convention that intensities are q-bit unsigned
-fixed point, position is 2n-bit, and the output register is a separate
-q-bit register holding the unsigned quotient.
-
-NOTE: The intermediate divider primitive used here lives in
-``qimp.processing.arithmetic.q_div_restoring`` and is built on the
-existing Cuccaro adders. Its inverse :func:`q_div_restoring_inv` will
-be added in a follow-up commit and is needed only for QAE-style
-state-prep reversibility — for the first POC, the divider's carry
-ancilla is left dirty after circuit execution and the result is read
-out by measurement.
+Intensities are q-bit unsigned integers and the position register has
+2n qubits. Registers are little-endian. Unless a builder states
+otherwise, carry ancillas are left dirty and the result is read out by
+measurement; the ``*_inv`` functions are provided where full
+uncomputation is needed.
 """
 
 from __future__ import annotations
@@ -55,6 +54,7 @@ from qimp.processing.arithmetic import (
     q_div_nonrestoring_inv,
     q_div_restoring,
     q_div_restoring_inv,
+    q_mul_const,
     q_sub,
     synth_pixel_map,
 )
@@ -62,16 +62,19 @@ from qimp.processing.arithmetic import (
 __all__ = [
     "affine_subtract_constant",
     "class_a_gp_full",
+    "class_a_gp_lookup",
     "class_a_gp_prefix",
     "class_b_ratio",
     "class_b_ratio_inv",
     "class_c_rogfp_full",
+    "class_c_rogfp_lookup",
     "decode_class_a_full",
     "decode_class_a_prefix",
     "decode_class_b_ratio",
     "decode_class_c_rogfp",
     "dual_neqr_load",
     "dual_neqr_load_inv",
+    "gp_g_fixed_point",
     "mark_good_oracle",
     "mark_good_oracle_inv",
 ]
@@ -417,15 +420,18 @@ def class_b_ratio(
         ``position``, ``I_a``, ``I_b``, ``quotient``, ``work``,
         ``pad``, ``c``, ``flag``.
 
+    Notes
+    -----
     The quotient is read out by measuring the ``quotient`` register.
     The ``flag`` qubit is set to 1 for pixels where I_b == 0 (the
     quotient at those pixels is undefined and the caller must mask
     them in the decoded image).
 
     Resource costs:
-      - Qubits: ``2n + 4q + 2 + (q+1)(q+2)``. At n=1, q=2: 24 qubits.
-      - Toffolis: O(q²) for the division × 1 per pixel branch (the
-        division acts uniformly on the position superposition).
+
+    - Qubits: ``2n + 4q + 2 + (q+1)(q+2)``. At n=1, q=2: 24 qubits.
+    - Toffolis: O(q²) for the division, once for all pixel branches
+      (the division acts uniformly on the position superposition).
     """
     if divider not in ("restoring", "nonrestoring", "lookup"):
         raise ValueError(
@@ -617,28 +623,34 @@ def class_a_gp_lookup(
     q: int,
     q_frac: int = 2,
     load: str = "ucry",
+    G: float = 1.0,
+    g_frac_bits: int | None = None,
 ) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
     """Class-A Laurdan GP circuit whose per-pixel map is synthesised.
 
-    Same observable and same read-out convention as :func:`class_a_gp_full`,
+    Same observable and same read-out convention as :func:`class_a_gp_full`.
+    With ``A = 2^f I_a`` and ``B = K I_b`` (``G_eff = K / 2^f`` from
+    :func:`gp_g_fixed_point`; ``A = I_a``, ``B = I_b`` for G = 1),
 
-        magnitude(p) = floor(|I_a(p) − I_b(p)| · 2^q_frac / (I_a(p) + I_b(p)))
-        sign(p)      = 1  iff  I_b(p) > I_a(p)
+        magnitude(p) = floor(|A(p) - B(p)| * 2^q_frac / (A(p) + B(p)))
+        sign(p)      = 1  iff  B(p) > A(p)
         div_flag(p)  = 1  iff  I_a(p) + I_b(p) = 0
 
     so :func:`decode_class_a_full` decodes it unchanged. The arithmetic
-    cascade of :func:`class_a_gp_full` (subtract, absolute value, shift,
-    divide) is replaced by one :func:`synth_pixel_map` over the two
-    intensity registers. Both operands are preserved and no ancilla is
-    used: ``2n + 2q + q_frac + 3`` qubits against 71 at ``n = 1, q = 2,
-    q_frac = 2``, which is what brings the observable within reach of
-    present hardware. The synthesis is generic in ``q`` and exact, and its
-    cost grows as ``2^{2q}``.
+    cascade of :func:`class_a_gp_full` (multiply, subtract, absolute
+    value, shift, divide) is replaced by one :func:`synth_pixel_map` over
+    the two intensity registers. Both operands are preserved and no
+    ancilla is used: ``2n + 2q + q_frac + 3`` qubits for every G, against
+    71 for the arithmetic pipeline at ``n = 1, q = 2, q_frac = 2, G = 1``.
+    G only changes the synthesised table, not the qubit count. The
+    synthesis is generic in ``q`` and exact, and its cost grows as
+    ``2^{2q}``.
 
     Layout keys: ``position``, ``I_a``, ``I_b``, ``quotient`` (magnitude,
     ``q_frac + 1`` bits), ``sign``, ``div_flag``.
     """
     n = _validate_dual_images(image_a, image_b, q)
+    k_g, f_g = gp_g_fixed_point(G, g_frac_bits)
     n_pos, mag_w = 2 * n, q_frac + 1
     layout: dict[str, list[int] | int] = {}
     cur = 0
@@ -668,11 +680,13 @@ def class_a_gp_lookup(
     table = []
     for x in range(1 << (2 * q)):
         a, b = x & ((1 << q) - 1), x >> q
-        den = a + b
+        big_a, big_b = a << f_g, b * k_g
+        den = big_a + big_b
         if den == 0:
             mag, sign, flag = 0, 0, 1
         else:
-            mag, sign, flag = (abs(a - b) << q_frac) // den, (1 if b > a else 0), 0
+            mag = (abs(big_a - big_b) << q_frac) // den
+            sign, flag = (1 if big_b > big_a else 0), 0
         table.append(mag | (sign << mag_w) | (flag << (mag_w + 1)))
     synth_pixel_map(
         qc,
@@ -883,6 +897,8 @@ def mark_good_oracle(
         zero-pad of ``value`` to widen it from q to q+1 bits for the
         subtract.
 
+    Notes
+    -----
     The construction is its own inverse: applying it twice on the same
     inputs returns ``good_qubit`` to its initial state (two XORs cancel),
     and all ancillas are restored each call. See
@@ -957,15 +973,159 @@ def mark_good_oracle_inv(
 
 
 # ============================================================================
-# Class A — Generalised Polarization (G = 1 Möbius form)
+# Class A: Laurdan generalised polarisation, GP = (I_a - G I_b) / (I_a + G I_b)
 # ============================================================================
+#
+# Representation of G. The circuits are integer arithmetic, so the G
+# factor is represented in fixed point as G_eff = K / 2^f with
+# K = round(G * 2^f) >= 1 (see gp_g_fixed_point). Multiplying numerator
+# and denominator by 2^f leaves the ratio unchanged:
+#
+#     GP = (2^f I_a - K I_b) / (2^f I_a + K I_b) = (A - B) / (A + B)
+#
+# with A = I_a << f (a free bit shift: I_a is copied f positions up) and
+# B = K * I_b computed with q_mul_const into a fresh register. The add
+# and subtract then run at width L = max(q + f, q + bit_length(K)), and
+# the num / den registers have L + 1 bits. When G_eff == 1 (K == 2^f) the
+# builders use the plain G = 1 path (A = I_a, B = I_b, L = q), so the
+# default circuits are the historical ones. The decoded GP is exact for
+# G_eff; the representation error of G itself is |G - G_eff| <= 2^-(f+1).
+
+_G_FRAC_BITS_AUTO_MAX = 16
+
+
+def gp_g_fixed_point(G: float, g_frac_bits: int | None = None) -> tuple[int, int]:
+    """Fixed-point representation ``G_eff = K / 2^f`` used by the Class-A builders.
+
+    Parameters
+    ----------
+    G
+        GP G-factor; must be finite and strictly positive.
+    g_frac_bits
+        Number of fractional bits ``f``. ``None`` (default) selects the
+        smallest ``f`` in ``[0, 16]`` for which ``G * 2^f`` is an integer,
+        so dyadic values (1.0, 0.5, 1.25, 2.0, ...) are represented exactly.
+        A non-dyadic G (e.g. 0.94) needs an explicit ``g_frac_bits``; it is
+        then rounded to ``round(G * 2^f) / 2^f``.
+
+    Returns
+    -------
+    (K, f)
+        The integer multiplier and the number of fractional bits, so that
+        ``G_eff = K / 2**f``.
+
+    Raises
+    ------
+    ValueError
+        If G is not finite and positive, if ``g_frac_bits`` is negative,
+        if ``g_frac_bits`` is None and G is not dyadic within 16 bits, or
+        if ``round(G * 2^f)`` is 0 (G too small for the chosen ``f``).
+    """
+    if isinstance(G, bool) or not isinstance(G, (int, float, np.integer, np.floating)):
+        raise ValueError(f"G must be a real number, got {G!r}")
+    G = float(G)
+    if not math.isfinite(G) or G <= 0.0:
+        raise ValueError(f"G must be finite and > 0, got {G}")
+    if g_frac_bits is None:
+        for f in range(_G_FRAC_BITS_AUTO_MAX + 1):
+            scaled = math.ldexp(G, f)
+            if scaled.is_integer():
+                return int(scaled), f
+        raise ValueError(
+            f"G={G} is not exactly representable with up to {_G_FRAC_BITS_AUTO_MAX} "
+            "fractional bits; pass g_frac_bits explicitly to round it to "
+            "round(G * 2**g_frac_bits) / 2**g_frac_bits"
+        )
+    if isinstance(g_frac_bits, bool) or int(g_frac_bits) != g_frac_bits or g_frac_bits < 0:
+        raise ValueError(f"g_frac_bits must be a non-negative integer, got {g_frac_bits!r}")
+    f = int(g_frac_bits)
+    K = round(math.ldexp(G, f))
+    if K < 1:
+        raise ValueError(
+            f"G={G} rounds to 0 with g_frac_bits={f}; increase g_frac_bits "
+            f"(need G * 2**g_frac_bits >= 0.5)"
+        )
+    return K, f
+
+
+def _gp_plan(G: float, g_frac_bits: int | None, q: int) -> tuple[int, int, int, bool]:
+    """Return ``(K, f, L, unit)``: fixed-point G, operand width, and whether G_eff == 1."""
+    K, f = gp_g_fixed_point(G, g_frac_bits)
+    if 1 << f == K:
+        return 1, 0, q, True
+    return K, f, max(q + f, q + K.bit_length()), False
+
+
+def _alloc_gp_num_den(
+    layout: dict[str, list[int] | int], cursor: int, q: int, K: int, L: int, unit: bool
+) -> int:
+    """Allocate the num / den stage registers in ``layout`` starting at ``cursor``.
+
+    Keys: ``num``, ``den``, ``add_c``, ``sub_c`` (``L + 1`` each) and, when
+    G_eff != 1, ``g_b`` (``L``, holds K * I_b), ``mul_c``
+    (``popcount(K) * (q + 2)``) and ``mul_guard`` (1). Returns the new cursor.
+    """
+    w = L + 1
+    for key in ("num", "den", "add_c", "sub_c"):
+        layout[key] = list(range(cursor, cursor + w))
+        cursor += w
+    if not unit:
+        n_mul_c = K.bit_count() * (q + 2)
+        layout["g_b"] = list(range(cursor, cursor + L))
+        cursor += L
+        layout["mul_c"] = list(range(cursor, cursor + n_mul_c))
+        cursor += n_mul_c
+        layout["mul_guard"] = cursor
+        cursor += 1
+    return cursor
+
+
+def _apply_gp_num_den(
+    qc: QuantumCircuit,
+    layout: dict[str, list[int] | int],
+    q: int,
+    K: int,
+    f: int,
+    L: int,
+    unit: bool,
+) -> None:
+    """den <- A + B (unsigned, L + 1 bits); num <- A - B (two's complement, L + 1 bits).
+
+    A = I_a << f and B = K * I_b; for G_eff == 1, A = I_a and B = I_b.
+    """
+    Ia, Ib, num, den = layout["I_a"], layout["I_b"], layout["num"], layout["den"]
+    add_c, sub_c = layout["add_c"], layout["sub_c"]
+    assert isinstance(Ia, list) and isinstance(Ib, list)
+    assert isinstance(num, list) and isinstance(den, list)
+    assert isinstance(add_c, list) and isinstance(sub_c, list)
+    if unit:
+        b_reg = Ib
+    else:
+        g_b, mul_c, guard = layout["g_b"], layout["mul_c"], layout["mul_guard"]
+        assert isinstance(g_b, list) and isinstance(mul_c, list) and isinstance(guard, int)
+        k_bits = [(K >> i) & 1 for i in range(K.bit_length())]
+        # g_b starts at |0>, so the shift-add accumulation is exact: g_b = K * I_b.
+        q_mul_const(qc, Ib, k_bits, g_b, mul_c, guard)
+        b_reg = g_b
+
+    # den <- A (I_a copied f positions up into the low L bits; the rest stays 0),
+    # then den[:L] += B at width L with the carry-out copied into den[L].
+    _copy_register(qc, Ia, den[f : f + q])
+    q_add(qc, b_reg, list(den[:L]), add_c)
+    qc.cx(add_c[-1], den[L])
+
+    # num <- A, then num[:L] -= B. q_sub leaves the no-borrow bit in
+    # sub_c[-1]; the sign bit num[L] is its negation.
+    _copy_register(qc, Ia, num[f : f + q])
+    q_sub(qc, b_reg, list(num[:L]), sub_c)
+    qc.cx(sub_c[-1], num[L])
+    qc.x(num[L])  # num[L] = 1 iff A < B (two's-complement sign bit)
 
 
 def _copy_register(qc: QuantumCircuit, src: list[int], dst: list[int]) -> None:
-    """In-place classical copy via CNOTs: dst ← dst ⊕ src.
+    """In-place classical copy via CNOTs: dst <- dst XOR src.
 
-    For basis-state inputs this is a true copy
-    in superposition it
+    For basis-state inputs this is a true copy; in superposition it
     creates entanglement between src and dst with the same per-branch
     value. Used to duplicate an NEQR intensity register so the original
     is preserved while the copy is consumed by arithmetic.
@@ -981,60 +1141,61 @@ def class_a_gp_prefix(
     image_b: np.ndarray,
     q: int,
     G: float = 1.0,
+    g_frac_bits: int | None = None,
 ) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
-    """Class A GP **prefix stage**: autonomously compute the numerator
-    (I_a − G·I_b, two's complement) and denominator (I_a + G·I_b,
-    unsigned) registers from two NEQR-encoded intensity images.
+    """Class A GP prefix stage: numerator and denominator registers.
 
-    This is the first half of the full GP pipeline
-    the second half
-    (conditional |·| then fractional divider) is currently
-    statevector-infeasible and pending the non-square ``q_div`` variant
-    — see Stage C note at the end of this module. The split exists for
-    two reasons: (1) the prefix is bit-exact-testable at small (n, q)
-    while the full pipeline is not
-    (2) the divider step uses a
-    different carry-ancilla budget that benefits from a separate
-    layout pass.
+    Computes, per pixel in superposition, with ``G_eff = K / 2^f`` from
+    :func:`gp_g_fixed_point`,
+
+        num(p) = 2^f I_a(p) - K I_b(p)   (two's complement, L + 1 bits)
+        den(p) = 2^f I_a(p) + K I_b(p)   (unsigned, L + 1 bits)
+
+    so that ``num / den = (I_a - G_eff I_b) / (I_a + G_eff I_b)``. For
+    G_eff = 1 this is ``num = I_a - I_b``, ``den = I_a + I_b`` with
+    ``L = q``. The full pipeline :func:`class_a_gp_full` continues from
+    these registers (absolute value, shift, divide); the prefix alone is
+    small enough to verify bit-exactly at small (n, q).
 
     Parameters
     ----------
     image_a, image_b
-        Square ``2^n × 2^n`` integer images with values in
-        ``[0, 2^q − 1]``.
+        Square ``2^n x 2^n`` integer images with values in
+        ``[0, 2^q - 1]``.
     q
         Intensity bit width.
     G
-        Classical GP G-factor. Only ``G = 1.0`` is currently supported;
-        any other value raises ``NotImplementedError``. General G
-        requires a ``q_mul_const`` composition to materialise
-        ``G · I_b`` before the add/sub — straightforward to add and
-        documented in the module-level note.
+        GP G-factor, finite and > 0. Default 1.0.
+    g_frac_bits
+        Fractional bits used to represent G; see :func:`gp_g_fixed_point`.
+        ``None`` picks the exact dyadic representation.
 
+    Returns
+    -------
+    (qc, layout)
+        The circuit and the qubit-index layout described in the notes.
+
+    Notes
+    -----
     Output layout (all little-endian):
-      - ``position``  (2n) — shared NEQR position register, in
-        uniform superposition after dual_neqr_load.
-      - ``I_a``, ``I_b``  (q each) — NEQR intensities, preserved.
-      - ``num``  (q + 1) — holds (I_a − I_b) two's-complement,
-        signed q+1-bit (MSB = sign).
-      - ``den``  (q + 1) — holds (I_a + I_b) unsigned q+1-bit.
-      - ``add_c`` (q + 1) — dirty carry register from the add.
-      - ``sub_c`` (q + 1) — dirty carry register from the sub.
 
-    After this builder:
-      - ``den[MSB] = carry-out of (I_a + I_b)`` (the bit normally
-        written into a q+1-bit accumulator).
-      - ``num[MSB] = sign bit`` (0 iff I_a ≥ I_b, 1 iff I_a < I_b).
+    - ``position`` (2n): shared NEQR position register, in uniform
+      superposition after dual_neqr_load.
+    - ``I_a``, ``I_b`` (q each): NEQR intensities, preserved.
+    - ``num`` (L + 1): A - B two's complement, MSB = sign (1 iff A < B).
+    - ``den`` (L + 1): A + B unsigned.
+    - ``add_c``, ``sub_c`` (L + 1 each): dirty carry registers.
+    - Only when G_eff != 1: ``g_b`` (L) holding K * I_b, ``mul_c``
+      (``popcount(K) (q + 2)``, dirty) and ``mul_guard`` (1, returned
+      to 0).
+
+    Here ``L = q`` for G_eff = 1 and ``L = max(q + f, q + bit_length(K))``
+    otherwise. Qubits: ``2n + 2q + 4(L + 1)``, plus
+    ``L + popcount(K)(q + 2) + 1`` when G_eff != 1.
     """
-    if G != 1.0:
-        raise NotImplementedError(
-            f"G={G}: general G requires q_mul_const composition; "
-            "currently only G=1.0 is supported. See the module-level "
-            "Stage C note for the recipe."
-        )
     n = _validate_dual_images(image_a, image_b, q)
+    K, f, L, unit = _gp_plan(G, g_frac_bits, q)
     n_pos = 2 * n
-    q_w = q + 1
 
     layout: dict[str, list[int] | int] = {}
     cursor = 0
@@ -1044,29 +1205,11 @@ def class_a_gp_prefix(
     cursor += q
     layout["I_b"] = list(range(cursor, cursor + q))
     cursor += q
-    layout["num"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
-    layout["den"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
-    layout["add_c"] = list(range(cursor, cursor + q_w))
-    cursor += q_w  # n+1 carries for the q-wide add (n = q)
-    layout["sub_c"] = list(range(cursor, cursor + q_w))
-    cursor += q_w  # n+1 carries for the q-wide sub
-    total = cursor
+    cursor = _alloc_gp_num_den(layout, cursor, q, K, L, unit)
 
-    qc = QuantumCircuit(total)
-
-    pos = layout["position"]
-    Ia = layout["I_a"]
-    Ib = layout["I_b"]
-    num = layout["num"]
-    den = layout["den"]
-    add_c = layout["add_c"]
-    sub_c = layout["sub_c"]
+    qc = QuantumCircuit(cursor)
+    pos, Ia, Ib = layout["position"], layout["I_a"], layout["I_b"]
     assert isinstance(pos, list) and isinstance(Ia, list) and isinstance(Ib, list)
-    assert isinstance(num, list) and isinstance(den, list)
-    assert isinstance(add_c, list) and isinstance(sub_c, list)
-
     dual_neqr_load(
         qc,
         image_a,
@@ -1076,22 +1219,7 @@ def class_a_gp_prefix(
         intensity_a_qubits=Ia,
         intensity_b_qubits=Ib,
     )
-
-    # den ← I_a (copy into low q bits; MSB stays 0)
-    _copy_register(qc, Ia, den[:q])
-    # den ← den + I_b at q-bit width; carry-out goes into den[q] (MSB).
-    q_add(qc, Ib, list(den[:q]), add_c)
-    qc.cx(add_c[-1], den[q])
-
-    # num ← I_a (copy into low q bits; MSB stays 0)
-    _copy_register(qc, Ia, num[:q])
-    # num ← num - I_b at q-bit width. q_sub leaves the no-borrow bit
-    # in sub_c[-1]; the result modular at 2^q in num[:q]. The sign bit
-    # we want in num[q] is the NEGATION of the no-borrow bit.
-    q_sub(qc, Ib, list(num[:q]), sub_c)
-    qc.cx(sub_c[-1], num[q])
-    qc.x(num[q])  # num[q] = 1 iff I_a < I_b (the two's-complement sign bit)
-
+    _apply_gp_num_den(qc, layout, q, K, f, L, unit)
     return qc, layout
 
 
@@ -1104,13 +1232,17 @@ def decode_class_a_prefix(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Decode the prefix-stage output: (num_signed, den_unsigned) per pixel.
 
+    The register width is taken from ``layout``, so the same decoder
+    serves every G.
+
     Returns
     -------
     (num_image, den_image)
-        Both ``2^n × 2^n`` int arrays. ``num_image`` is the signed
-        two's-complement interpretation of the ``num`` register (sign
-        bit at position q, magnitude at positions 0..q-1). ``den_image``
-        is the unsigned (q+1)-bit sum.
+        Both ``2^n x 2^n`` int arrays. ``num_image`` is the signed
+        two's-complement value of the ``num`` register, i.e.
+        ``2^f I_a - K I_b`` (``I_a - I_b`` for G_eff = 1). ``den_image`` is
+        the unsigned ``2^f I_a + K I_b``. The GP is ``num_image / den_image``
+        where ``den_image > 0``.
     """
     side = 1 << n
     num_img = np.zeros((side, side), dtype=np.int64)
@@ -1127,15 +1259,15 @@ def decode_class_a_prefix(
     def bit_at(flat: str, qubit_idx: int) -> int:
         return int(flat[total_qubits - 1 - qubit_idx])
 
-    q_w = q + 1
+    w = len(num_q)
     for state, count in counts.items():
         flat = state.replace(" ", "")
         col = sum(bit_at(flat, pos[i]) << i for i in range(n))
         row = sum(bit_at(flat, pos[n + i]) << i for i in range(n))
-        num_unsigned = sum(bit_at(flat, num_q[i]) << i for i in range(q_w))
-        # Convert two's-complement (q+1)-bit to signed int
-        num_signed = num_unsigned - (1 << q_w) if num_unsigned >> q else num_unsigned
-        den_val = sum(bit_at(flat, den_q[i]) << i for i in range(q_w))
+        num_unsigned = sum(bit_at(flat, num_q[i]) << i for i in range(w))
+        # Two's complement w-bit to signed int.
+        num_signed = num_unsigned - (1 << w) if num_unsigned >> (w - 1) else num_unsigned
+        den_val = sum(bit_at(flat, den_q[i]) << i for i in range(len(den_q)))
         histograms_num.setdefault((row, col), {})
         histograms_num[(row, col)][num_signed] = (
             histograms_num[(row, col)].get(num_signed, 0) + count
@@ -1147,14 +1279,6 @@ def decode_class_a_prefix(
     for (row, col), votes in histograms_den.items():
         den_img[row, col] = max(votes, key=votes.__getitem__)
     return num_img, den_img
-
-
-# NOTE: The full Class A pipeline (sub + add + conditional-negate +
-# fractional-scale + divide) requires registers totalling ~40 qubits
-# at n=1, q=2, putting it past laptop statevector range. We expose the
-# prefix stage above as the bit-exact-testable component; the
-# divider step will be added in a follow-up commit and validated via
-# the MPS simulator on AerSimulator(method='matrix_product_state').
 
 
 # ============================================================================
@@ -1322,51 +1446,72 @@ def class_a_gp_full(
     image_b: np.ndarray,
     q: int,
     q_frac: int = 2,
+    G: float = 1.0,
+    g_frac_bits: int | None = None,
 ) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
-    """Full autonomous Class A GP circuit with G = 1 (Möbius normalised
-    difference).
+    """Full autonomous Class A GP circuit, GP = (I_a - G I_b) / (I_a + G I_b).
 
-    For each pixel in superposition, the circuit computes:
+    With ``G_eff = K / 2^f`` from :func:`gp_g_fixed_point`,
+    ``A = 2^f I_a`` and ``B = K I_b`` (``A = I_a``, ``B = I_b`` for
+    G_eff = 1), the circuit computes for each pixel in superposition:
 
-        magnitude(p) = floor(|I_a(p) − I_b(p)| · 2^q_frac / (I_a(p) + I_b(p)))
-        sign(p)      = 1  iff  I_b(p) > I_a(p)
+        magnitude(p) = floor(|A(p) - B(p)| * 2^q_frac / (A(p) + B(p)))
+        sign(p)      = 1  iff  B(p) > A(p)
 
-    The classical GP is reconstructed by the decoder as
-    ``gp(p) = (-1)^sign(p) · magnitude(p) / 2^q_frac``.
+    The decoder reconstructs ``gp(p) = (-1)^sign(p) * magnitude(p) / 2^q_frac``,
+    which is the GP for G_eff truncated towards zero to ``q_frac``
+    fractional bits.
 
-    Pipeline (composition of already-tested primitives):
-      1. ``dual_neqr_load(I_a, I_b)``
-      2. ``den ← I_a + I_b``  (q_w = q+1 bits)
-      3. ``num ← I_a − I_b``  (signed q_w bits, two's complement)
-      4. Copy num's MSB into a dedicated sign qubit.
-      5. Conditional two's-complement negate of num: flip all bits
-         (CNOT(sign, num[i])) then conditional ``+1`` via
-         ``q_add_ctrl`` against a 1-valued constant register. Result:
-         num holds |I_a − I_b| as an unsigned q_w-bit integer.
-      6. Bit-shift num up by ``q_frac`` into a wider ``num_scaled``
-         register (width q_w + q_frac).
-      7. ``q_div_general(num_scaled, den)`` → quotient holds the
-         fractional GP magnitude.
-
-    Resource budget at n=1, q=2, q_frac=2: ~70 qubits — past laptop
-    statevector. Use ``AerSimulator(method='matrix_product_state')`` for execution.
-    Each underlying primitive is bit-exact verified at small width;
-    end-to-end correctness relies on the composition (every primitive
-    is position-independent so the action lifts uniformly across the
-    NEQR position superposition).
+    Parameters
+    ----------
+    image_a, image_b, q
+        As in :func:`class_a_gp_prefix`.
+    q_frac
+        Fractional bits of the output magnitude, ``>= 0``.
+    G, g_frac_bits
+        GP G-factor and its fixed-point representation, see
+        :func:`gp_g_fixed_point`. The default G = 1.0 gives the plain
+        normalised difference.
 
     Returns
     -------
-    (qc, layout) with keys: ``position``, ``I_a``, ``I_b``, ``num``,
-    ``den``, ``add_c``, ``sub_c``, ``sign``, ``ones_reg``,
-    ``inc_carry``, ``num_scaled``, ``quotient``, ``div_work``,
-    ``div_pad``, ``div_c``, ``div_flag``.
+    (qc, layout)
+        ``layout`` has keys ``position``, ``I_a``, ``I_b``, ``num``,
+        ``den``, ``add_c``, ``sub_c``, ``sign``, ``ones_reg``,
+        ``inc_carry``, ``num_scaled``, ``quotient``, ``div_work``,
+        ``div_pad``, ``div_c``, ``div_flag``, and for G_eff != 1 also
+        ``g_b``, ``mul_c``, ``mul_guard``.
+
+    Notes
+    -----
+    Pipeline (composition of tested primitives):
+
+    1. ``dual_neqr_load(I_a, I_b)``.
+    2. Only for G_eff != 1: ``g_b <- K * I_b`` via ``q_mul_const``.
+    3. ``den <- A + B`` and ``num <- A - B`` (``w = L + 1`` bits, num
+       in two's complement), as in :func:`class_a_gp_prefix`.
+    4. Copy num's MSB into a dedicated sign qubit.
+    5. Conditional two's-complement negate of num: flip all bits
+       (CNOT(sign, num[i])) then conditional ``+1`` via ``q_add_ctrl``
+       against a 1-valued constant register, so num holds ``|A - B|``.
+    6. Bit-shift num up by ``q_frac`` into ``num_scaled``
+       (width ``w + q_frac``).
+    7. ``q_div_general(num_scaled, den)``: quotient holds the
+       fractional GP magnitude.
+
+    Resources: with ``w = L + 1`` (``L = q`` for G_eff = 1, else
+    ``max(q + f, q + bit_length(K))``) and ``d = w + q_frac`` the circuit
+    has ``2n + 2q + 7w + 4 + 2d + (d + 1)(w + 2)`` qubits, plus
+    ``L + popcount(K)(q + 2) + 1`` for the multiplier when G_eff != 1.
+    At n = 1, q = 2, q_frac = 2, G = 1 this is 71 qubits, past
+    statevector range; use ``AerSimulator(method='matrix_product_state')``.
     """
     n = _validate_dual_images(image_a, image_b, q)
     if q_frac < 0:
         raise ValueError(f"q_frac must be >= 0, got {q_frac}")
+    K, f, L, unit = _gp_plan(G, g_frac_bits, q)
     n_pos = 2 * n
-    q_w = q + 1
+    q_w = L + 1
     q_dividend = q_w + q_frac
     needed_div_c = (q_dividend + 1) * (q_w + 2)
 
@@ -1378,14 +1523,7 @@ def class_a_gp_full(
     cursor += q
     layout["I_b"] = list(range(cursor, cursor + q))
     cursor += q
-    layout["num"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
-    layout["den"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
-    layout["add_c"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
-    layout["sub_c"] = list(range(cursor, cursor + q_w))
-    cursor += q_w
+    cursor = _alloc_gp_num_den(layout, cursor, q, K, L, unit)
     layout["sign"] = cursor
     cursor += 1
     layout["ones_reg"] = list(range(cursor, cursor + q_w))
@@ -1413,8 +1551,6 @@ def class_a_gp_full(
     Ib = layout["I_b"]
     num = layout["num"]
     den = layout["den"]
-    add_c = layout["add_c"]
-    sub_c = layout["sub_c"]
     sign = layout["sign"]
     ones_reg = layout["ones_reg"]
     inc_carry = layout["inc_carry"]
@@ -1426,7 +1562,6 @@ def class_a_gp_full(
     div_flag = layout["div_flag"]
     assert isinstance(Ia, list) and isinstance(Ib, list)
     assert isinstance(num, list) and isinstance(den, list)
-    assert isinstance(add_c, list) and isinstance(sub_c, list)
     assert isinstance(sign, int)
     assert isinstance(ones_reg, list) and isinstance(inc_carry, list)
     assert isinstance(num_scaled, list)
@@ -1445,19 +1580,11 @@ def class_a_gp_full(
         intensity_b_qubits=Ib,
     )
 
-    # 2. den ← I_a + I_b (q+1 bits, carry into den[q]).
-    _copy_register(qc, Ia, den[:q])
-    q_add(qc, Ib, list(den[:q]), add_c)
-    qc.cx(add_c[-1], den[q])
-
-    # 3. num ← I_a − I_b (two's complement, q+1 bits; MSB = sign bit).
-    _copy_register(qc, Ia, num[:q])
-    q_sub(qc, Ib, list(num[:q]), sub_c)
-    qc.cx(sub_c[-1], num[q])
-    qc.x(num[q])
+    # 2-3. den <- A + B, num <- A - B (two's complement, MSB = sign bit).
+    _apply_gp_num_den(qc, layout, q, K, f, L, unit)
 
     # 4. Copy sign bit out.
-    qc.cx(num[q], sign)
+    qc.cx(num[L], sign)
 
     # 5. Conditional two's-complement negate: |num|.
     for i in range(q_w):
@@ -1467,7 +1594,7 @@ def class_a_gp_full(
     # ones_reg stays at 1 throughout the rest of the circuit; will be
     # uncomputed only by a full-pipeline inverse if needed.
 
-    # 6. Bit-shift num up by q_frac → num_scaled (CNOT copy).
+    # 6. Bit-shift num up by q_frac into num_scaled (CNOT copy).
     for i in range(q_w):
         qc.cx(num[i], num_scaled[i + q_frac])
 
@@ -1495,21 +1622,24 @@ def decode_class_a_full(
 ) -> tuple[np.ndarray, np.ndarray]:
     """Decode Class A full counts into (gp_signed_image, divzero_mask).
 
-    Reads the ``sign`` qubit, the **full** ``quotient`` register, and the
-    ``div_flag``. The magnitude must be read across the whole register,
-    not just its low ``q_frac`` bits: since ``|I_a - I_b| <= I_a + I_b``
-    the quotient is bounded by ``2**q_frac``, and it *attains* that value
-    at the saturating ``GP = ±1`` endpoints (one channel quantised to 0),
-    which sets bit ``q_frac`` and would be truncated away by a low-bits
-    read. Bits above ``q_frac`` are identically zero, so the full read is
-    exact at every pixel.
+    Serves :func:`class_a_gp_full` and :func:`class_a_gp_lookup` for any G
+    (the G factor only changes the circuit, not the read-out). Reads the
+    ``sign`` qubit, the full ``quotient`` register, and the ``div_flag``.
+    The magnitude must be read across the whole register, not just its
+    low ``q_frac`` bits: since ``|A - B| <= A + B`` the quotient is bounded
+    by ``2**q_frac``, and it attains that value at the saturating
+    ``GP = +-1`` endpoints (one channel quantised to 0), which sets bit
+    ``q_frac`` and would be truncated away by a low-bits read. Bits above
+    ``q_frac`` are identically zero, so the full read is exact at every
+    pixel.
 
     Returns
     -------
     (gp_image, divzero_mask)
         ``gp_image[r, c] = (-1)^sign * magnitude / 2^q_frac``,
-        floating-point in [−1, 1]. ``divzero_mask[r, c]`` is True for
-        pixels where the denominator (I_a + I_b) was 0.
+        floating-point in [-1, 1]. ``divzero_mask[r, c]`` is True for
+        pixels where the denominator was 0 (``I_a = I_b = 0``, since
+        G > 0).
     """
     side = 1 << n
     gp_img = np.zeros((side, side), dtype=np.float64)
