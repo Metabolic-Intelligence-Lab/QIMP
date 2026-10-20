@@ -1,7 +1,4 @@
-"""Chromatic transformations: color complement, color change, halving, classify.
-
-Reference: docs/tesi.pdf §2.4
-"""
+"""Chromatic transformations: color complement, color change, halving, classify."""
 
 from __future__ import annotations
 
@@ -24,7 +21,7 @@ __all__ = [
 def frqi_color_complement(qc: QuantumCircuit, *, color_qubit: int | None = None) -> QuantumCircuit:
     """Invert FRQI colors by applying an X to the color qubit.
 
-    Maps ``cos(θ)|0⟩ + sin(θ)|1⟩`` → ``sin(θ)|0⟩ + cos(θ)|1⟩``, i.e. ``θ → π−θ``.
+    Maps ``cos(θ)|0⟩ + sin(θ)|1⟩`` → ``sin(θ)|0⟩ + cos(θ)|1⟩``, i.e. ``θ → π/2 − θ``.
     If ``color_qubit`` is ``None`` the highest-indexed qubit is used.
     """
     target = qc.num_qubits - 1 if color_qubit is None else color_qubit

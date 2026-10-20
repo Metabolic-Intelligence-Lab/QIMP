@@ -1,104 +1,129 @@
 # Encodings
 
-Three canonical encodings, three different trade-offs.
+All encoders share one interface: `encode(image)` returns a `QuantumCircuit`
+and `decode(counts)` returns the image reconstructed from measurement counts.
+Image side `2^n` and, where relevant, bit depth `q` are taken from the input
+or passed explicitly.
 
-| Encoding | Type | Qubits | Retrieval | Complexity |
+| Encoding | Class | Image | Qubits | Retrieval |
 |---|---|---|---|---|
-| **FRQI** | Phase | `2n + 1` | Approximated (shot-noise) | `O(2^{4n})` |
-| **NEQR** | Basis | `2n + q` | **Exact** | `O(q·n·2^{2n})` |
-| **QPIE** | Amplitude | `2n` | Approximated (shot-noise) | `O(2^n)` |
+| FRQI | `FrqiEncoder` | grey-scale | `2n + 1` | statistical (shot noise) |
+| NEQR | `NeqrEncoder` | grey-scale | `2n + q` | exact |
+| QPIE | `QpieEncoder` | grey-scale | `2n` | statistical (shot noise) |
+| MCRQI | `McrqiEncoder` | RGB | `2n + 3` | statistical (shot noise) |
+| NCQI | `NcqiEncoder` | RGB | `2n + 3q` | exact |
 
-## FRQI — Flexible Representation of Quantum Images
+## FRQI
 
-Pixel intensities map to RY rotation angles applied to a *color* qubit
-controlled by the position register. Compact (one extra qubit on top of
-position), but retrieval is approximate and intensity precision is
-shot-limited.
+Flexible representation of quantum images. Each pixel intensity sets the angle
+of a rotation of one colour qubit, controlled by the position register. The
+circuit is compact in qubits, and the intensity is recovered from measurement
+statistics.
 
 ```python
+import numpy as np
 from qimp.encoding.frqi import FrqiEncoder
+from qimp.testing import ideal_simulation
 
+image = np.random.default_rng(0).integers(0, 256, (4, 4)).astype(np.uint8)
 encoder = FrqiEncoder()
-qc = encoder.encode(image)         # image: (2^n, 2^n)
-# ... run, get counts ...
-recovered = encoder.decode(counts)[0]
+qc = encoder.encode(image)
+recovered = encoder.decode(ideal_simulation(qc, shots=40_000, seed=0))
 ```
 
-Multi-image FRQI: pass a stack of images (`(num_images, H, W)`) and `m =
-⌈log₂(num_images)⌉` selection qubits are added automatically. Non-power-of-two
-batches are zero-padded.
+A stack of images of shape `(num_images, H, W)` adds `m = ceil(log2(num_images))`
+selection qubits, and `decode` returns a list of images. Stacks whose length is
+not a power of two are zero-padded.
 
-```python
-qc = encoder.encode(np.stack([image_a, image_b]))    # 2n + 1 + 1 qubits
-```
+## NEQR
 
-## NEQR — Novel Enhanced Quantum Representation
-
-Intensity is stored as a basis state in a `q`-qubit register, conditional on
-the position register. This gives **exact** retrieval — useful for arithmetic
-operations that need precise pixel values.
+Novel enhanced quantum representation. The intensity of each pixel is written
+as a basis state of a `q`-qubit register, conditioned on the position register.
+Retrieval is exact, which is what the arithmetic operations need, at the cost
+of `q` extra qubits and more gates per pixel.
 
 ```python
 from qimp.encoding.neqr import NeqrEncoder
+from qimp.testing import exact_counts
 
-encoder = NeqrEncoder(q=8)         # 8-bit intensity, max value 255
-qc = encoder.encode(image)         # image: (2^n, 2^n), integer dtype
-recovered = encoder.decode(counts)
-assert (recovered == image).all()  # byte-for-byte recovery
+encoder = NeqrEncoder(q=8)
+qc = encoder.encode(image)
+assert (encoder.decode(exact_counts(qc)) == image).all()
 ```
 
-The cost is the extra `q` qubits and a higher per-pixel gate count.
+## QPIE
 
-## QPIE — Quantum Probability Image Encoding
-
-Pixel intensities are stored directly as amplitude probabilities:
-`|Ψ⟩ = Σ (I_i / ‖I‖) |i⟩`. The most compact encoding (only `2n` qubits, no
-color register), at the cost of an arbitrary state preparation that transpiles
-to deep circuits.
+Quantum probability image encoding. The normalised intensities are the
+amplitudes of the position register, `|psi> = sum_i (I_i / ||I||) |i>`. It uses
+the fewest qubits (`2n`), but the state preparation transpiles to deep
+circuits. The decoder rescales with the norm computed at encoding time.
 
 ```python
 from qimp.encoding.qpie import QpieEncoder
 
 encoder = QpieEncoder()
 qc = encoder.encode(image.astype(float))
-recovered = encoder.decode(counts)
+recovered = encoder.decode(ideal_simulation(qc, shots=80_000, seed=0))
 ```
 
-Note that QPIE preserves intensity *proportions*, not absolute scale. The
-decoder uses the RMS computed at encoding time to rescale back; you only get
-proportional reconstruction otherwise.
+QHED edge detection works on QPIE states.
 
-## Choosing between them
+## MCRQI and NCQI
 
-- Need **exact pixel values** for arithmetic / sorting? → NEQR.
-- Need **compact circuits** for shallow-depth experiments on near-term
-  hardware? → QPIE.
-- Need the **classical interface point** for variational pipelines (e.g.
-  QHED-style algorithms)? → QPIE (QHED is QPIE-only).
-- Don't have multi-controlled X gates with auxiliary qubits but accept
-  amplitude encoding of intensity? → FRQI.
+RGB extensions of FRQI and NEQR. MCRQI uses one colour qubit per channel
+(`2n + 3` qubits); NCQI uses one `q`-qubit intensity register per channel
+(`2n + 3q` qubits) and retrieves the image exactly. Both take an array of
+shape `(H, W, 3)`.
 
-## Qubit layout convention
+```python
+from qimp.encoding.ncqi import NcqiEncoder
 
-All three encodings share the same position-register layout:
+rgb = np.random.default_rng(1).integers(0, 4, (2, 2, 3))
+encoder = NcqiEncoder(q=2)
+qc = encoder.encode(rgb)
+assert (encoder.decode(exact_counts(qc)) == rgb).all()
+```
 
-| Qubit indices | Role |
+## Compression
+
+`qimp.encoding.compression` reduces the multi-controlled gates of FRQI and
+NEQR. The pixels that share an intensity (FRQI) or an intensity bit (NEQR) form
+a Boolean function of the position bits; minimising that function gives fewer,
+partially controlled gates. `FrqiCompressor` and `NeqrCompressor` build the
+compressed circuits and produce the same state as the uncompressed encoders.
+The cover of the function must be disjoint, because the gates act by angle sum
+(FRQI) or XOR (NEQR). Two minimisers are available through the `method`
+argument: exact Quine-McCluskey (`"qm"`) and the ESPRESSO heuristic
+(`"espresso"`), which scales to larger images. The default, `"auto"`, uses
+Quine-McCluskey up to `n = 4` and ESPRESSO above.
+
+```python
+from qimp.encoding.compression import NeqrCompressor
+
+compressor = NeqrCompressor(image, q=8, method="auto")
+qc = compressor.neqr_image()        # same state as NeqrEncoder(q=8).encode(image)
+```
+
+## Qubit layout
+
+All encodings use the same position register:
+
+| Qubits | Role |
 |---|---|
-| `0 .. n-1` | **X axis** (column). Qubit ``i`` holds bit ``i`` of the column index (LSB-first). |
-| `n .. 2n-1` | **Y axis** (row). Qubit ``n + i`` holds bit ``i`` of the row index (LSB-first). |
-| Above `2n` | Encoding-specific: FRQI color qubit at `2n`, NEQR intensity qubits *below* position (qubits 0..q-1), QPIE has nothing above. |
+| `0 .. n-1` | column index, least significant bit first |
+| `n .. 2n-1` | row index, least significant bit first |
 
-This means that when you read a Qiskit count bitstring (MSB-first), the
-**leftmost** bit (after the color/intensity prefix) is the high bit of the
-row index, and the **rightmost** is the LSB of the column index. The
-`np.fliplr` / `np.flipud` / `np.transpose` mapping used by
-`qimp.processing.geometric` follows this convention.
+FRQI puts its colour qubit at `2n`. NEQR puts the intensity register on qubits
+`0 .. q-1` and the position register above it, so geometric operations on NEQR
+circuits take `pos_offset=q`. QPIE has no extra qubits.
 
-For NEQR, position qubits start at offset ``q`` (the intensity register
-occupies qubits 0..q-1). Pass `pos_offset=q` to any geometric operation.
+In a Qiskit count string, which is written most significant bit first, the
+leftmost position bit is the high bit of the row index and the rightmost is the
+low bit of the column index.
 
-## RGB extensions (v0.2)
+## Choosing an encoding
 
-`MCRQI` (FRQI for RGB) and `NCQI` (NEQR for RGB) are scaffolded but not yet
-implemented. Track [issue #N](https://github.com/Metabolic-Intelligence-Lab/QIMP/issues)
-for progress.
+- Exact pixel values for arithmetic, comparison or sorting: NEQR (or NCQI for
+  RGB).
+- Fewest qubits: QPIE, which is also the input of QHED.
+- One extra qubit and a rotation per pixel: FRQI (or MCRQI for RGB).

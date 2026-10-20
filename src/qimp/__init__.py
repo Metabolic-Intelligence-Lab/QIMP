@@ -15,8 +15,6 @@ Scalability
 All encoders accept arbitrary `n` (spatial qubits per axis, image size = 2^n × 2^n),
 arbitrary `q` (intensity qubits for NEQR), and arbitrary `m` (number of images for
 multi-image FRQI). No hard-coded qubit counts.
-
-Specification: see docs/tesi.pdf, Chapter 3.
 """
 
 from qimp._version import __version__

@@ -1,14 +1,15 @@
 # Examples
 
-Self-contained, runnable Python scripts demonstrating QIMP features. Each one
-uses only `[dev]` dependencies and runs on a CPU Aer simulator in seconds.
+Runnable scripts. Each uses only the `[dev]` dependencies and runs on the CPU
+Aer simulator in seconds.
 
-| Script | What it shows |
+| Script | Content |
 |---|---|
-| `01_frqi_fidelity.py` | FRQI encoding round-trip + PSNR fidelity measure |
-| `02_neqr_round_trip.py` | NEQR exact retrieval — recovers the image byte-for-byte |
-| `03_qhed_edges.py` | Quantum Hadamard Edge Detection on a synthetic image |
-| `04_qpie_round_trip.py` | QPIE amplitude encoding round-trip |
+| `01_frqi_fidelity.py` | FRQI round trip, with PSNR |
+| `02_neqr_round_trip.py` | NEQR round trip with exact recovery |
+| `03_qhed_edges.py` | QHED edge detection on a synthetic image |
+| `04_qpie_round_trip.py` | QPIE round trip |
+| `05_real_image_pipeline.py` | every encoder, a geometric operation and QHED on a microscopy tile, with outputs saved to `data/output/` |
 
 Run any of them with:
 

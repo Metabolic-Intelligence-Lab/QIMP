@@ -125,9 +125,10 @@ pip install -e ".[ui]"
 qimp ui    # or: streamlit run apps/qimp_explorer/app.py
 ```
 
-It has four pages (Encoder Explorer, Processing Playground, Benchmark,
-GP-ratio) for running the encoders and processing operations, saving outputs
-to `data/output/run_<timestamp>/` and comparing metrics. See
+The main page walks an image through loading, preprocessing, encoding,
+processing and execution on a simulator or an IBM Quantum backend, and saves
+the outputs to `data/output/run_<timestamp>/`. Three further pages cover
+benchmarks of the encoders, the GP-ratio pipeline and system information. See
 [`docs/ui.md`](docs/ui.md).
 
 ## Hardware execution

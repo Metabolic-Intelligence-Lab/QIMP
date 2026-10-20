@@ -1,7 +1,4 @@
-"""Test harnesses: ideal/noisy simulation and IBM Quantum hardware execution.
-
-Reference: docs/tesi.pdf §3.1.5
-"""
+"""Test harnesses: ideal/noisy simulation and IBM Quantum hardware execution."""
 
 from __future__ import annotations
 

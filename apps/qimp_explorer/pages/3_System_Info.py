@@ -137,19 +137,18 @@ with col_b:
 st.divider()
 
 # ----------------------------------------------------------- Module status ----
-st.subheader("Library modules (v0.2)")
+st.subheader("Library modules")
 st.markdown(
-    "All thesis-spec modules are now implemented:\n\n"
-    "- ✅ `qimp.encoding.frqi`, `qimp.encoding.neqr`, `qimp.encoding.qpie`\n"
-    "- ✅ `qimp.encoding.mcrqi` / `qimp.encoding.ncqi` — FRQI / NEQR for RGB.\n"
-    "- ✅ `qimp.encoding.compression` — Boolean-function minimisation (Quine–McCluskey + greedy disjoint cover).\n"
-    "- ✅ `qimp.processing.{geometric, chromatic, filters, gp_ratio}`\n"
-    "- ✅ `qimp.processing.arithmetic` — quantum ADD/SUB and comparator on NEQR.\n"
-    "- ✅ `qimp.qml.classifier` — variational FRQI image classifier.\n"
-    "- ✅ `qimp.io.{image, datasets}`\n"
-    "- ✅ `qimp.metrics`, `qimp.qft`, `qimp.runtime`, `qimp.testing`\n\n"
-    "Still on the roadmap (v0.3+):\n\n"
-    "- `qimp.processing.arithmetic.neqr_sort` — pairwise compare-and-swap sort.\n"
-    "- ESPRESSO heuristic for `compression` at large fan-in (≥ 5).\n"
-    "- IBM Quantum hardware integration in the UI."
+    "- `qimp.encoding`: FRQI, NEQR, QPIE, MCRQI and NCQI encoders; compression of "
+    "FRQI and NEQR by Boolean minimisation (Quine-McCluskey or ESPRESSO).\n"
+    "- `qimp.processing`: geometric and chromatic operations, QHED edge detection, "
+    "reversible arithmetic (addition, comparison, sorting, multiplication, division, "
+    "truth-table synthesis), ratiometric operators and the GP-ratio pipeline.\n"
+    "- `qimp.qml`: variational FRQI image classifier.\n"
+    "- `qimp.io`: image and dataset loaders.\n"
+    "- `qimp.runtime`: simulator manager, memory pool, circuit cache, IBM Quantum "
+    "execution with TREX, dynamical decoupling and zero-noise extrapolation.\n"
+    "- `qimp.metrics`, `qimp.qft`, `qimp.testing`.\n\n"
+    "Step 5 of the explorer runs the circuit on an ideal or noisy simulator or on an "
+    "IBM Quantum backend."
 )

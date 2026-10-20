@@ -1,4 +1,4 @@
-# API Reference — Processing
+# API reference: processing
 
 ## qimp.processing.geometric
 
@@ -12,6 +12,18 @@
 
 ::: qimp.processing.filters
 
+## qimp.processing.arithmetic
+
+::: qimp.processing.arithmetic
+
+## qimp.processing.ratiometric_circuit
+
+::: qimp.processing.ratiometric_circuit
+
 ## qimp.processing.gp_ratio
 
 ::: qimp.processing.gp_ratio
+
+## qimp.qml.classifier
+
+::: qimp.qml.classifier

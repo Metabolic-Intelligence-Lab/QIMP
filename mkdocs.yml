@@ -70,10 +70,11 @@ nav:
   - Getting Started: getting-started.md
   - Encodings: encoding.md
   - Processing: processing.md
+  - Simulation and hardware: runtime.md
   - Examples: examples.md
   - Interactive UI: ui.md
   - API Reference:
       - Encoding: api/encoding.md
       - Processing: api/processing.md
-      - I/O & Metrics: api/io-metrics.md
-      - Runtime & Testing: api/runtime-testing.md
+      - I/O and metrics: api/io-metrics.md
+      - Runtime and testing: api/runtime-testing.md

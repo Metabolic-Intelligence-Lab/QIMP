@@ -7,7 +7,7 @@ adding m = ceil(log2(num_images)) selection qubits, for a total of 2n+m+1 qubits
 
 Scales freely with n (image side = 2^n) and m (number of stacked images = 2^m).
 
-Reference: docs/tesi.pdf §3.1.1, §2.2.1
+Reference: P.Q. Le, F. Dong, K. Hirota, Quantum Inf. Process. 10 (2011) 63-84.
 """
 
 from __future__ import annotations

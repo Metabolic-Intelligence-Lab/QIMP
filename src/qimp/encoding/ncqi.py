@@ -11,7 +11,7 @@ Qubit layout (low → high index):
   - n X-position qubits (qubits 3q … 3q+n-1)
   - n Y-position qubits (qubits 3q+n … 3q+2n-1)
 
-Reference: docs/tesi.pdf §3.1.2 (color extension).
+Reference: J. Sang, S. Wang, Q. Li, Quantum Inf. Process. 16 (2017) 42.
 """
 
 from __future__ import annotations

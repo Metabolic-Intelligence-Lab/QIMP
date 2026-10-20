@@ -1,7 +1,4 @@
-"""Image loading and preparation utilities.
-
-Reference: docs/tesi.pdf §3.1.6 (image_preparation module)
-"""
+"""Image loading and preparation utilities."""
 
 from __future__ import annotations
 

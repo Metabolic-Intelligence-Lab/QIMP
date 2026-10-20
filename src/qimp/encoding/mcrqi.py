@@ -8,7 +8,7 @@ Compared to FRQI:
 - adds 2 qubits (3 color qubits instead of 1);
 - per-pixel construction is 3 fully-controlled RY gates instead of 1.
 
-Reference: docs/tesi.pdf §3.1.1 (color extension).
+Reference: B. Sun et al., J. Adv. Comput. Intell. Intell. Inform. 17 (2013) 404-417.
 """
 
 from __future__ import annotations
