@@ -1,6 +1,7 @@
 """IBM Quantum Runtime helpers — service singleton, backend resolution,
-hardware execution via SamplerV2 with TREX + DD mitigation, Aer
-noise-model fallback, and per-run artifact persistence.
+hardware execution via SamplerV2 with TREX + DD mitigation and
+counts-side zero-noise extrapolation, Aer noise-model fallback, and
+per-run artifact persistence.
 
 All IBM-Runtime imports are local to this module: the rest of the
 library imports only the typed helpers exposed here.
@@ -13,20 +14,30 @@ import logging
 import os
 import tempfile
 import time
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 from qiskit import QuantumCircuit
 
+from qimp.runtime.zne import ZNE_METHODS, fold_gates, zne_extrapolate, zne_probabilities
+
 __all__ = [
+    "ZNE_METHODS",
     "aer_noisy_run",
+    "fold_gates",
     "get_service",
     "hw_run",
     "is_run_complete",
     "list_backends",
     "persist_run",
     "pick_backend",
+    "zne_extrapolate",
+    "zne_probabilities",
 ]
+
+# Default noise scales for mitigation="zne" (global folding 1x, 3x, 5x).
+DEFAULT_ZNE_SCALES: tuple[float, ...] = (1.0, 3.0, 5.0)
 
 logger = logging.getLogger(__name__)
 
@@ -221,17 +232,71 @@ def is_run_complete(outdir: Path, label: str, pass_name: str) -> bool:
         return False
 
 
+def _validate_zne_args(scales: Sequence[float], method: str) -> tuple[float, ...]:
+    if method not in ZNE_METHODS:
+        raise ValueError(f"unknown ZNE method {method!r}; expected one of {ZNE_METHODS}")
+    out = tuple(float(s) for s in scales)
+    if len(out) < 2 or len(set(out)) != len(out) or min(out) < 1.0:
+        raise ValueError(f"ZNE scales must be >= 2 distinct values >= 1, got {list(scales)}")
+    return out
+
+
+def _fold_for_zne(
+    transpiled: QuantumCircuit, scales: tuple[float, ...], target: Any | None
+) -> tuple[list[QuantumCircuit], list[float]]:
+    """Fold an ISA circuit at each scale; return circuits and achieved scales."""
+    folded = [fold_gates(transpiled, s, target=target) for s in scales]
+    achieved = [float(c.metadata["zne_fold_scale"]) for c in folded]
+    return folded, achieved
+
+
+def _two_q_gate_count(qc: QuantumCircuit) -> int:
+    """Two-qubit gates in ``qc``, barriers excluded."""
+    return sum(
+        1
+        for instr in qc.data
+        if instr.operation.num_qubits >= 2 and instr.operation.name != "barrier"
+    )
+
+
+def _zne_summary(
+    scales: tuple[float, ...],
+    achieved: list[float],
+    method: str,
+    folded: list[QuantumCircuit],
+    raw_counts: list[dict[str, int]],
+) -> dict[str, Any]:
+    return {
+        "zne_scales": list(scales),
+        "zne_achieved_scales": achieved,
+        "zne_method": method,
+        "zne_depths": [c.depth() for c in folded],
+        "zne_two_q_gate_counts": [_two_q_gate_count(c) for c in folded],
+        "zne_raw_counts": raw_counts,
+    }
+
+
 def aer_noisy_run(
     qc: QuantumCircuit,
     *,
     backend: Any,
     shots: int = 4096,
+    zne_scales: Sequence[float] | None = None,
+    zne_method: str = "richardson",
+    seed: int | None = None,
 ) -> dict[str, int]:
     """Run ``qc`` on an Aer simulator wired with ``backend``'s noise model.
 
     Uses :func:`AerSimulator.from_backend` which inherits the device's
     noise + coupling map + basis gates. Adds ``measure_all()`` if the
     circuit has no measurements (reuses ``qimp.testing._ensure_measured``).
+
+    When ``zne_scales`` is given (e.g. ``(1, 3, 5)``), the transpiled
+    circuit is folded at each scale with :func:`fold_gates`, all folded
+    circuits are simulated with ``shots`` shots each, and the
+    zero-noise extrapolated counts (:func:`zne_extrapolate` with
+    ``zne_method``) are returned instead of the raw counts. ``seed`` fixes
+    both the transpiler and the simulator seed.
     """
     from qiskit import transpile
     from qiskit_aer import AerSimulator
@@ -240,9 +305,16 @@ def aer_noisy_run(
 
     sim = AerSimulator.from_backend(backend)
     measured = _ensure_measured(qc)
-    transpiled = transpile(measured, sim)
-    result = sim.run(transpiled, shots=shots).result()
-    return dict(result.get_counts())
+    transpiled = transpile(measured, sim, seed_transpiler=seed)
+    if zne_scales is None:
+        result = sim.run(transpiled, shots=shots, seed_simulator=seed).result()
+        return dict(result.get_counts())
+
+    scales = _validate_zne_args(zne_scales, zne_method)
+    folded, achieved = _fold_for_zne(transpiled, scales, sim.target)
+    result = sim.run(folded, shots=shots, seed_simulator=seed).result()
+    raw = [dict(result.get_counts(i)) for i in range(len(folded))]
+    return zne_extrapolate(raw, achieved, method=zne_method, shots=shots)
 
 
 def _sampler_v2_cls() -> Any:
@@ -281,6 +353,8 @@ def hw_run(
     dd_sequence: str = "XY4",
     optimization_level: int = 3,
     timeout_s: float = 1200.0,
+    zne_scales: Sequence[float] = DEFAULT_ZNE_SCALES,
+    zne_method: str = "richardson",
 ) -> tuple[dict[str, int], QuantumCircuit, str, dict[str, Any]]:
     """Submit ``qc`` to ``backend`` via SamplerV2 with TREX + DD mitigation.
 
@@ -298,11 +372,15 @@ def hw_run(
         ``'trex+dd'`` enables twirled readout error extinction and
         dynamical decoupling (default). ``'trex'`` enables only TREX,
         ``'dd'`` enables only DD, ``'none'`` disables all mitigation.
-        ``'zne'`` enables zero-noise extrapolation on top of TREX+DD
-        by setting ``resilience_level=2`` on SamplerOptions; the runtime
-        executes three implicit noise-scaled copies and returns the
-        extrapolated mitigated counts. The five modes together support
-        ablation studies of which layer contributes the recovered signal.
+        ``'zne'`` adds counts-side zero-noise extrapolation on top of
+        TREX+DD: the transpiled ISA circuit is folded at each of
+        ``zne_scales`` with :func:`fold_gates`, the folded circuits are
+        submitted as separate pubs of one SamplerV2 job, and each
+        bitstring probability is extrapolated to zero noise with
+        :func:`zne_extrapolate`. The returned counts are the extrapolated
+        counts rescaled to ``shots``; ``transpiled_qc`` is the unfolded
+        circuit. The five modes together support ablation studies of
+        which layer contributes the recovered signal.
     dd_sequence:
         Decoupling sequence used when ``mitigation`` includes DD. ``'XY4'``
         (default) is the sequence used throughout the paper's campaign.
@@ -318,12 +396,31 @@ def hw_run(
         ``timeout_s`` is currently advisory; recovery of long-running jobs is
         handled by the caller (the CLI sweep script in Task 15 persists
         ``job_id`` before awaiting ``job.result()``).
+    zne_scales:
+        Noise scales for ``mitigation='zne'`` (default ``(1, 3, 5)``). Odd
+        integers give full global folds; other values add a partial fold
+        of the last gates. Ignored by the other modes.
+    zne_method:
+        Extrapolation model for ``mitigation='zne'``: ``'richardson'``
+        (default), ``'linear'`` or ``'exponential'``.
+
+    Returns
+    -------
+    tuple
+        ``(counts, transpiled_qc, job_id, transpile_summary)``. With
+        ``mitigation='zne'`` the summary also holds ``zne_scales``,
+        ``zne_achieved_scales`` (used as the abscissa), ``zne_method``,
+        per-scale ``zne_depths`` and ``zne_two_q_gate_counts``, and the raw
+        per-scale counts ``zne_raw_counts``, so callers that persist the
+        summary keep everything needed to redo the fit.
     """
     _allowed_mitigation = ("trex+dd", "trex", "dd", "none", "zne")
     if mitigation not in _allowed_mitigation:
         raise ValueError(
             f"unknown mitigation {mitigation!r}; expected one of {_allowed_mitigation}"
         )
+    if mitigation == "zne":
+        scales = _validate_zne_args(zne_scales, zne_method)
 
     from qiskit import transpile
     from qiskit.transpiler import Target
@@ -346,26 +443,30 @@ def hw_run(
 
     Options = _sampler_options_cls()
     options = Options()
-    if mitigation in ("trex+dd", "dd"):
+    if mitigation in ("trex+dd", "dd", "zne"):
         options.dynamical_decoupling.enable = True
         options.dynamical_decoupling.sequence_type = dd_sequence
-    if mitigation in ("trex+dd", "trex"):
+    if mitigation in ("trex+dd", "trex", "zne"):
         options.twirling.enable_measure = True
-    if mitigation == "zne":
-        # Zero-noise extrapolation is an expectation-value technique on
-        # EstimatorV2 and is not exposed on SamplerV2's options schema
-        # (qiskit-ibm-runtime >= 0.47 removed `resilience_level` from
-        # SamplerOptions). A counts-side ZNE for this pipeline would
-        # require manual gate folding (1x/3x/5x noise scales) + per-pixel
-        # extrapolation — implemented in scripts/, not in this helper.
-        raise NotImplementedError(
-            "mitigation='zne' is not available through SamplerV2's options "
-            "in qiskit-ibm-runtime >= 0.47. Implement counts-side ZNE in "
-            "the caller via manual gate folding + per-pixel extrapolation."
-        )
 
     Sampler = _sampler_v2_cls()
     sampler = Sampler(mode=backend, options=options)
+    if mitigation == "zne":
+        # SamplerV2 has no ZNE option (qiskit-ibm-runtime >= 0.47 dropped
+        # resilience_level from SamplerOptions), so fold by hand. Folding
+        # happens on the ISA circuit, with barriers between copies and the
+        # inverse gates translated into the target basis, so nothing
+        # downstream can cancel U^dag U.
+        folded, achieved = _fold_for_zne(transpiled, scales, _target)
+        job = sampler.run(folded, shots=shots)
+        job_id = job.job_id()
+        logger.info("Submitted ZNE job %s on %s (scales %s)", job_id, backend.name, list(scales))
+        result = job.result()
+        raw = [dict(getattr(result[i].data, creg_name).get_counts()) for i in range(len(folded))]
+        counts = zne_extrapolate(raw, achieved, method=zne_method, shots=shots)
+        summary.update(_zne_summary(scales, achieved, zne_method, folded, raw))
+        return counts, transpiled, job_id, summary
+
     job = sampler.run([transpiled], shots=shots)
     job_id = job.job_id()
     logger.info("Submitted job %s on %s", job_id, backend.name)

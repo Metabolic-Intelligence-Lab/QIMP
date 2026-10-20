@@ -402,11 +402,76 @@ def test_hw_run_mitigation_dd_only_enables_dd_only():
     assert options_obj.twirling.enable_measure is False
 
 
-def test_hw_run_mitigation_zne_raises_not_implemented():
-    """Mitigation mode 'zne' is not available on SamplerV2 in
-    qiskit-ibm-runtime >= 0.47 (SamplerOptions no longer exposes
-    resilience_level). hw_run must raise NotImplementedError with a
-    clear message rather than crash deep in pydantic validation."""
+def test_hw_run_mitigation_zne_folds_extrapolates_and_records_metadata():
+    """Mode 'zne' submits one SamplerV2 job with one pub per noise scale
+    (folded ISA circuits), keeps TREX+DD on, extrapolates the per-scale
+    counts to zero noise and records scales/method in the summary."""
+    from types import SimpleNamespace
+
+    from qimp.runtime import ibm
+
+    fake_backend = MagicMock()
+    fake_backend.name = "ibm_fake"
+    fake_backend.num_qubits = 5
+
+    per_scale = [
+        {"00": 450, "11": 450, "01": 62, "10": 62},
+        {"00": 380, "11": 380, "01": 132, "10": 132},
+        {"00": 330, "11": 330, "01": 182, "10": 182},
+    ]
+    pub_results = []
+    for c in per_scale:
+        pr = MagicMock()
+        pr.data.c.get_counts.return_value = c
+        pub_results.append(pr)
+    fake_job = MagicMock()
+    fake_job.job_id.return_value = "zne-job"
+    fake_job.result.return_value = pub_results
+
+    fake_sampler_instance = MagicMock()
+    fake_sampler_instance.run.return_value = fake_job
+    fake_sampler_cls = MagicMock(return_value=fake_sampler_instance)
+    options_obj = SimpleNamespace(
+        dynamical_decoupling=SimpleNamespace(enable=False, sequence_type=None),
+        twirling=SimpleNamespace(enable_measure=False),
+    )
+    fake_options_cls = MagicMock(return_value=options_obj)
+
+    with (
+        patch.object(ibm, "_sampler_v2_cls", return_value=fake_sampler_cls),
+        patch.object(ibm, "_sampler_options_cls", return_value=fake_options_cls),
+    ):
+        counts, transpiled, job_id, summary = ibm.hw_run(
+            _toy_circuit(), backend=fake_backend, shots=1024, mitigation="zne"
+        )
+
+    assert job_id == "zne-job"
+    assert options_obj.dynamical_decoupling.enable is True
+    assert options_obj.twirling.enable_measure is True
+
+    fake_sampler_instance.run.assert_called_once()
+    (pubs,), kw = fake_sampler_instance.run.call_args
+    assert kw["shots"] == 1024
+    assert len(pubs) == 3
+    base_2q = summary["zne_two_q_gate_counts"][0]
+    assert base_2q >= 1
+    assert summary["zne_two_q_gate_counts"] == [base_2q, 3 * base_2q, 5 * base_2q]
+    assert summary["zne_scales"] == [1.0, 3.0, 5.0]
+    assert summary["zne_achieved_scales"] == [1.0, 3.0, 5.0]
+    assert summary["zne_method"] == "richardson"
+    assert summary["zne_raw_counts"] == per_scale
+    assert "depth" in summary and "two_q_gate_count" in summary
+    json.dumps(summary)  # persistable as metadata
+
+    expected = ibm.zne_extrapolate(per_scale, [1, 3, 5], method="richardson", shots=1024)
+    assert counts == expected
+    assert sum(counts.values()) == 1024
+    # Extrapolation pushes weight back to the ideal Bell outcomes.
+    assert counts["00"] + counts["11"] > 900
+    assert transpiled.count_ops().get("barrier", 0) <= 1  # unfolded circuit returned
+
+
+def test_hw_run_mitigation_zne_rejects_bad_scales_and_method():
     from qimp.runtime import ibm
 
     fake_backend = MagicMock()
@@ -416,9 +481,24 @@ def test_hw_run_mitigation_zne_raises_not_implemented():
     with (
         patch.object(ibm, "_sampler_v2_cls", return_value=MagicMock()),
         patch.object(ibm, "_sampler_options_cls", return_value=MagicMock()),
-        pytest.raises(NotImplementedError, match="zne"),
     ):
-        ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="zne")
+        with pytest.raises(ValueError, match="ZNE scales"):
+            ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="zne", zne_scales=(1,))
+        with pytest.raises(ValueError, match="unknown ZNE method"):
+            ibm.hw_run(_toy_circuit(), backend=fake_backend, mitigation="zne", zne_method="cubic")
+
+
+def test_aer_noisy_run_with_zne_returns_extrapolated_counts():
+    from qiskit.providers.fake_provider import GenericBackendV2
+
+    from qimp.runtime import ibm
+
+    backend = GenericBackendV2(3, seed=5)
+    counts = ibm.aer_noisy_run(
+        _toy_circuit(), backend=backend, shots=2048, zne_scales=(1, 3, 5), seed=1
+    )
+    assert sum(counts.values()) == 2048
+    assert counts.get("00", 0) + counts.get("11", 0) > 1800
 
 
 def test_hw_run_rejects_unknown_mitigation():
