@@ -289,6 +289,10 @@ def zne_probabilities(
         )
 
     est = np.clip(np.asarray(est, dtype=float), 0.0, 1.0)
+    # Round-off from the fits (log, lstsq, exp) leaves residues of order
+    # 1e-16 on bitstrings whose estimate is zero; they differ between BLAS
+    # builds, so treat anything below the resolution of any shot count as 0.
+    est[est < 1e-12] = 0.0
     total = float(est.sum())
     if total <= 0:
         raise ValueError("ZNE: every extrapolated probability is <= 0")
