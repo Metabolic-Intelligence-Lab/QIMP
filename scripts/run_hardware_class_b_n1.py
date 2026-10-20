@@ -135,7 +135,7 @@ def laurdan_2x2() -> tuple[np.ndarray, np.ndarray]:
 
 
 def utc_stamp() -> str:
-    return dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def submit_one(qc: QuantumCircuit, *, label: str, backend, outdir: Path,

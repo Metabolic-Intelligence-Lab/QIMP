@@ -49,13 +49,13 @@ from qimp.processing.arithmetic import (
     q_add,
     q_add_ctrl,
     q_div_general,
+    q_div_lookup,
+    q_div_lookup_inv,
     q_div_nonrestoring,
     q_div_nonrestoring_inv,
     q_div_restoring,
     q_div_restoring_inv,
     q_sub,
-    q_div_lookup,
-    q_div_lookup_inv,
     synth_pixel_map,
 )
 
@@ -170,7 +170,7 @@ def _ucry_compressed(
         gate = gate.inverse()
     tmp.append(gate, list(range(1 + len(controls))))
     flat = transpile(tmp, basis_gates=["ry", "cx"], optimization_level=0)
-    wires = [target] + list(controls)
+    wires = [target, *list(controls)]
     pending: list[int] = []
 
     def flush() -> None:
@@ -217,8 +217,9 @@ def _ucry_load_planes(
     removed (:func:`_ucry_compressed`), which is exact and image-dependent."""
     from qiskit.circuit.library import UCRYGate
 
-    planes = [(image_a, intensity_a_qubits, b) for b in range(q)] + \
-             [(image_b, intensity_b_qubits, b) for b in range(q)]
+    planes = [(image_a, intensity_a_qubits, b) for b in range(q)] + [
+        (image_b, intensity_b_qubits, b) for b in range(q)
+    ]
     if inverse:
         planes = planes[::-1]
     for img, reg, bit in planes:
@@ -229,7 +230,7 @@ def _ucry_load_planes(
         gate = UCRYGate(angles)
         if inverse:
             gate = gate.inverse()
-        qc.append(gate, [reg[bit]] + list(position_qubits))
+        qc.append(gate, [reg[bit], *list(position_qubits)])
 
 
 def dual_neqr_load(
@@ -282,8 +283,17 @@ def dual_neqr_load(
     qc.h(position_qubits)
     qc.barrier()
     if mode == "ucry":
-        _ucry_load_planes(qc, image_a, image_b, q, n, position_qubits,
-                          intensity_a_qubits, intensity_b_qubits, compress=compress)
+        _ucry_load_planes(
+            qc,
+            image_a,
+            image_b,
+            q,
+            n,
+            position_qubits,
+            intensity_a_qubits,
+            intensity_b_qubits,
+            compress=compress,
+        )
         qc.barrier()
         return
     if mode != "mcx":
@@ -341,8 +351,18 @@ def dual_neqr_load_inv(
         )
 
     if mode == "ucry":
-        _ucry_load_planes(qc, image_a, image_b, q, n, position_qubits,
-                          intensity_a_qubits, intensity_b_qubits, inverse=True, compress=compress)
+        _ucry_load_planes(
+            qc,
+            image_a,
+            image_b,
+            q,
+            n,
+            position_qubits,
+            intensity_a_qubits,
+            intensity_b_qubits,
+            inverse=True,
+            compress=compress,
+        )
         qc.barrier()
         qc.h(position_qubits)
         return
@@ -408,7 +428,9 @@ def class_b_ratio(
         division acts uniformly on the position superposition).
     """
     if divider not in ("restoring", "nonrestoring", "lookup"):
-        raise ValueError(f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}")
+        raise ValueError(
+            f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}"
+        )
     n = _validate_dual_images(image_a, image_b, q)
     if divider == "lookup":
         return _class_b_ratio_lookup(image_a, image_b, q, n, load)
@@ -620,15 +642,24 @@ def class_a_gp_lookup(
     n_pos, mag_w = 2 * n, q_frac + 1
     layout: dict[str, list[int] | int] = {}
     cur = 0
-    layout["position"] = list(range(cur, cur + n_pos)); cur += n_pos
-    layout["I_a"] = list(range(cur, cur + q)); cur += q
-    layout["I_b"] = list(range(cur, cur + q)); cur += q
-    layout["quotient"] = list(range(cur, cur + mag_w)); cur += mag_w
-    layout["sign"] = cur; cur += 1
-    layout["div_flag"] = cur; cur += 1
+    layout["position"] = list(range(cur, cur + n_pos))
+    cur += n_pos
+    layout["I_a"] = list(range(cur, cur + q))
+    cur += q
+    layout["I_b"] = list(range(cur, cur + q))
+    cur += q
+    layout["quotient"] = list(range(cur, cur + mag_w))
+    cur += mag_w
+    layout["sign"] = cur
+    cur += 1
+    layout["div_flag"] = cur
+    cur += 1
     qc = QuantumCircuit(cur)
     dual_neqr_load(
-        qc, image_a, image_b, q,
+        qc,
+        image_a,
+        image_b,
+        q,
         position_qubits=layout["position"],  # type: ignore[arg-type]
         intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
         intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
@@ -646,7 +677,7 @@ def class_a_gp_lookup(
     synth_pixel_map(
         qc,
         list(layout["I_a"]) + list(layout["I_b"]),  # type: ignore[arg-type]
-        list(layout["quotient"]) + [layout["sign"], layout["div_flag"]],  # type: ignore[arg-type]
+        [*list(layout["quotient"]), layout["sign"], layout["div_flag"]],  # type: ignore[arg-type, list-item]
         table,
     )
     return qc, layout
@@ -682,14 +713,22 @@ def class_c_rogfp_lookup(
     n_pos, rc_w = 2 * n, q + q_frac + 1
     layout: dict[str, list[int] | int] = {}
     cur = 0
-    layout["position"] = list(range(cur, cur + n_pos)); cur += n_pos
-    layout["I_a"] = list(range(cur, cur + q)); cur += q
-    layout["I_b"] = list(range(cur, cur + q)); cur += q
-    layout["rc_signed"] = list(range(cur, cur + rc_w)); cur += rc_w
-    layout["div_flag"] = cur; cur += 1
+    layout["position"] = list(range(cur, cur + n_pos))
+    cur += n_pos
+    layout["I_a"] = list(range(cur, cur + q))
+    cur += q
+    layout["I_b"] = list(range(cur, cur + q))
+    cur += q
+    layout["rc_signed"] = list(range(cur, cur + rc_w))
+    cur += rc_w
+    layout["div_flag"] = cur
+    cur += 1
     qc = QuantumCircuit(cur)
     dual_neqr_load(
-        qc, image_a, image_b, q,
+        qc,
+        image_a,
+        image_b,
+        q,
         position_qubits=layout["position"],  # type: ignore[arg-type]
         intensity_a_qubits=layout["I_a"],  # type: ignore[arg-type]
         intensity_b_qubits=layout["I_b"],  # type: ignore[arg-type]
@@ -708,7 +747,7 @@ def class_c_rogfp_lookup(
     synth_pixel_map(
         qc,
         list(layout["I_a"]) + list(layout["I_b"]),  # type: ignore[arg-type]
-        list(layout["rc_signed"]) + [layout["div_flag"]],  # type: ignore[arg-type]
+        [*list(layout["rc_signed"]), layout["div_flag"]],  # type: ignore[arg-type, list-item]
         table,
     )
     return qc, layout
@@ -755,7 +794,9 @@ def class_b_ratio_inv(
     """
     # First undo the divider step.
     if divider not in ("restoring", "nonrestoring", "lookup"):
-        raise ValueError(f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}")
+        raise ValueError(
+            f"divider must be 'restoring', 'nonrestoring' or 'lookup', got {divider!r}"
+        )
     if divider == "lookup":
         q_div_lookup_inv(
             qc,

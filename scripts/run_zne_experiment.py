@@ -52,7 +52,7 @@ NOISE_SCALES = (1, 3, 5)
 
 
 def _utc_stamp() -> str:
-    return dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H-%M-%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
 
 def _load_image(repo_root: Path, frame_name: str) -> np.ndarray:

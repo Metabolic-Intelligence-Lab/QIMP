@@ -8,10 +8,10 @@ Modular Python library for **Quantum Image Processing** on top of Qiskit:
 FRQI, NEQR, QPIE encodings, geometric / chromatic / arithmetic processing,
 edge detection (QHED), variational QML on encoded images, and figures of merit.
 
-Specification: Dolciami, Politecnico di Torino,
-"A quantum circuit library for image processing", 2022) — Chapter 3 defines the
-library's intended structure; this implementation extends it with the
-Metabolic-Intelligence Lab's Green-Purple ratio pipeline (`qimp.processing.gp_ratio`).
+Designed and developed by G. Maulucci (Metabolic Intelligence Lab, Università
+Cattolica del Sacro Cuore). The catalogue of standard QIMP circuits it covers is
+also surveyed in C. Dolciami, "A quantum circuit library for image processing",
+M.Sc. thesis, Politecnico di Torino, 2022.
 
 ## Status
 
@@ -63,7 +63,7 @@ cd QIMP
 pip install -e ".[dev]"
 
 # Or install a pinned tag directly with pip (no clone needed)
-pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v2-submission"
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.0"
 ```
 
 ### Optional extras
@@ -108,7 +108,7 @@ image = np.random.randint(0, 256, (4, 4), dtype=np.uint8)
 encoder = FrqiEncoder()
 qc = encoder.encode(image)             # 2n+1 = 5 qubits for n=2
 counts = ideal_simulation(qc, shots=8192)
-reconstructed = encoder.decode(counts, n=2)
+reconstructed = encoder.decode(counts)
 print("PSNR:", psnr(image, reconstructed))
 ```
 
@@ -170,13 +170,13 @@ Requires the `[ibm]` extra (`pip install -e ".[ibm]"`) and an IBM Quantum API to
 
 ## Citation
 
-If you use this library in academic work, please cite the paper and the underlying thesis:
+If you use this library in academic work, please cite:
 
 > Maulucci, G. (2026). *Autonomous Ratiometric Image Processing on a Superconducting Quantum Processor*. Submitted.
 > Companion repository: https://github.com/Metabolic-Intelligence-Lab/QIMP, tag `v2-submission`.
 
-> Dolciami, C. (2022). *A quantum circuit library for image processing*.
-> M.Sc. thesis, Politecnico di Torino.
+> Maulucci, G. *qimp-mi: a tested, size-parametric Python library for quantum image processing on Qiskit*. Submitted to SoftwareX.
+
 
 ## License
 

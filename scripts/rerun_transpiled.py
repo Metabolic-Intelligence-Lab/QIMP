@@ -34,7 +34,7 @@ def main():
     t0 = time.time(); job = sampler.run([circ], shots=a.shots); jid = job.job_id(); res = job.result()
     creg = circ.cregs[0].name
     counts = dict(getattr(res[0].data, creg).get_counts())
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     d = OUT / stamp / "runs" / f"{a.label}_hw"; d.mkdir(parents=True, exist_ok=True)
     json.dump(counts, open(d / "counts.json", "w")); shutil.copy(src / "transpiled.qpy", d / "transpiled.qpy")
     n2 = sum(v for k, v in circ.count_ops().items() if k in ("cz", "cx", "ecr", "rzz"))

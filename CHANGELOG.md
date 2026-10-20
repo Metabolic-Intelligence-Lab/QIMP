@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-19
+
+Release described in the SoftwareX software paper.
+
+### Fixed
+- README quick start: `FrqiEncoder.decode` takes the counts only (the
+  example passed an `n=` keyword that the method does not accept).
+- Lint, formatting and `mypy` errors that made the CI `lint` job fail.
+
+### Added
+- `scripts/softwarex_figures.py`, which regenerates the figures and numbers
+  of the software paper from the bundled Laurdan frame on a simulator.
+- `CITATION.cff`.
+
+
 The autonomous-ratiometric line of work: a reversible-arithmetic layer on
 NEQR intensity registers, three end-to-end operator pipelines built on it,
 a QAE oracle composed from them, and the IBM Heron r2 runtime used to put

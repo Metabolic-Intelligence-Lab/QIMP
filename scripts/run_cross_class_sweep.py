@@ -98,7 +98,7 @@ def synthesise_rogfp(side: int, slope: float, axis: int = 0,
 
 
 def _utc_stamp() -> str:
-    return dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H-%M-%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
 
 def _max_intensity_for_metric(ref: np.ndarray) -> float:

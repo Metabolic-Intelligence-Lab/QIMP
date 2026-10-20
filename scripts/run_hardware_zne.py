@@ -58,7 +58,7 @@ DEFAULT_OUTDIR = REPO / "data" / "output" / "ibm_hw"
 
 
 def utc_stamp() -> str:
-    return dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def load_dataset(dataset: str, n: int, q: int):

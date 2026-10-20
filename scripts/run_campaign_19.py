@@ -45,7 +45,7 @@ def main():
     a_true = float(np.mean((R > THRESHOLD) & (Ib > 0)))
     theta = np.arcsin(np.sqrt(a_true))
     svc = ibm.get_service(); be = svc.backend(a.backend); tgt = be.target
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     pre = OUT / stamp / "transpiled_c19"; pre.mkdir(parents=True, exist_ok=True)
     circuits = {}
     print(f"dataset {DATASET} n={N} q={Q} threshold={THRESHOLD}: a_true = {a_true:.4f}")

@@ -133,7 +133,7 @@ def main():
     c, n2, nx = circuits[a.condition]
     Options = ibm._sampler_options_cls(); opts = Options(); opts.twirling.enable_measure = True
     Sampler = ibm._sampler_v2_cls(); sampler = Sampler(mode=be, options=opts)
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     for rep in range(1, a.repeat + 1):
         camp = {"dd_spect_matched": 12, "dd_active_bunched": 13, "dd_spect_matched_bunched": 13}.get(a.condition, 11)
         if a.condition in DOSE:

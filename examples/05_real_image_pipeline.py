@@ -5,7 +5,8 @@ every encoder + a geometric op + QHED edge detection. Prints numerical
 fidelity at each step **and saves every input/output as a TIFF plus a
 side-by-side PNG comparison figure** under `data/output/run_<timestamp>/`.
 
-Requires `data/immagini/trainQML/Train_QML_16/` to exist (gitignored).
+Uses `data/immagini/trainQML/Train_QML_16/` when present (gitignored);
+otherwise falls back to a 16x16 crop of the Laurdan frame tracked in the repo.
 
 Run:
     python examples/05_real_image_pipeline.py
@@ -21,19 +22,40 @@ import numpy as np
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 TRAIN_DIR = REPO_ROOT / "data" / "immagini" / "trainQML" / "Train_QML_16"
+# Laurdan frame tracked in the repository; used when Train_QML_16/ is absent
+# (e.g. on CI or in a fresh clone).
+BUNDLED_FRAME = (
+    REPO_ROOT / "data" / "immagini" / "trainQML" / "membraneStack_Sample011_L_UV_DC_001rbc3DM2.tif"
+)
+
+
+def _load_bundled_tile() -> tuple[np.ndarray, str] | None:
+    """16x16 crop of the first channel of the bundled Laurdan frame."""
+    if not BUNDLED_FRAME.exists():
+        return None
+    from PIL import Image
+
+    arr = np.asarray(Image.open(BUNDLED_FRAME))
+    if arr.ndim == 3:
+        arr = arr[..., 0]
+    tile = arr[10:26, 18:34]
+    print(f"  loaded: {BUNDLED_FRAME.name} (16x16 crop)")
+    return tile, BUNDLED_FRAME.stem + "_crop16"
+
+
 OUTPUT_ROOT = REPO_ROOT / "data" / "output"
 
 
 def _load_first_real_tile() -> tuple[np.ndarray, str] | None:
     if not TRAIN_DIR.exists():
-        return None
+        return _load_bundled_tile()
     try:
         from PIL import Image
     except ImportError:
         return None
     files = sorted(TRAIN_DIR.glob("*.tif"))
     if not files:
-        return None
+        return _load_bundled_tile()
     # Pick the first file with non-zero content so the demo isn't a wall of zeros.
     for path in files[:50]:
         arr = np.asarray(Image.open(path))

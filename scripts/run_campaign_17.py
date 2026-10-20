@@ -42,7 +42,7 @@ def main():
     a = ap.parse_args()
     svc = ibm.get_service(); be = svc.backend(a.backend); tgt = be.target
     targets = MAIN if a.phase == "main" else REPLICATION
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     pre = OUT / stamp / "transpiled_c17"; pre.mkdir(parents=True, exist_ok=True)
     circuits = {}
     if a.reuse:
