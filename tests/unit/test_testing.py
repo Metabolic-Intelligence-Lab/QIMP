@@ -31,6 +31,12 @@ def test_ideal_simulation_appends_measurements_when_missing() -> None:
     assert sum(counts.values()) == 512
 
 
+def test_ideal_simulation_seed_is_reproducible() -> None:
+    qc = QuantumCircuit(3)
+    qc.h([0, 1, 2])
+    assert ideal_simulation(qc, shots=256, seed=7) == ideal_simulation(qc, shots=256, seed=7)
+
+
 def test_noisy_simulation_runs_without_noise_model() -> None:
     counts = noisy_simulation(_bell_pair(), shots=1024)
     assert sum(counts.values()) == 1024
