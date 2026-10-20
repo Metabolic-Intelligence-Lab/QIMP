@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-10-20
+
+Version described in the Computer Physics Communications software paper.
+
+### Added
+- `scripts/cpc_numbers.py`, which regenerates every table and the scaling
+  figure of that paper on a simulator with fixed seeds: encoder resources for
+  `n = 1` to `4`, arithmetic blocks, dividers, sorting network, compression,
+  zero-noise extrapolation on a depolarising model and FRQI PSNR versus shots.
+
 ## [0.3.1] - 2026-10-20
 
 Version described in the SoftwareX software paper. Completes the parts of
