@@ -62,7 +62,7 @@ def _load_first_real_tile() -> tuple[np.ndarray, str] | None:
         if arr.max() > 0:
             print(f"  loaded: {path.name}")
             return arr, path.stem
-    return None
+    return _load_bundled_tile()
 
 
 def _save_tiff(img: np.ndarray, path: Path) -> None:
@@ -113,11 +113,11 @@ def _save_comparison_figure(panels: list[tuple[str, np.ndarray]], path: Path) ->
 
 
 def main() -> int:
-    print("Loading a real 16x16 grayscale tile from data/immagini/trainQML/Train_QML_16/...")
+    print("Loading a real 16x16 grayscale tile (Train_QML_16/ or the bundled Laurdan frame)...")
     loaded = _load_first_real_tile()
     if loaded is None:
-        print(f"  ERROR: no data found in {TRAIN_DIR}", file=sys.stderr)
-        print("  (sync OneDrive or run from a populated checkout)", file=sys.stderr)
+        print(f"  ERROR: no data found in {TRAIN_DIR} or {BUNDLED_FRAME}", file=sys.stderr)
+        print("  (install Pillow and run from a full checkout of the repository)", file=sys.stderr)
         return 1
     image, _stem = loaded
     print(
