@@ -5,7 +5,8 @@
 QIMP implements the three canonical quantum image representations from the
 literature — **FRQI**, **NEQR**, and **QPIE** — plus the geometric / chromatic
 operations and the Quantum Hadamard Edge Detection (QHED) algorithm that
-operate on them. Specifications follow Dolciami, Politecnico di Torino, 2022, Chapter 3.
+operate on them. The standard circuit catalogue is also surveyed in Dolciami,
+Politecnico di Torino, 2022.
 
 ## Design
 
@@ -98,10 +99,9 @@ Optional extras: `[ibm]`, `[gpu]`, `[qml]`, `[notebooks]`, `[docs]`.
 
 ## Citation
 
-If you use QIMP in academic work, please cite the underlying thesis:
+If you use QIMP in academic work, please cite:
 
-> Dolciami, C. (2022). *A quantum circuit library for image processing*.
-> M.Sc. thesis, Politecnico di Torino.
+> Maulucci, G. *qimp-mi: a tested, size-parametric Python library for quantum image processing on Qiskit*. Submitted to SoftwareX.
 
 ## License
 

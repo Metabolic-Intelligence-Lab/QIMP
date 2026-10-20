@@ -58,7 +58,7 @@ def main():
     ap.add_argument("--start-round", type=int, default=1)
     a = ap.parse_args()
     svc = ibm.get_service(); be = svc.backend(a.backend); tgt = be.target
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     pre = OUT / stamp / "transpiled_c20"; pre.mkdir(parents=True, exist_ok=True)
     circuits = {}
     for cls, ds, n, shots in TARGETS:

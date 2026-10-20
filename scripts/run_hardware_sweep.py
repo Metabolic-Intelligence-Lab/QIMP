@@ -80,7 +80,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _utc_stamp() -> str:
-    return dt.datetime.now(dt.UTC).strftime("%Y-%m-%dT%H-%M-%SZ")
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H-%M-%SZ")
 
 
 def _estimate_qpu_seconds(qc_depth: int, shots: int, avg_gate_ns: float = 100.0) -> float:

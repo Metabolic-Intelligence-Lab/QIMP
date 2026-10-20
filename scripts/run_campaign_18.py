@@ -36,7 +36,7 @@ def main():
     a = ap.parse_args()
     svc = ibm.get_service(); be = svc.backend(a.backend); tgt = be.target
     targets = MAIN if a.phase == "main" else REPLICATION
-    stamp = dt.datetime.now(dt.UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     pre = OUT / stamp / "transpiled_c18"; pre.mkdir(parents=True, exist_ok=True)
     circuits = {}
     for ds, n, shots in targets:
