@@ -12,7 +12,8 @@ figures of merit.
 Designed and developed by G. Maulucci (Metabolic Intelligence Lab, Università
 Cattolica del Sacro Cuore). The standard QIMP circuits it covers are also
 surveyed in C. Dolciami, "A quantum circuit library for image processing",
-M.Sc. thesis, Politecnico di Torino, 2022.
+M.Sc. thesis, Politecnico di Torino, 2022. Code writing assisted with Claude
+Code (Anthropic).
 
 The core (FRQI, NEQR, QPIE, processing, testing and metrics) is released. The
 GP-ratio application and the QML extensions are optional subpackages. The
