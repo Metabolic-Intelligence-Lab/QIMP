@@ -9,22 +9,69 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.3.1] - 2026-10-20
 
-Version described in the SoftwareX software paper.
+Version described in the SoftwareX software paper. Completes the parts of
+the library that were documented as planned.
 
 ### Added
-- `qimp.testing.ideal_simulation` takes an optional keyword `seed` that fixes
-  the transpiler and simulator seeds. The default (`None`) keeps the previous
-  behaviour.
+- `qimp.encoding.compression`: `espresso_minimize`, a pure-Python
+  implementation of the ESPRESSO heuristic (expand, irredundant, reduce),
+  and `make_disjoint_cover`. `FrqiCompressor`, `NeqrCompressor` and
+  `position_strings_to_implicants` take `method="auto" | "qm" | "espresso"`;
+  `"auto"` keeps Quine-McCluskey up to `n = 4` and uses ESPRESSO above, so
+  existing results for small images are unchanged.
+- `qimp.runtime.zne` (new module): `fold_gates` (global unitary folding
+  after transpilation, with barriers that survive optimisation),
+  `zne_probabilities` and `zne_extrapolate` (Richardson, linear or
+  exponential extrapolation of bitstring probabilities to zero noise).
+  `hw_run(mitigation="zne")` submits the folded circuits as one job on top
+  of TREX and dynamical decoupling and records the per-scale counts in its
+  summary; `aer_noisy_run` takes `zne_scales` and `seed` to run the same
+  path on a noise model.
+- `qimp.processing.arithmetic`: `neqr_compare_swap` (comparator followed
+  by Fredkin gates, with one flag qubit that records the swap) and
+  `neqr_sort`, an odd-even transposition network that sorts `k` intensity
+  registers with `k(k-1)/2` compare-and-swaps, in ascending or descending
+  order, plus their exact inverses `neqr_compare_swap_inv` and
+  `neqr_sort_inv`, which restore the inputs and clear the flags.
+- `qimp.processing.ratiometric_circuit`: the Class A builders
+  (`class_a_gp_prefix`, `class_a_gp_full`, `class_a_gp_lookup`) accept any
+  positive G-factor through the keywords `G` and `g_frac_bits`. G is
+  represented in fixed point as `K / 2^f` (`gp_g_fixed_point`), `I_b` is
+  multiplied by `K` with `q_mul_const` and `I_a` is shifted by `f` bits, so
+  the ratio is unchanged. The default `G = 1.0` produces the same circuits
+  as before; values that are not dyadic need an explicit `g_frac_bits`.
+  `class_a_gp_lookup`, `class_c_rogfp_lookup` and `gp_g_fixed_point` are
+  now listed in `__all__`.
+- `qimp.testing.ideal_simulation` takes an optional keyword `seed` that
+  fixes the transpiler and simulator seeds. The default (`None`) keeps the
+  previous behaviour.
+- API reference pages for every module (MCRQI, NCQI, compression,
+  arithmetic, ratiometric circuits, classifier, datasets, IBM runtime, ZNE
+  and the runtime helpers were missing), and a documentation page on
+  simulation, hardware execution and error mitigation.
+
+### Changed
+- Documentation rewritten to match the code. The previous pages still
+  described arithmetic, MCRQI and NCQI as unimplemented and listed a
+  roadmap of features that had already been released; the FRQI examples
+  used `decode(counts)[0]`, which returns the first row of the image.
+- Module docstrings cite the original publications instead of the thesis
+  file `docs/tesi.pdf`, which is not part of the repository.
+- README and this changelog in a plain style.
 
 ### Fixed
-- `scripts/softwarex_figures.py`: the QHED panel drops the wrap-around row of
-  the vertical pass as well as the wrap-around column of the horizontal pass.
-  The axis-flip check compares against the row inversion only. The
-  shot-sampled FRQI run uses `ideal_simulation(seed=...)`. Panel titles follow
-  `n` and `q`. The NEQR circuit and the frame are built once.
-- `examples/05_real_image_pipeline.py` falls back to the bundled Laurdan frame
-  also when `Train_QML_16/` holds only blank tiles. Its messages name the data
-  actually used.
+- `scripts/softwarex_figures.py`: the QHED panel drops the wrap-around row
+  of the vertical pass as well as the wrap-around column of the horizontal
+  pass. The axis-flip check compares against the row inversion only. The
+  shot-sampled FRQI run uses `ideal_simulation(seed=...)`. Panel titles
+  follow `n` and `q`. The NEQR circuit and the frame are built once.
+- `examples/05_real_image_pipeline.py` falls back to the bundled Laurdan
+  frame also when `Train_QML_16/` holds only blank tiles. Its messages name
+  the data actually used.
+- `frqi_color_complement`: the docstring gave the angle map as
+  `theta -> pi - theta`; the gate implements `theta -> pi/2 - theta`.
+- Docstrings of `q_div_restoring` and of `qimp.processing.ratiometric_circuit`
+  no longer describe inverses and operators that exist as missing.
 - The 0.3.0 entry of this changelog had been split by a misplaced heading.
 
 ## [0.3.0] - 2026-10-19
