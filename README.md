@@ -68,7 +68,7 @@ cd QIMP
 pip install -e ".[dev]"
 
 # Or install a tagged version directly
-pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.1"
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.2"
 ```
 
 Optional extras: `[ibm]` (IBM Quantum Runtime), `[gpu]` (Aer GPU), `[qml]`

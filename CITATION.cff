@@ -8,7 +8,7 @@ authors:
     email: giuseppe.maulucci@unicatt.it
     orcid: "https://orcid.org/0000-0002-2154-319X"
     affiliation: "Università Cattolica del Sacro Cuore, Rome, Italy"
-version: 0.3.1
+version: 0.3.2
 date-released: 2026-10-20
 license: MIT
 repository-code: "https://github.com/Metabolic-Intelligence-Lab/QIMP"
