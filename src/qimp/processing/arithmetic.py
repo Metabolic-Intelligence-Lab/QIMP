@@ -17,6 +17,11 @@ Public ops:
 - ``q_div_restoring(qc, …)`` — fixed-point unsigned restoring division.
 - ``neqr_comparator(qc, a_qubits, b_qubits, c_qubits, gt_qubit)`` — sets
   ``gt_qubit = 1`` iff ``a > b``.
+- ``neqr_compare_swap(qc, a_qubits, b_qubits, c_qubits, flag_qubit)`` -
+  reversible compare-and-swap: leaves ``min(a, b)`` in ``a`` and
+  ``max(a, b)`` in ``b``, recording the swap decision in ``flag_qubit``.
+- ``neqr_sort(qc, registers, c_qubits, flag_qubits)`` - odd-even
+  transposition sorting network over ``k`` intensity registers.
 
 Conventions
 -----------
@@ -32,8 +37,6 @@ compose uniformly across a position-superposition: if the position register
 holds Σ_p |p⟩ and the intensity register holds |I(p)⟩ for the addressed
 pixel, the primitives apply the same arithmetic transformation on |I(p)⟩
 for every p in the superposition.
-
-Reference: docs/tesi.pdf §3.1.2 (NEQR processing).
 """
 
 from __future__ import annotations
@@ -44,6 +47,10 @@ from qiskit import QuantumCircuit
 
 __all__ = [
     "neqr_comparator",
+    "neqr_compare_swap",
+    "neqr_compare_swap_inv",
+    "neqr_sort",
+    "neqr_sort_inv",
     "q_add",
     "q_add_ctrl",
     "q_add_ctrl_inv",
@@ -313,8 +320,8 @@ def q_mul_const(
     c_qubits: Sequence[int],
     guard_qubit: int,
 ) -> QuantumCircuit:
-    """Multiply ``b`` by a classical constant via shift-add into the
-    accumulator: ``accum ← accum + b · k`` (mod ``2**(q + m)``).
+    """Multiply ``b`` by a classical constant via shift-add into a zeroed
+    accumulator: ``accum ← b · k`` (mod ``2**(q + m)``).
 
     Parameters
     ----------
@@ -324,9 +331,16 @@ def q_mul_const(
         Classical bit pattern of ``k`` as a sequence of ``{0, 1}`` values,
         little-endian (``k = Σ k_bits[i] · 2**i``). ``len(k_bits) = m``.
     accum_qubits
-        Accumulator register of width ``q + m`` bits; not assumed to be
-        initially zero — the operation is ``accum += b · k`` (modular at
-        the accumulator width).
+        Accumulator register of width ``q + m`` bits, ``|0⟩`` on entry.
+        Each set bit ``i`` of ``k`` adds ``b`` into the ``(q + 1)``-bit
+        window ``accum[i .. i + q]``; starting from zero, the partial sum
+        in that window is below ``2**q`` before every add, so no carry is
+        lost and the result is exactly ``b · k``. With a non-zero
+        accumulator on entry an intermediate add can overflow its window,
+        and the carry-out is not propagated, so the result is not
+        ``accum + b · k`` in general. To add a product onto an existing
+        value, multiply into a fresh zeroed register and add it with
+        :func:`q_add`.
     c_qubits
         Carry-scratch register. Width must be at least
         ``popcount(k) * (q + 2)`` — each shift consumes a fresh
@@ -557,17 +571,13 @@ def q_div_restoring(
     O(q²) Toffolis with constant factor ~10. Ancilla: ``(q + 1)(q + 2)``
     carry + 1 divisor-pad.
 
-    Composition note: this primitive is suitable for
-    *measurement-and-discard* use (Class B / Class A / Class C autonomous
-    circuits where the result is read out and the carry register is
-    thrown away). It is **not** yet composable inside a QAE-style oracle
-    or a multi-stage pipeline that reuses the carry register, because
-    the per-iteration ``c_act`` slices are left entangled with the
-    quotient and remainder. A clean ``q_div_restoring_inv`` (and the
-    prerequisite ``q_add_ctrl_inv`` / ``q_sub_ctrl_inv`` controlled-op
-    inverses) would unblock QAE — see TODO in
-    ``tests/unit/test_arithmetic.py`` (``test_q_div_restoring_inv_round_trip``)
-    and the Stage E note in the project plan.
+    Composition note: on exit the per-iteration ``c_act`` slices are
+    left entangled with the quotient and remainder. This is harmless for
+    *measurement-and-discard* use, where the result is read out and the
+    carry register is thrown away. To reuse the carry register, or to
+    embed the divider in a QAE-style oracle, follow it with
+    :func:`q_div_restoring_inv` (built on :func:`q_sub_ctrl_inv`), which
+    returns every ancilla to ``|0⟩``.
     """
     q = len(dividend_qubits)
     if len(divisor_qubits) != q:
@@ -1090,3 +1100,176 @@ def q_div_lookup_inv(
 ) -> QuantumCircuit:
     """Inverse of :func:`q_div_lookup`, which is self-inverse."""
     return q_div_lookup(qc, dividend_qubits, divisor_qubits, quotient_qubits, div_zero_flag)
+
+
+def neqr_compare_swap(
+    qc: QuantumCircuit,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+    flag_qubit: int,
+) -> QuantumCircuit:
+    """Reversible compare-and-swap: ``(a, b) ← (min(a, b), max(a, b))``.
+
+    Layout (little-endian, width ``q`` unless stated):
+      - ``a_qubits``, ``b_qubits`` (q) → on exit: ``a`` holds the minimum,
+                                         ``b`` the maximum.
+      - ``c_qubits``           (q + 1) → carry scratch, ``|0⟩`` on entry
+                                         and on exit.
+      - ``flag_qubit``             (1) → ``|0⟩`` on entry; on exit holds
+                                         ``1`` iff the inputs satisfied
+                                         ``a > b`` (the registers were
+                                         swapped).
+
+    Steps: :func:`neqr_comparator` writes ``a > b`` into the flag, the
+    trailing :func:`q_sub_inv` restores ``b`` and the carry register, and
+    one Fredkin gate per bit swaps ``a`` and ``b`` under the flag. Equal
+    inputs are not swapped.
+
+    The flag cannot be uncomputed from the sorted outputs alone (sorting
+    is not injective), so it is the garbage bit that keeps the map
+    reversible. Only :func:`neqr_compare_swap_inv` returns it to ``|0⟩``.
+
+    Cost: one ``q_sub`` / ``q_sub_inv`` pair (``4q`` Toffolis) plus ``q``
+    Fredkin gates.
+    """
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    neqr_comparator(qc, a_qubits, b_qubits, c_qubits, flag_qubit)
+    # Undo the subtraction left in b / c by the comparator; the flag keeps
+    # its value because it is only a target of the comparator's CNOT.
+    q_sub_inv(qc, a_qubits, b_qubits, c_qubits)
+    for qa, qb in zip(a_qubits, b_qubits, strict=True):
+        qc.cswap(flag_qubit, qa, qb)
+    return qc
+
+
+def neqr_compare_swap_inv(
+    qc: QuantumCircuit,
+    a_qubits: Sequence[int],
+    b_qubits: Sequence[int],
+    c_qubits: Sequence[int],
+    flag_qubit: int,
+) -> QuantumCircuit:
+    """Exact inverse of :func:`neqr_compare_swap`.
+
+    Swaps back under the flag, then recomputes the comparison on the
+    restored inputs, which clears ``flag_qubit`` to ``|0⟩``. The carry
+    register is ``|0⟩`` on entry and exit.
+    """
+    _check_registers(a_qubits, b_qubits, c_qubits)
+    for qa, qb in zip(a_qubits, b_qubits, strict=True):
+        qc.cswap(flag_qubit, qa, qb)
+    # Reverse of neqr_comparator followed by q_sub_inv, gate group by group.
+    q_sub(qc, a_qubits, b_qubits, c_qubits)
+    qc.x(flag_qubit)
+    qc.cx(c_qubits[-1], flag_qubit)
+    q_sub_inv(qc, a_qubits, b_qubits, c_qubits)
+    return qc
+
+
+def _odd_even_pairs(k: int) -> list[tuple[int, int]]:
+    """Comparator pairs of the odd-even transposition network on ``k`` wires,
+    in application order: ``k`` rounds, round ``r`` compares ``(i, i + 1)``
+    for every ``i ≡ r (mod 2)``. The total is ``k (k - 1) / 2`` pairs."""
+    return [(i, i + 1) for r in range(k) for i in range(r % 2, k - 1, 2)]
+
+
+def _check_sort_registers(
+    registers: Sequence[Sequence[int]],
+    c_qubits: Sequence[int],
+    flag_qubits: Sequence[int],
+) -> list[tuple[int, int]]:
+    k = len(registers)
+    if k == 0:
+        raise ValueError("registers must contain at least one register")
+    q = len(registers[0])
+    if q == 0:
+        raise ValueError("registers must have width q ≥ 1")
+    for j, reg in enumerate(registers):
+        if len(reg) != q:
+            raise ValueError(f"all registers must have width q={q}, register {j} has {len(reg)}")
+    if len(c_qubits) != q + 1:
+        raise ValueError(f"c must have q+1 = {q + 1} qubits, got {len(c_qubits)}")
+    pairs = _odd_even_pairs(k)
+    if len(flag_qubits) != len(pairs):
+        raise ValueError(
+            f"flag_qubits must have k(k-1)/2 = {len(pairs)} qubits for k={k}, "
+            f"got {len(flag_qubits)}"
+        )
+    used = [x for reg in registers for x in reg] + list(c_qubits) + list(flag_qubits)
+    if len(set(used)) != len(used):
+        raise ValueError("registers, c_qubits and flag_qubits must be pairwise disjoint")
+    return pairs
+
+
+def neqr_sort(
+    qc: QuantumCircuit,
+    registers: Sequence[Sequence[int]],
+    c_qubits: Sequence[int],
+    flag_qubits: Sequence[int],
+    descending: bool = False,
+) -> QuantumCircuit:
+    """Pairwise compare-and-swap sort of ``k`` intensity registers.
+
+    Layout (little-endian):
+      - ``registers``   (k × q) → ``k`` registers of equal width ``q``;
+                                  on exit their values are sorted,
+                                  ascending along the list (``registers[0]``
+                                  holds the minimum) or descending if
+                                  ``descending=True``.
+      - ``c_qubits``    (q + 1) → carry scratch shared by every comparator,
+                                  ``|0⟩`` on entry and on exit.
+      - ``flag_qubits`` (k (k - 1) / 2) → one ``|0⟩`` ancilla per
+                                  comparator; on exit flag ``j`` records
+                                  whether comparator ``j`` swapped.
+
+    Algorithm: odd-even transposition network. It runs ``k`` rounds;
+    round ``r`` applies :func:`neqr_compare_swap` to the neighbouring
+    pairs ``(i, i + 1)`` with ``i ≡ r (mod 2)``. After ``k`` rounds any
+    input is sorted (0-1 principle). Comparators within a round act on
+    disjoint registers but share the carry scratch, so as built they run
+    sequentially; giving each one its own carry register would allow
+    depth ``O(k q)``.
+
+    Reversibility: sorting is many-to-one, so the flags are kept as
+    garbage and stay entangled with the sorted registers. The flags
+    together with the sorted values determine the input, and
+    :func:`neqr_sort_inv` uses them to restore it and clear the flags.
+    Measuring only the sorted registers is unaffected by the flags.
+
+    Cost: ``k (k - 1) / 2`` compare-and-swaps, i.e. ``2 k (k - 1) q``
+    Toffolis plus ``k (k - 1) q / 2`` Fredkin gates. Ancilla:
+    ``q + 1`` carry + ``k (k - 1) / 2`` flags.
+
+    Like the other primitives, this acts only on the qubits passed in.
+    The registers are separate intensity registers (for instance the
+    intensities of ``k`` NEQR images, or ``k`` pixels already loaded into
+    their own registers); a single NEQR state holds its pixels in one
+    register under a position superposition, so sorting its pixels
+    against each other is not a register-level operation.
+    """
+    pairs = _check_sort_registers(registers, c_qubits, flag_qubits)
+    for (i, j), flag in zip(pairs, flag_qubits, strict=True):
+        lo, hi = (j, i) if descending else (i, j)
+        neqr_compare_swap(qc, registers[lo], registers[hi], c_qubits, flag)
+    return qc
+
+
+def neqr_sort_inv(
+    qc: QuantumCircuit,
+    registers: Sequence[Sequence[int]],
+    c_qubits: Sequence[int],
+    flag_qubits: Sequence[int],
+    descending: bool = False,
+) -> QuantumCircuit:
+    """Exact inverse of :func:`neqr_sort` (same arguments).
+
+    Applies :func:`neqr_compare_swap_inv` over the comparator list in
+    reverse order, restoring the registers to their unsorted input and
+    every flag to ``|0⟩``.
+    """
+    pairs = _check_sort_registers(registers, c_qubits, flag_qubits)
+    for (i, j), flag in reversed(list(zip(pairs, flag_qubits, strict=True))):
+        lo, hi = (j, i) if descending else (i, j)
+        neqr_compare_swap_inv(qc, registers[lo], registers[hi], c_qubits, flag)
+    return qc

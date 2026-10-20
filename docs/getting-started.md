@@ -2,71 +2,58 @@
 
 ## Install
 
-QIMP targets **Python ≥ 3.10** and **Qiskit ≥ 1.0**.
-
-The repository is currently **private**. Installation requires a GitHub PAT with
-*Contents: Read* permission. Two options:
+`qimp-mi` needs Python 3.10 or later and Qiskit 1.0 or later. It is not on
+PyPI; install it from the repository.
 
 ```bash
-# Editable install from a clone (recommended for development)
-git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git
+# Editable install from a clone, for development
+git clone https://github.com/Metabolic-Intelligence-Lab/QIMP.git
 cd QIMP
 pip install -e ".[dev]"
 
-# Or install a pinned tag directly with pip
-pip install "git+https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.1.0"
+# Or install a tagged version directly
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.1"
 ```
-
-A future public release will simplify this to `pip install qimp-mi`.
 
 ## Optional extras
 
-| Extra | Adds | When you need it |
+| Extra | Adds | Needed for |
 |---|---|---|
-| `[ibm]` | `qiskit-ibm-runtime` | Running on IBM Quantum hardware via `device_test` |
-| `[gpu]` | `qiskit-aer-gpu` | GPU-accelerated Aer simulation for large `n` |
-| `[qml]` | `qiskit-machine-learning`, `scikit-learn` | Variational image classifiers (v0.2) |
-| `[notebooks]` | `jupyterlab`, `ipywidgets` | Running the example notebooks |
-| `[docs]` | `mkdocs-material`, `mkdocstrings[python]` | Building these docs locally |
-| `[dev]` | `pytest`, `ruff`, `mypy`, `pre-commit` | Contributors |
+| `[ibm]` | `qiskit-ibm-runtime` | Running on IBM Quantum hardware |
+| `[gpu]` | `qiskit-aer-gpu` | GPU simulation with Aer |
+| `[qml]` | `qiskit-machine-learning`, `scikit-learn` | Interoperability with qiskit-machine-learning |
+| `[ui]` | `streamlit`, `pandas` | The interactive explorer (`qimp ui`) |
+| `[notebooks]` | `jupyterlab`, `ipywidgets` | Working in notebooks |
+| `[docs]` | `mkdocs-material`, `mkdocstrings[python]`, `mkdocs-jupyter` | Building this documentation |
+| `[dev]` | `pytest`, `pytest-xdist`, `ruff`, `mypy`, `pre-commit` | Development and tests |
 
-Combine extras with commas: `pip install "qimp-mi[ibm,gpu]"`.
+Extras can be combined: `pip install -e ".[dev,ibm]"`.
 
-## Verifying the install
+## Checking the install
 
 ```python
 import qimp
-print(qimp.__version__)            # 0.1.0
+print(qimp.__version__)
 ```
 
 ```bash
 python examples/01_frqi_fidelity.py
+pytest                         # default suite; slow and hardware tests are opt-in
 ```
-
-You should see an encoded → measured → decoded 4×4 image with a PSNR of ~40 dB.
 
 ## Scaling
 
-All public APIs are parametric in qubit count. You can encode arbitrarily large
-images (memory permitting) without code changes:
+The public API takes the image size from the input, so the same code works
+for any size that fits in the simulator or on the device:
 
 ```python
 import numpy as np
 from qimp.encoding.frqi import FrqiEncoder
 
-# n = 4 → 16x16 image → 2n + 1 = 9 qubits
 encoder = FrqiEncoder()
-qc = encoder.encode(np.zeros((16, 16), dtype=np.uint8))
-
-# n = 6 → 64x64 image → 2n + 1 = 13 qubits
-qc = encoder.encode(np.zeros((64, 64), dtype=np.uint8))
+qc = encoder.encode(np.zeros((16, 16), dtype=np.uint8))   # n = 4, 9 qubits
+qc = encoder.encode(np.zeros((64, 64), dtype=np.uint8))   # n = 6, 13 qubits
 ```
 
-The hard wall is your simulator's RAM (or QPU's qubit count), not the library.
-
-## Next steps
-
-- [Encodings](encoding.md) — FRQI vs NEQR vs QPIE: when to use which.
-- [Processing](processing.md) — geometric, chromatic, arithmetic, QHED.
-- [Examples](examples.md) — runnable scripts under `examples/`.
-- [API Reference](api/encoding.md) — auto-generated from docstrings.
+The limit is the memory of the simulator or the qubit count and gate fidelity
+of the device.

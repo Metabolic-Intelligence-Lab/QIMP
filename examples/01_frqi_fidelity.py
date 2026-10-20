@@ -3,8 +3,6 @@
 Encode a small 4x4 grayscale image with FRQI, measure on an ideal simulator,
 decode back into an image, and report PSNR.
 
-Reproduces the workflow of `docs/tesi.pdf` §3.2.1 with the modern API.
-
 Run:
     python examples/01_frqi_fidelity.py
 """

@@ -2,12 +2,19 @@
 
 from __future__ import annotations
 
+import itertools
+import random
+
 import pytest
 from qiskit import QuantumCircuit, QuantumRegister
 from qiskit.quantum_info import Statevector
 
 from qimp.processing.arithmetic import (
     neqr_comparator,
+    neqr_compare_swap,
+    neqr_compare_swap_inv,
+    neqr_sort,
+    neqr_sort_inv,
     q_add,
     q_add_ctrl,
     q_add_ctrl_inv,
@@ -755,3 +762,128 @@ def test_q_add_sub_ctrl_inv_round_trip(n: int, a_val: int, b_val: int, ctrl_val:
     assert _read_register(sv, b_idx) == b_val
     for q_idx in c_idx:
         assert _read_register(sv, [q_idx]) == 0
+
+
+# ---------------------------------------------------------------------------
+# Compare-and-swap and sorting network
+# ---------------------------------------------------------------------------
+
+
+def _run_classical(qc: QuantumCircuit, bits: list[int]) -> list[int]:
+    """Propagate a computational-basis state through a circuit made only of
+    X / CX / CCX / MCX / CSWAP gates (a permutation), without a statevector."""
+    out = list(bits)
+    for inst in qc.data:
+        name = inst.operation.name
+        idx = [qc.find_bit(qb).index for qb in inst.qubits]
+        if name in ("x", "cx", "ccx", "mcx"):
+            if all(out[c] for c in idx[:-1]):
+                out[idx[-1]] ^= 1
+        elif name == "cswap":
+            if out[idx[0]]:
+                out[idx[1]], out[idx[2]] = out[idx[2]], out[idx[1]]
+        else:
+            raise AssertionError(f"unexpected gate {name}")
+    return out
+
+
+def _sort_layout(k: int, q: int) -> tuple[int, list[list[int]], list[int], list[int]]:
+    """Registers 0..k-1 (width q), then the carry (q+1), then k(k-1)/2 flags."""
+    regs = [list(range(j * q, (j + 1) * q)) for j in range(k)]
+    c_idx = list(range(k * q, k * q + q + 1))
+    n_flags = k * (k - 1) // 2
+    flags = list(range(k * q + q + 1, k * q + q + 1 + n_flags))
+    return k * q + q + 1 + n_flags, regs, c_idx, flags
+
+
+@pytest.mark.parametrize("q", [1, 2, 3])
+def test_neqr_compare_swap_exhaustive(q: int) -> None:
+    """min goes to a, max to b, flag = (a > b), carry clean; inv restores all."""
+    a_idx = list(range(q))
+    b_idx = list(range(q, 2 * q))
+    c_idx = list(range(2 * q, 3 * q + 1))
+    flag = 3 * q + 1
+    for a_val, b_val in itertools.product(range(1 << q), repeat=2):
+        qc = QuantumCircuit(3 * q + 2)
+        _set_register_to_int(qc, a_idx, a_val)
+        _set_register_to_int(qc, b_idx, b_val)
+        neqr_compare_swap(qc, a_idx, b_idx, c_idx, flag)
+        sv = Statevector.from_instruction(qc)
+        assert _read_register(sv, a_idx) == min(a_val, b_val)
+        assert _read_register(sv, b_idx) == max(a_val, b_val)
+        assert _read_register(sv, [flag]) == int(a_val > b_val)
+        assert _read_register(sv, c_idx) == 0
+        neqr_compare_swap_inv(qc, a_idx, b_idx, c_idx, flag)
+        sv = Statevector.from_instruction(qc)
+        assert _read_register(sv, a_idx) == a_val
+        assert _read_register(sv, b_idx) == b_val
+        assert _read_register(sv, [flag]) == 0
+        assert _read_register(sv, c_idx) == 0
+
+
+@pytest.mark.parametrize("descending", [False, True])
+@pytest.mark.parametrize(
+    "k, q",
+    [(1, 2), (2, 1), (2, 3), (3, 1), (3, 2), (3, 3), (4, 1), (4, 2), (5, 1)],
+)
+def test_neqr_sort_exhaustive(k: int, q: int, descending: bool) -> None:
+    """Every basis input is sorted, the carry is clean, and neqr_sort_inv
+    returns the input with all flags cleared."""
+    width, regs, c_idx, flags = _sort_layout(k, q)
+    fwd = QuantumCircuit(width)
+    neqr_sort(fwd, regs, c_idx, flags, descending=descending)
+    full = QuantumCircuit(width)
+    neqr_sort(full, regs, c_idx, flags, descending=descending)
+    neqr_sort_inv(full, regs, c_idx, flags, descending=descending)
+    for values in itertools.product(range(1 << q), repeat=k):
+        bits = [0] * width
+        for reg, v in zip(regs, values, strict=True):
+            for i, qb in enumerate(reg):
+                bits[qb] = (v >> i) & 1
+        out = _run_classical(fwd, bits)
+        got = [sum(out[qb] << i for i, qb in enumerate(reg)) for reg in regs]
+        assert got == sorted(values, reverse=descending), f"input {values}"
+        assert all(out[x] == 0 for x in c_idx)
+        assert _run_classical(full, bits) == bits, f"inv failed on {values}"
+
+
+@pytest.mark.parametrize("k, q", [(3, 2), (4, 1)])
+def test_neqr_sort_statevector_sample(k: int, q: int) -> None:
+    """Statevector cross-check of the classical propagation on random inputs."""
+    width, regs, c_idx, flags = _sort_layout(k, q)
+    rng = random.Random(1234 + k * 10 + q)
+    for _ in range(4):
+        values = [rng.randrange(1 << q) for _ in range(k)]
+        qc = QuantumCircuit(width)
+        for reg, v in zip(regs, values, strict=True):
+            _set_register_to_int(qc, reg, v)
+        neqr_sort(qc, regs, c_idx, flags)
+        sv = Statevector.from_instruction(qc)
+        assert [_read_register(sv, reg) for reg in regs] == sorted(values)
+        assert _read_register(sv, c_idx) == 0
+
+
+@pytest.mark.parametrize("k, q", [(2, 2), (3, 2)])
+def test_neqr_sort_inv_on_superposition(k: int, q: int) -> None:
+    """neqr_sort followed by neqr_sort_inv is the identity on a uniform
+    superposition of all register values (phases included)."""
+    width, regs, c_idx, flags = _sort_layout(k, q)
+    prep = QuantumCircuit(width)
+    for reg in regs:
+        prep.h(reg)
+    qc = prep.copy()
+    neqr_sort(qc, regs, c_idx, flags)
+    neqr_sort_inv(qc, regs, c_idx, flags)
+    assert Statevector.from_instruction(qc).equiv(Statevector.from_instruction(prep))
+
+
+def test_neqr_sort_rejects_bad_layout() -> None:
+    qc = QuantumCircuit(20)
+    with pytest.raises(ValueError, match="width"):
+        neqr_sort(qc, [[0, 1], [2]], [3, 4, 5], [6])
+    with pytest.raises(ValueError, match="q\\+1"):
+        neqr_sort(qc, [[0, 1], [2, 3]], [4, 5], [6])
+    with pytest.raises(ValueError, match="k\\(k-1\\)/2"):
+        neqr_sort(qc, [[0, 1], [2, 3], [4, 5]], [6, 7, 8], [9, 10])
+    with pytest.raises(ValueError, match="disjoint"):
+        neqr_sort(qc, [[0, 1], [1, 2]], [3, 4, 5], [6])

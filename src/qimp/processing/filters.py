@@ -5,7 +5,7 @@ images encoded with QPIE. QHED is a poly(n) algorithm that uses a single
 auxiliary qubit, a Hadamard gate, and a cyclic decrement gate to extract
 gradient information from adjacent pixels in a single shot batch.
 
-Reference: docs/tesi.pdf §2.7.3, §3.1.4
+Reference: X.-W. Yao et al., Phys. Rev. X 7 (2017) 031041.
 """
 
 from __future__ import annotations

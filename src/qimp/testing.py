@@ -1,7 +1,4 @@
-"""Test harnesses: ideal/noisy simulation and IBM Quantum hardware execution.
-
-Reference: docs/tesi.pdf §3.1.5
-"""
+"""Test harnesses: ideal/noisy simulation and IBM Quantum hardware execution."""
 
 from __future__ import annotations
 
@@ -30,12 +27,15 @@ def _ensure_measured(qc: QuantumCircuit) -> QuantumCircuit:
     return new_qc
 
 
-def ideal_simulation(qc: QuantumCircuit, shots: int = 8192) -> Counts:
-    """Run on a noise-free Aer simulator and return counts."""
+def ideal_simulation(qc: QuantumCircuit, shots: int = 8192, *, seed: int | None = None) -> Counts:
+    """Run on a noise-free Aer simulator and return counts.
+
+    Pass ``seed`` to make the shot sampling reproducible (for a given Aer version).
+    """
     sim = get_simulator()
     measured = _ensure_measured(qc)
-    transpiled = transpile(measured, sim)
-    result = sim.run(transpiled, shots=shots).result()
+    transpiled = transpile(measured, sim, seed_transpiler=seed)
+    result = sim.run(transpiled, shots=shots, seed_simulator=seed).result()
     return dict(result.get_counts())
 
 

@@ -5,8 +5,6 @@ vertical edge. Edges are detected by running QHED on the original image
 (horizontal gradients) and on its transpose (vertical gradients), then
 summing.
 
-Reproduces the workflow of `docs/tesi.pdf` §3.2.3 with the modern API.
-
 Run:
     python examples/03_qhed_edges.py
 """

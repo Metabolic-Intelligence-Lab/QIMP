@@ -19,9 +19,11 @@ from qiskit import ClassicalRegister, QuantumCircuit, QuantumRegister, transpile
 from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
+from qimp.processing.gp_ratio import classical_gp_image
 from qimp.processing.ratiometric_circuit import (
     affine_subtract_constant,
     class_a_gp_full,
+    class_a_gp_lookup,
     class_a_gp_prefix,
     class_b_ratio,
     class_b_ratio_inv,
@@ -32,6 +34,7 @@ from qimp.processing.ratiometric_circuit import (
     decode_class_c_rogfp,
     dual_neqr_load,
     dual_neqr_load_inv,
+    gp_g_fixed_point,
     mark_good_oracle,
 )
 
@@ -579,3 +582,162 @@ def test_class_c_rogfp_full_divzero_flag_mps() -> None:
         assert not divzero[r, c], f"unexpected div-zero at ({r}, {c})"
         want = ((int(image_a[r, c]) << q_frac) // int(image_b[r, c]) - R_red_fp) / denom
         assert rc[r, c] == pytest.approx(want), f"R_C at ({r}, {c}): got {rc[r, c]}, want {want}"
+
+
+# ---------------------------------------------------------------------------
+# Class A with a general G factor (fixed point G_eff = K / 2^f)
+#
+# The circuits are basis-state per pixel branch, so the MPS runs are exact
+# and fast. The reference is the classical fixed-point GP computed on the
+# integers A = 2^f I_a and B = K I_b, which is what the circuit implements;
+# it is also checked against qimp.processing.gp_ratio.classical_gp_image
+# with alpha = G_eff up to the q_frac truncation.
+# ---------------------------------------------------------------------------
+
+G_VALUES = [0.5, 1.0, 1.25, 2.0]
+
+
+def _random_pair(n: int, q: int, seed: int) -> tuple[np.ndarray, np.ndarray]:
+    rng = np.random.default_rng(seed)
+    side = 1 << n
+    a = rng.integers(0, 1 << q, size=(side, side), dtype=np.int64)
+    b = rng.integers(0, 1 << q, size=(side, side), dtype=np.int64)
+    return a, b
+
+
+def _fixed_point_gp_reference(
+    a: np.ndarray, b: np.ndarray, K: int, f: int, q_frac: int
+) -> tuple[np.ndarray, np.ndarray]:
+    """Classical reference: (-1)^[B > A] floor(|A - B| 2^q_frac / (A + B)) / 2^q_frac."""
+    big_a, big_b = a.astype(np.int64) << f, K * b.astype(np.int64)
+    den = big_a + big_b
+    mag = (np.abs(big_a - big_b) << q_frac) // np.maximum(den, 1)
+    gp = np.where(big_b > big_a, -1.0, 1.0) * mag / float(1 << q_frac)
+    return np.where(den > 0, gp, 0.0), den == 0
+
+
+def _check_all_pixels_sampled(counts: dict[str, int], n: int, layout: dict, total: int) -> None:
+    pos = layout["position"]
+    seen = set()
+    for state in counts:
+        flat = state.replace(" ", "")
+        seen.add(tuple(int(flat[total - 1 - p]) for p in pos))
+    assert len(seen) == 1 << (2 * n), "not every pixel branch was sampled"
+
+
+@pytest.mark.parametrize(
+    "G, g_frac_bits, expected",
+    [
+        (1.0, None, (1, 0)),
+        (0.5, None, (1, 1)),
+        (1.25, None, (5, 2)),
+        (2.0, None, (2, 0)),
+        (3, None, (3, 0)),
+        (0.94, 3, (8, 3)),  # round(7.52) = 8
+        (0.94, 6, (60, 6)),  # round(60.16) = 60
+        (1.0, 3, (8, 3)),
+    ],
+)
+def test_gp_g_fixed_point(G: float, g_frac_bits: int | None, expected: tuple[int, int]) -> None:
+    assert gp_g_fixed_point(G, g_frac_bits) == expected
+
+
+@pytest.mark.parametrize(
+    "G, g_frac_bits",
+    [(0.0, None), (-1.0, None), (float("nan"), None), (float("inf"), None), (0.94, None)],
+)
+@pytest.mark.parametrize(
+    "builder", [class_a_gp_prefix, class_a_gp_full, class_a_gp_lookup, gp_g_fixed_point]
+)
+def test_class_a_rejects_bad_g(builder: object, G: float, g_frac_bits: int | None) -> None:
+    a, b = _random_pair(1, 2, 0)
+    with pytest.raises(ValueError, match="G"):
+        if builder is gp_g_fixed_point:
+            gp_g_fixed_point(G, g_frac_bits)
+        else:
+            builder(a, b, 2, G=G, g_frac_bits=g_frac_bits)  # type: ignore[operator]
+
+
+def test_gp_g_fixed_point_rejects_bad_frac_bits() -> None:
+    with pytest.raises(ValueError, match="g_frac_bits"):
+        gp_g_fixed_point(1.25, -1)
+    with pytest.raises(ValueError, match="rounds to 0"):
+        gp_g_fixed_point(0.1, 2)  # round(0.4) = 0
+
+
+@pytest.mark.parametrize("n", [1, 2])
+@pytest.mark.parametrize("q", [1, 2, 3])
+@pytest.mark.parametrize("builder", ["prefix", "full"])
+def test_class_a_g1_circuit_unchanged(n: int, q: int, builder: str) -> None:
+    """G = 1 (default, explicit, or with redundant fractional bits) builds the
+    plain add/subtract circuit with the historical qubit count."""
+    a, b = _random_pair(n, q, 10 * n + q)
+
+    def build(**kw: object) -> tuple[QuantumCircuit, dict[str, list[int] | int]]:
+        if builder == "prefix":
+            return class_a_gp_prefix(a, b, q, **kw)  # type: ignore[arg-type]
+        return class_a_gp_full(a, b, q, 2, **kw)  # type: ignore[arg-type]
+
+    def fingerprint(qc: QuantumCircuit) -> list[tuple[str, tuple[int, ...]]]:
+        return [(i.operation.name, tuple(qc.find_bit(x).index for x in i.qubits)) for i in qc.data]
+
+    qc0, lay0 = build()
+    q_w, d = q + 1, q + 1 + 2
+    if builder == "prefix":
+        assert qc0.num_qubits == 2 * n + 2 * q + 4 * q_w
+    else:
+        assert qc0.num_qubits == 2 * n + 2 * q + 7 * q_w + 4 + 2 * d + (d + 1) * (q_w + 2)
+    assert not {"g_b", "mul_c", "mul_guard"} & set(lay0)
+    for kw in ({"G": 1.0}, {"G": 1}, {"G": 1.0, "g_frac_bits": 3}):
+        qc1, lay1 = build(**kw)
+        assert lay1 == lay0
+        assert fingerprint(qc1) == fingerprint(qc0)
+
+
+@pytest.mark.parametrize("n", [1, 2])
+@pytest.mark.parametrize("q", [1, 2])
+@pytest.mark.parametrize("G", [*G_VALUES, 0.94])
+def test_class_a_prefix_general_g_mps(n: int, q: int, G: float) -> None:
+    """num = 2^f I_a - K I_b and den = 2^f I_a + K I_b exactly on random images."""
+    g_frac_bits = 3 if G == 0.94 else None
+    K, f = gp_g_fixed_point(G, g_frac_bits)
+    a, b = _random_pair(n, q, 1000 * n + 10 * q + int(16 * G))
+    a[0, 0], b[0, 0] = (1 << q) - 1, (1 << q) - 1  # largest A and B on one pixel
+    qc, layout = class_a_gp_prefix(a, b, q, G=G, g_frac_bits=g_frac_bits)
+    if 1 << f == K:
+        K, f = 1, 0  # G_eff == 1 (e.g. 0.94 with 3 bits): the plain I_a -+ I_b path
+    else:
+        L = max(q + f, q + K.bit_length())
+        assert len(layout["num"]) == L + 1  # type: ignore[arg-type]
+        extra = L + K.bit_count() * (q + 2) + 1
+        assert qc.num_qubits == 2 * n + 2 * q + 4 * (L + 1) + extra
+    counts = _run_mps(qc, shots=128 << (2 * n))
+    _check_all_pixels_sampled(counts, n, layout, qc.num_qubits)
+    num, den = decode_class_a_prefix(counts, n, q, layout, qc.num_qubits)
+    np.testing.assert_array_equal(num, (a << f) - K * b)
+    np.testing.assert_array_equal(den, (a << f) + K * b)
+
+
+@pytest.mark.parametrize(
+    "n, q",
+    [(1, 1), (1, 2), pytest.param(2, 2, marks=pytest.mark.slow)],
+)
+@pytest.mark.parametrize("G", [*G_VALUES, 0.94])
+@pytest.mark.parametrize("q_frac", [2])
+def test_class_a_full_general_g_mps(n: int, q: int, G: float, q_frac: int) -> None:
+    """Decoded GP equals the classical fixed-point reference bit-exactly."""
+    g_frac_bits = 3 if G == 0.94 else None
+    K, f = gp_g_fixed_point(G, g_frac_bits)
+    a, b = _random_pair(n, q, 2000 * n + 10 * q + int(16 * G))
+    a[0, 0], b[0, 0] = 0, 0  # force a div-zero pixel
+    qc, layout = class_a_gp_full(a, b, q, q_frac, G=G, g_frac_bits=g_frac_bits)
+    counts = _run_mps(qc, shots=128 << (2 * n))
+    _check_all_pixels_sampled(counts, n, layout, qc.num_qubits)
+    gp, divzero = decode_class_a_full(counts, n, q, q_frac, layout, qc.num_qubits)
+    ref, ref_dz = _fixed_point_gp_reference(a, b, K, f, q_frac)
+    np.testing.assert_array_equal(divzero, ref_dz)
+    np.testing.assert_array_equal(gp[~ref_dz], ref[~ref_dz])
+    # Against the float classical GP with alpha = G_eff: truncation toward 0.
+    exact = classical_gp_image(a, b, alpha=K / (1 << f), eps=1e-300)
+    gap = np.abs(exact[~ref_dz]) - np.abs(gp[~ref_dz])
+    assert (gap > -1e-9).all() and (gap < 1.0 / (1 << q_frac)).all()

@@ -1,7 +1,4 @@
-"""Figures of merit for quantum image processing.
-
-Reference: docs/tesi.pdf §3.1.6
-"""
+"""Figures of merit for quantum image processing."""
 
 from __future__ import annotations
 

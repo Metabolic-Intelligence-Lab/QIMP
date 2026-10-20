@@ -5,7 +5,7 @@ loaded as amplitude probabilities into 2n qubits via Qiskit's `initialize`.
 Compact (only 2n qubits) but produces an arbitrary state preparation that
 transpiles to deep circuits.
 
-Reference: docs/tesi.pdf §2.2.3, §3.1.3
+Reference: X.-W. Yao et al., Phys. Rev. X 7 (2017) 031041.
 """
 
 from __future__ import annotations

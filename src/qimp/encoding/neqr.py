@@ -9,7 +9,7 @@ Qubit layout (low → high index):
   - n X-position qubits (qubits q … q+n-1)
   - n Y-position qubits (qubits q+n … q+2n-1)
 
-Reference: docs/tesi.pdf §2.2.2, §3.1.2
+Reference: Y. Zhang et al., Quantum Inf. Process. 12 (2013) 2833-2860.
 """
 
 from __future__ import annotations

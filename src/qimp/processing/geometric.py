@@ -16,8 +16,6 @@ NEQR          q  (qubits q..q+2n-1, with q the intensity-qubit count)
 Qubit layout within the position block (LSB-first):
 - ``pos_offset .. pos_offset + n - 1``  → X-axis qubits (column, x_0 … x_{n-1})
 - ``pos_offset + n .. pos_offset + 2n - 1`` → Y-axis qubits (row, y_0 … y_{n-1})
-
-Reference: docs/tesi.pdf §2.3
 """
 
 from __future__ import annotations
@@ -104,8 +102,6 @@ def ort_rotation(qc: QuantumCircuit, n: int, angle: int, *, pos_offset: int = 0)
     - 90°:  coord_swap then axis_flip('y')   (swap rows/cols, then invert cols)
     - 180°: axis_flip('x') then axis_flip('y')
     - 270°: coord_swap then axis_flip('x')
-
-    Reference: docs/tesi.pdf §2.3.3
     """
     _validate_position_register(qc, n, pos_offset)
     if angle == 90:
@@ -136,8 +132,6 @@ def pos_shift(
     Implemented as a cyclic increment / decrement on the n-qubit position
     register for that axis. Each cyclic step is a cascade of multi-controlled X
     gates of decreasing arity (Toffoli-tower), giving ``O(n²)`` gate complexity.
-
-    Reference: docs/tesi.pdf §2.3.5
     """
     if axis not in ("x", "y"):
         raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
@@ -174,8 +168,6 @@ def restr_flip(
     Implemented as a multi-controlled X on each X-axis qubit, with controls on
     the higher-order qubits of the orthogonal axis taking the prefix as a
     bitmask.
-
-    Reference: docs/tesi.pdf §2.3.4
     """
     if axis not in ("x", "y"):
         raise ValueError(f"axis must be 'x' or 'y', got {axis!r}")
@@ -221,8 +213,6 @@ def restr_coord_swap(
     Decomposition idea: for each ``i``, apply a controlled-SWAP between
     ``x_i`` and ``y_i`` conditioned on the region prefix. Implemented as
     ``CSWAP = CNOT(b,a) → Toffoli(ctrl..., a, b) → CNOT(b, a)`` per pair.
-
-    Reference: docs/tesi.pdf §2.3.4
     """
     if len(region_bits) > n or any(c not in "01" for c in region_bits):
         raise ValueError(

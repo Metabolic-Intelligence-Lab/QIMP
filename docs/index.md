@@ -1,107 +1,77 @@
 # QIMP
 
-**Quantum Image Processing** on Qiskit, with a modular API and a scalable design.
+`qimp-mi` is a Python library for quantum image processing on Qiskit.
 
-QIMP implements the three canonical quantum image representations from the
-literature — **FRQI**, **NEQR**, and **QPIE** — plus the geometric / chromatic
-operations and the Quantum Hadamard Edge Detection (QHED) algorithm that
-operate on them. The standard circuit catalogue is also surveyed in Dolciami,
-Politecnico di Torino, 2022.
+It provides five image encodings (FRQI, NEQR, QPIE and the RGB extensions
+MCRQI and NCQI), geometric and chromatic operations, quantum Hadamard edge
+detection (QHED), reversible arithmetic on NEQR intensity registers,
+Boolean-function compression of the encoders, a variational image classifier,
+ratiometric image operators, simulation and IBM Quantum execution helpers, and
+image metrics. The standard circuit catalogue is also surveyed in C. Dolciami,
+"A quantum circuit library for image processing", M.Sc. thesis, Politecnico di
+Torino, 2022.
 
 ## Design
 
-- **Scalable by construction.** Every encoder accepts arbitrary `n` (image
-  side = 2^n), `q` (NEQR intensity qubits), and `m` (multi-image FRQI). No
-  constants are hard-coded; tests are parametrized over qubit counts.
-- **Modern stack.** Qiskit ≥ 1.0, Python ≥ 3.10, `src/`-layout, hatchling
-  build, ruff + mypy strict.
-- **Modular.** Encoding, processing, runtime, I/O, and testing live in
-  independent sub-packages.
+- Every circuit is a function of the image size and bit depth. Encoders accept
+  any `n` (image side 2^n), `q` (intensity qubits) and `m` (number of stacked
+  images, multi-image FRQI). No sizes are hard-coded, and the tests are
+  parametrised over `n` and `q`.
+- Qiskit 1.0 or later, Python 3.10 or later, `src/` layout, hatchling build,
+  ruff and strict mypy.
+- Encoding, processing, QML, I/O, runtime and testing are separate
+  subpackages. The user interface and the IBM Quantum runtime are optional
+  extras.
 
 ## Install
 
-The repository is currently **private**. Use a GitHub Personal Access Token
-(`repo: Contents: Read`) when cloning:
-
 ```bash
-git clone https://<TOKEN>@github.com/Metabolic-Intelligence-Lab/QIMP
+git clone https://github.com/Metabolic-Intelligence-Lab/QIMP.git
 cd QIMP
 pip install -e ".[dev]"
 ```
 
-A future public release will simplify this to `pip install qimp-mi`.
+See [Getting started](getting-started.md) for the optional extras.
 
-Optional extras: `[ibm]`, `[gpu]`, `[qml]`, `[notebooks]`, `[docs]`.
+## Example
 
-## At a glance
+```python
+import numpy as np
+from qimp.encoding.frqi import FrqiEncoder
+from qimp.encoding.neqr import NeqrEncoder
+from qimp.metrics import psnr
+from qimp.testing import exact_counts, ideal_simulation
 
-=== "FRQI (phase encoding)"
+image = np.random.default_rng(0).integers(0, 256, (4, 4)).astype(np.uint8)
 
-    ```python
-    import numpy as np
-    from qimp.encoding.frqi import FrqiEncoder
-    from qimp.testing import ideal_simulation
-    from qimp.metrics import psnr
+frqi = FrqiEncoder()
+qc = frqi.encode(image)                       # 2n + 1 = 5 qubits
+decoded = frqi.decode(ideal_simulation(qc, shots=40_000, seed=0))
+print("FRQI PSNR:", psnr(image, decoded), "dB")
 
-    image = np.random.randint(0, 256, (4, 4), dtype=np.uint8)
-    encoder = FrqiEncoder()
-    qc = encoder.encode(image)          # 2n + 1 = 5 qubits
-    counts = ideal_simulation(qc, 40_000)
-    decoded = encoder.decode(counts)[0]
-    print("PSNR:", psnr(image, decoded), "dB")
-    ```
+neqr = NeqrEncoder(q=8)
+qc = neqr.encode(image)                       # 2n + q = 12 qubits
+assert (neqr.decode(exact_counts(qc)) == image).all()
+```
 
-=== "NEQR (basis encoding)"
+## Contents
 
-    ```python
-    from qimp.encoding.neqr import NeqrEncoder
-
-    image = np.array([[10, 20], [30, 40]], dtype=np.int64)
-    encoder = NeqrEncoder(q=8)
-    qc = encoder.encode(image)          # 2n + q = 10 qubits
-    counts = ideal_simulation(qc, 4096)
-    print(encoder.decode(counts))       # exact recovery
-    ```
-
-=== "QPIE (amplitude encoding)"
-
-    ```python
-    from qimp.encoding.qpie import QpieEncoder
-
-    encoder = QpieEncoder()
-    qc = encoder.encode(image.astype(float))   # 2n = 4 qubits
-    counts = ideal_simulation(qc, 80_000)
-    print(encoder.decode(counts))
-    ```
-
-=== "QHED (edge detection)"
-
-    ```python
-    from qimp.processing.filters import qhed_filter, qhed_full_edges
-
-    qc_h, n, rms = qhed_filter(image)
-    qc_v, _, _ = qhed_filter(image.T)
-    counts_h = ideal_simulation(qc_h, 40_000)
-    counts_v = ideal_simulation(qc_v, 40_000)
-    edges = qhed_full_edges(image, counts_h, counts_v)
-    ```
-
-## Roadmap
-
-| Phase | Status |
-|---|---|
-| FRQI / NEQR / QPIE encoding + decoding | ✅ shipped (v0.1.0) |
-| Geometric / chromatic / filters / QHED | ✅ shipped (v0.1.0) |
-| Compression (Quine–McCluskey for FRQI/NEQR) | 📋 v0.2 |
-| Arithmetic (q_ADD/SUB, comparator, sort) | 📋 v0.2 |
-| MCRQI / NCQI (RGB extensions) | 📋 v0.2 |
-| QML variational classifier | 📋 v0.2 |
+- [Getting started](getting-started.md): installation, extras, scaling.
+- [Encodings](encoding.md): FRQI, NEQR, QPIE, MCRQI, NCQI and compression.
+- [Processing](processing.md): geometric, chromatic, QHED, arithmetic,
+  ratiometric operators and GP ratio.
+- [Simulation and hardware](runtime.md): simulators, IBM Quantum execution and
+  error mitigation.
+- [Examples](examples.md): runnable scripts.
+- [Interactive UI](ui.md): the Streamlit explorer.
+- API reference, generated from the docstrings.
 
 ## Citation
 
-If you use QIMP in academic work, please cite:
+> Maulucci, G. *qimp-mi: a tested, size-parametric Python library for quantum
+> image processing on Qiskit*. Submitted to SoftwareX.
 
-> Maulucci, G. *qimp-mi: a tested, size-parametric Python library for quantum image processing on Qiskit*. Submitted to SoftwareX.
+See also `CITATION.cff` in the repository.
 
 ## License
 

@@ -1,8 +1,12 @@
-# API Reference — I/O and Metrics
+# API reference: I/O and metrics
 
 ## qimp.io.image
 
 ::: qimp.io.image
+
+## qimp.io.datasets
+
+::: qimp.io.datasets
 
 ## qimp.metrics
 

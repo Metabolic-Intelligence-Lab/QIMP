@@ -17,6 +17,7 @@ from qimp.processing.ratiometric_circuit import (
     class_c_rogfp_lookup,
     decode_class_a_full,
     decode_class_c_rogfp,
+    gp_g_fixed_point,
 )
 
 
@@ -157,3 +158,42 @@ def test_compressed_ucry_load_round_trip(n: int) -> None:
     dual_neqr_load(qc, Ia, Ib, q, **kw)
     dual_neqr_load_inv(qc, Ia, Ib, q, **kw)
     assert abs(abs(Statevector(qc).data[0]) - 1.0) < 1e-9
+
+
+@pytest.mark.parametrize("q", [1, 2])
+@pytest.mark.parametrize("q_frac", [1, 2])
+@pytest.mark.parametrize("G, g_frac_bits", [(0.5, None), (1.25, None), (2.0, None), (0.94, 3)])
+def test_class_a_gp_lookup_general_g(
+    q: int, q_frac: int, G: float, g_frac_bits: int | None
+) -> None:
+    """The synthesised map matches the fixed-point GP for G_eff = K / 2^f exactly."""
+    K, f = gp_g_fixed_point(G, g_frac_bits)
+    rng = np.random.default_rng(300 * q + 10 * q_frac + int(16 * G))
+    Ia = rng.integers(0, 1 << q, size=(2, 2))
+    Ib = rng.integers(0, 1 << q, size=(2, 2))
+    Ia[0, 0], Ib[0, 0] = 0, 0  # force a div-zero pixel
+    qc, lay = class_a_gp_lookup(Ia, Ib, q=q, q_frac=q_frac, G=G, g_frac_bits=g_frac_bits)
+    assert qc.num_qubits == 2 + 2 * q + q_frac + 3  # independent of G
+    probs = {s: p for s, p in Statevector(qc).probabilities_dict().items() if p > 1e-9}
+    counts = {s: round(p * 4096) for s, p in probs.items()}
+    gp, dz = decode_class_a_full(counts, 1, q, q_frac, lay, qc.num_qubits)
+    for r in range(2):
+        for c in range(2):
+            big_a, big_b = int(Ia[r, c]) << f, K * int(Ib[r, c])
+            assert dz[r, c] == (big_a + big_b == 0)
+            if big_a + big_b:
+                mag = (abs(big_a - big_b) << q_frac) // (big_a + big_b)
+                want = (-1.0 if big_b > big_a else 1.0) * mag / (1 << q_frac)
+                assert gp[r, c] == want
+
+
+def test_class_a_gp_lookup_g1_unchanged() -> None:
+    Ia = np.array([[3, 0], [1, 2]])
+    Ib = np.array([[1, 0], [3, 2]])
+    qc0, lay0 = class_a_gp_lookup(Ia, Ib, q=2, q_frac=2)
+    for kw in ({"G": 1.0}, {"G": 1.0, "g_frac_bits": 4}):
+        qc1, lay1 = class_a_gp_lookup(Ia, Ib, q=2, q_frac=2, **kw)  # type: ignore[arg-type]
+        assert lay1 == lay0
+        assert [(i.operation.name, i.qubits) for i in qc1.data] == [
+            (i.operation.name, i.qubits) for i in qc0.data
+        ]
