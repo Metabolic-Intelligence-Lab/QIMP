@@ -33,8 +33,7 @@ from qimp.io.image import load_tiff_16bit
 from qimp.metrics import psnr
 from qimp.processing.filters import qhed_filter, qhed_full_edges
 from qimp.processing.geometric import axis_flip
-from qimp.runtime import get_simulator
-from qimp.testing import _ensure_measured, exact_counts
+from qimp.testing import exact_counts, ideal_simulation
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "paper" / "softwarex" / "figures"
@@ -49,13 +48,6 @@ def _quantise(x: np.ndarray, q: int) -> np.ndarray:
     x = x.astype(float)
     top = float(x.max()) or 1.0
     return np.clip(np.round(x / top * ((1 << q) - 1)), 0, (1 << q) - 1).astype(int)
-
-
-def _seeded_counts(qc: qiskit.QuantumCircuit, shots: int, seed: int = SEED) -> dict[str, int]:
-    """Shot-sampled counts on the noise-free Aer simulator, with a fixed seed."""
-    sim = get_simulator()
-    t = transpile(_ensure_measured(qc), sim, seed_transpiler=seed)
-    return dict(sim.run(t, shots=shots, seed_simulator=seed).result().get_counts())
 
 
 def _patch(n: int, row0: int = 10, col0: int = 18) -> tuple[np.ndarray, np.ndarray]:
@@ -136,35 +128,17 @@ def fig_architecture(path: Path) -> None:
     plt.close(fig)
 
 
-def roundtrip_numbers(n: int = 3, q: int = 8) -> dict[str, float]:
-    """FRQI (shot-free, exact) and NEQR round trip on one 8x8 channel."""
-    a, _ = _patch(n)
-    img8 = _quantise(a, q).astype(np.uint8)
-    out: dict[str, float] = {}
-    neqr = NeqrEncoder()
-    qc = neqr.encode(img8)
-    counts = exact_counts(qc)
-    rec = neqr.decode(counts)
-    out["neqr_qubits"] = qc.num_qubits
-    out["neqr_exact"] = float(np.array_equal(rec, img8))
-    frqi = FrqiEncoder()
-    qc = frqi.encode(img8)
-    counts = exact_counts(qc)
-    rec = frqi.decode(counts)
-    out["frqi_qubits"] = qc.num_qubits
-    out["frqi_psnr_db"] = float(psnr(img8, rec, max_intensity=255))
-    return out
-
-
 def fig_examples(path: Path, n: int = 3, q: int = 8, shots: int = 8192) -> dict[str, float]:
-    """Encode / process / decode one 8x8 channel of the Laurdan frame."""
+    """Encode / process / decode one 2^n x 2^n, q-bit channel of the Laurdan frame."""
+    side = 1 << n
     a, _ = _patch(n)
     img = _quantise(a, q).astype(np.uint8)
-    out: dict[str, float] = {"side": 1 << n, "q": q, "shots": shots}
+    out: dict[str, float] = {"side": side, "q": q, "shots": shots}
 
     frqi = FrqiEncoder()
     qc = frqi.encode(img)
-    rec_frqi = frqi.decode(_seeded_counts(qc, shots))
+    out["frqi_psnr_db"] = float(psnr(img, frqi.decode(exact_counts(qc)), max_intensity=255))
+    rec_frqi = frqi.decode(ideal_simulation(qc, shots=shots, seed=SEED))
     out["frqi_qubits"] = qc.num_qubits
     out["frqi_psnr_shots_db"] = float(psnr(img, rec_frqi, max_intensity=255))
 
@@ -174,28 +148,30 @@ def fig_examples(path: Path, n: int = 3, q: int = 8, shots: int = 8192) -> dict[
     out["neqr_qubits"] = qc.num_qubits
     out["neqr_exact"] = float(np.array_equal(rec_neqr, img))
 
-    qc = neqr.encode(img)
-    axis_flip(qc, n, axis="x", pos_offset=q)
-    flipped = neqr.decode(exact_counts(qc))
-    out["neqr_flip_exact"] = float(
-        np.array_equal(flipped, img[:, ::-1]) or np.array_equal(flipped, img[::-1, :])
-    )
+    # axis="x" inverts the row index.
+    qc_flip = qc.copy()
+    axis_flip(qc_flip, n, axis="x", pos_offset=q)
+    flipped = neqr.decode(exact_counts(qc_flip))
+    out["neqr_flip_exact"] = float(np.array_equal(flipped, img[::-1, :]))
 
     qc_h, _, _ = qhed_filter(img.astype(float))
     qc_v, _, _ = qhed_filter(img.T.astype(float))
     edges = qhed_full_edges(img.astype(float), exact_counts(qc_h), exact_counts(qc_v))
+    # The cyclic shift wraps the last column of the horizontal pass and, after
+    # the transpose, the last row of the vertical pass: drop both.
+    edges = edges[:-1, :-1]
     out["qhed_qubits"] = qc_h.num_qubits
 
     fig, axs = plt.subplots(1, 5, figsize=(13, 3))
     panels = [
-        (img, "input (8-bit, 8x8)"),
+        (img, f"input ({q}-bit, {side}x{side})"),
         (
             rec_frqi,
             f"FRQI, {out['frqi_qubits']} qubits\n{shots} shots, PSNR {out['frqi_psnr_shots_db']:.1f} dB",
         ),
         (rec_neqr, f"NEQR, {out['neqr_qubits']} qubits\nexact round trip"),
         (flipped, "NEQR + axis_flip"),
-        (edges[:, :-1], f"QHED edges, {out['qhed_qubits']} qubits\n(wrap-around column dropped)"),
+        (edges, f"QHED edges, {out['qhed_qubits']} qubits\n(wrap-around row and column dropped)"),
     ]
     for ax, (im_, title) in zip(axs, panels, strict=True):
         im = ax.imshow(im_, cmap="gray")
@@ -245,7 +221,6 @@ def main() -> None:
     numbers = {
         "versions": {"qiskit": qiskit.__version__, "qiskit_aer": qiskit_aer.__version__},
         "seed": SEED,
-        "roundtrip": roundtrip_numbers(),
         "examples": fig_examples(OUT / "fig2_examples.png"),
         "resources": resource_table(),
     }
