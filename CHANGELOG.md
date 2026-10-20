@@ -72,6 +72,13 @@ the library that were documented as planned.
   `theta -> pi - theta`; the gate implements `theta -> pi/2 - theta`.
 - Docstrings of `q_div_restoring` and of `qimp.processing.ratiometric_circuit`
   no longer describe inverses and operators that exist as missing.
+- `q_mul_const` documented the accumulator as "not assumed to be initially
+  zero"; the shifted adds do not propagate a carry out of their window, so
+  the result is `b * k` only from a zeroed accumulator. The docstring now
+  states the precondition. The circuit is unchanged.
+- Stale comments in `qimp.processing.ratiometric_circuit` that described
+  the Class C composition as not packaged, although `class_c_rogfp_full`
+  exists.
 - The 0.3.0 entry of this changelog had been split by a misplaced heading.
 
 ## [0.3.0] - 2026-10-19

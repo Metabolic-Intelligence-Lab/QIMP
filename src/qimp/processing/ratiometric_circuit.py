@@ -803,7 +803,7 @@ def class_b_ratio_inv(
         ``class_b_ratio`` circuit (the inverse re-uses the same
         per-pixel encoding gates).
     layout
-        The layout dict returned by :func:`class_b_ratio` — its qubit
+        The layout dict returned by :func:`class_b_ratio`; its qubit
         indices direct the inverse onto the right registers.
     """
     # First undo the divider step.
@@ -1282,7 +1282,7 @@ def decode_class_a_prefix(
 
 
 # ============================================================================
-# Class C — roGFP calibrated ratio (affine reparametrisation primitive)
+# Class C: roGFP calibrated ratio (affine reparametrisation primitive)
 # ============================================================================
 
 
@@ -1306,21 +1306,18 @@ def affine_subtract_constant(
     Parameters
     ----------
     R_qubits
-        ``q``-bit unsigned input register
-        preserved on exit.
+        ``q``-bit unsigned input register, preserved on exit.
     c_value
         Classical non-negative integer in ``[0, 2^(q+1) - 1]``.
     output_signed_qubits
-        ``q + 1``-bit register, ``|0⟩`` on entry
-        holds
+        ``q + 1``-bit register, ``|0⟩`` on entry; holds
         ``(R - c_value) mod 2^(q+1)`` on exit (MSB is the sign bit).
     c_const_register_qubits
         ``q + 1``-bit ancilla, ``|0⟩`` on entry and exit. Used to hold
         ``c_value`` temporarily during the subtract.
     sub_carry_qubits
         ``q + 2``-bit carry register for the subtractor, ``|0⟩`` on
-        entry
-        dirty on exit (carries from the subtract).
+        entry, dirty on exit (carries from the subtract).
 
     Notes
     -----
@@ -1331,8 +1328,8 @@ def affine_subtract_constant(
     ``R_C = (R - R_red) / (R_ox - R_red)``. The division by the
     classical constant ``R_ox - R_red`` is naturally implemented
     downstream as a ``q_mul_const`` with ``k = 2^k_frac / (R_ox - R_red)``
-    in fixed-point — see the recipe at the bottom of this module for
-    the full composition.
+    in fixed point; :func:`class_c_rogfp_full` packages the full
+    composition.
 
     Composition example (Class B → affine subtract, autonomous Class C
     without the optional 1/(R_ox - R_red) rescaling)::
@@ -1371,15 +1368,12 @@ def affine_subtract_constant(
 
     For an in-circuit /(R_ox - R_red) rescaling, append a ``q_mul_const``
     with ``k_bits`` encoding ``2^k_frac / (R_ox - R_red)`` as a fixed-point
-    integer
-    the multiply consumes ``R_C_idx`` as its ``b`` argument and
+    integer; the multiply consumes ``R_C_idx`` as its ``b`` argument and
     writes the scaled result to a fresh accumulator.
 
-    At n=1, q=2 the whole pipeline costs ~35 qubits, past laptop
-    statevector range
-    component correctness is established by the
-    bit-exact unit tests of each primitive (`q_div_restoring`,
-    `affine_subtract_constant`).
+    At n=1, q=2 the whole pipeline needs about 35 qubits. Each primitive
+    (`q_div_restoring`, `affine_subtract_constant`) has bit-exact unit
+    tests, and :func:`class_c_rogfp_full` packages the composition.
     """
     q = len(R_qubits)
     q_w = q + 1
@@ -1399,7 +1393,7 @@ def affine_subtract_constant(
         raise ValueError(f"c_value={c_value} out of range [0, 2^(q+1) - 1] = [0, {(1 << q_w) - 1}]")
 
     # Copy R (q-bit) into the low q bits of output_signed (q+1-bit).
-    # MSB stays 0 — this is the zero-extension that turns the unsigned
+    # MSB stays 0: this is the zero-extension that turns the unsigned
     # value into a positive signed value before the subtract.
     for i in range(q):
         qc.cx(R_qubits[i], output_signed_qubits[i])
@@ -1421,24 +1415,12 @@ def affine_subtract_constant(
             qc.x(c_const_register_qubits[i])
 
 
-# ----- Class C top-level composition (Class B → affine subtract) ---------
+# ----- Class C top-level composition -----------------------------------
 #
-# The full autonomous Class C circuit is the composition
-#
-#     dual_neqr_load
-#     → q_div_restoring     (Class B integer ratio R = I_a // I_b)
-#     → affine_subtract_constant  (R - R_red, signed q+1 bits)
-#     → (optional) q_mul_const  (× 2^k / (R_ox - R_red), fixed-point)
-#
-# At n=1, q=2 the layout would total ~35 qubits — past statevector
-# range for the typical 16 GB laptop. We therefore do NOT package the
-# composition as a single function: instead we provide
-# `affine_subtract_constant` as a bit-exact-testable primitive, and
-# leave it to the caller to chain it with `class_b_ratio`'s output
-# quotient register inside a larger QuantumCircuit. See
-# `test_affine_subtract_constant` for an isolated bit-exact check;
-# the chained composition is straightforward and not separately tested
-# under statevector.
+# The autonomous Class C circuit is dual_neqr_load, a fractional ratio
+# (shift by q_frac, then q_div_general) and affine_subtract_constant
+# (ratio - R_red, signed). It is packaged as class_c_rogfp_full below;
+# affine_subtract_constant is the bit-exact-testable primitive it uses.
 
 
 def class_a_gp_full(
@@ -1700,9 +1682,8 @@ def class_c_rogfp_full(
 
         R_C(p) = rc_signed(p) / ((R_ox - R_red) * 2^q_frac)  in [0, 1]
 
-    — exactly as a wet-lab roGFP calibration applies (R_ox - R_red), and
-    in direct parallel with the ``/2^q_frac`` scalar of the Class-A
-    decoder. The fractional ratio (shift by ``q_frac`` then non-square
+    This is how a wet-lab roGFP calibration applies (R_ox - R_red), and
+    it parallels the ``/2^q_frac`` scalar of the Class-A decoder. The fractional ratio (shift by ``q_frac`` then non-square
     divide) is what lifts the integer-quotient degeneracy that makes
     Class B uninformative for roGFP at small ``q`` (the sub-unit
     physiological F405/F488 ratio).
@@ -1711,14 +1692,14 @@ def class_c_rogfp_full(
       1. ``dual_neqr_load(I_a, I_b)``
       2. Bit-shift I_a up by ``q_frac`` into ``num_scaled`` (CNOT copy).
       3. ``q_div_general(num_scaled, I_b)`` → ``ratio`` holds the
-         fixed-point fractional ratio
-         div-zero flag set iff I_b == 0.
+         fixed-point fractional ratio; the div-zero flag is set iff
+         I_b == 0.
       4. ``affine_subtract_constant(ratio, R_red_fp)`` → ``rc_signed``
          holds ``ratio - R_red_fp`` (signed two's-complement).
 
-    Resource budget at n=1, q=4, q_frac=4: ~114 qubits — past laptop
-    statevector. Use ``AerSimulator(method='matrix_product_state')``
-    the bond dimension
+    Resource budget at n=1, q=4, q_frac=4: about 114 qubits, beyond
+    laptop statevector simulation. Use
+    ``AerSimulator(method='matrix_product_state')``: the bond dimension
     stays small because the position register superposes only ``4^n``
     pixel branches.
 

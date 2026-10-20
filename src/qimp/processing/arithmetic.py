@@ -320,8 +320,8 @@ def q_mul_const(
     c_qubits: Sequence[int],
     guard_qubit: int,
 ) -> QuantumCircuit:
-    """Multiply ``b`` by a classical constant via shift-add into the
-    accumulator: ``accum ← accum + b · k`` (mod ``2**(q + m)``).
+    """Multiply ``b`` by a classical constant via shift-add into a zeroed
+    accumulator: ``accum ← b · k`` (mod ``2**(q + m)``).
 
     Parameters
     ----------
@@ -331,9 +331,16 @@ def q_mul_const(
         Classical bit pattern of ``k`` as a sequence of ``{0, 1}`` values,
         little-endian (``k = Σ k_bits[i] · 2**i``). ``len(k_bits) = m``.
     accum_qubits
-        Accumulator register of width ``q + m`` bits; not assumed to be
-        initially zero — the operation is ``accum += b · k`` (modular at
-        the accumulator width).
+        Accumulator register of width ``q + m`` bits, ``|0⟩`` on entry.
+        Each set bit ``i`` of ``k`` adds ``b`` into the ``(q + 1)``-bit
+        window ``accum[i .. i + q]``; starting from zero, the partial sum
+        in that window is below ``2**q`` before every add, so no carry is
+        lost and the result is exactly ``b · k``. With a non-zero
+        accumulator on entry an intermediate add can overflow its window,
+        and the carry-out is not propagated, so the result is not
+        ``accum + b · k`` in general. To add a product onto an existing
+        value, multiply into a fresh zeroed register and add it with
+        :func:`q_add`.
     c_qubits
         Carry-scratch register. Width must be at least
         ``popcount(k) * (q + 2)`` — each shift consumes a fresh
