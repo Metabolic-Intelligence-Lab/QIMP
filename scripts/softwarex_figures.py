@@ -19,6 +19,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import qiskit
+import qiskit_aer
 from matplotlib.patches import FancyBboxPatch
 from qiskit import transpile
 
@@ -31,11 +33,15 @@ from qimp.io.image import load_tiff_16bit
 from qimp.metrics import psnr
 from qimp.processing.filters import qhed_filter, qhed_full_edges
 from qimp.processing.geometric import axis_flip
-from qimp.testing import exact_counts, ideal_simulation
+from qimp.runtime import get_simulator
+from qimp.testing import _ensure_measured, exact_counts
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "paper" / "softwarex" / "figures"
 FRAME = ROOT / "data" / "immagini" / "trainQML" / "membraneStack_Sample011_L_UV_DC_001rbc3DM2.tif"
+# Fixed seed for the shot-sampled FRQI reconstruction, so the quoted PSNR is
+# reproducible for a given Qiskit Aer version.
+SEED = 0
 
 
 def _quantise(x: np.ndarray, q: int) -> np.ndarray:
@@ -43,6 +49,13 @@ def _quantise(x: np.ndarray, q: int) -> np.ndarray:
     x = x.astype(float)
     top = float(x.max()) or 1.0
     return np.clip(np.round(x / top * ((1 << q) - 1)), 0, (1 << q) - 1).astype(int)
+
+
+def _seeded_counts(qc: qiskit.QuantumCircuit, shots: int, seed: int = SEED) -> dict[str, int]:
+    """Shot-sampled counts on the noise-free Aer simulator, with a fixed seed."""
+    sim = get_simulator()
+    t = transpile(_ensure_measured(qc), sim, seed_transpiler=seed)
+    return dict(sim.run(t, shots=shots, seed_simulator=seed).result().get_counts())
 
 
 def _patch(n: int, row0: int = 10, col0: int = 18) -> tuple[np.ndarray, np.ndarray]:
@@ -151,7 +164,7 @@ def fig_examples(path: Path, n: int = 3, q: int = 8, shots: int = 8192) -> dict[
 
     frqi = FrqiEncoder()
     qc = frqi.encode(img)
-    rec_frqi = frqi.decode(ideal_simulation(qc, shots=shots))
+    rec_frqi = frqi.decode(_seeded_counts(qc, shots))
     out["frqi_qubits"] = qc.num_qubits
     out["frqi_psnr_shots_db"] = float(psnr(img, rec_frqi, max_intensity=255))
 
@@ -230,6 +243,8 @@ def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     fig_architecture(OUT / "fig1_architecture.png")
     numbers = {
+        "versions": {"qiskit": qiskit.__version__, "qiskit_aer": qiskit_aer.__version__},
+        "seed": SEED,
         "roundtrip": roundtrip_numbers(),
         "examples": fig_examples(OUT / "fig2_examples.png"),
         "resources": resource_table(),
