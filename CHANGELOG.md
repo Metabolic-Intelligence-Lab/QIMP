@@ -7,26 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.3.0] - 2026-10-19
+## [0.3.1] - 2026-10-20
 
 Release described in the SoftwareX software paper.
 
-### Fixed
-- README quick start: `FrqiEncoder.decode` takes the counts only (the
-  example passed an `n=` keyword that the method does not accept).
-- Lint, formatting and `mypy` errors that made the CI `lint` job fail.
-
 ### Added
-- `scripts/softwarex_figures.py`, which regenerates the figures and numbers
-  of the software paper from the bundled Laurdan frame on a simulator.
-- `CITATION.cff`.
+- `qimp.testing.ideal_simulation` takes an optional keyword `seed` that
+  fixes the transpiler and simulator seeds. The default (`None`) keeps the
+  previous behaviour.
 
+### Fixed
+- `scripts/softwarex_figures.py`: the QHED panel now drops the wrap-around
+  row of the vertical pass as well as the wrap-around column of the
+  horizontal pass; the axis-flip check compares against the row inversion
+  only; the shot-sampled FRQI run uses `ideal_simulation(seed=...)`; panel
+  titles follow `n` and `q`; the NEQR circuit and the frame are built once.
+- `examples/05_real_image_pipeline.py` falls back to the bundled Laurdan
+  frame also when `Train_QML_16/` holds only blank tiles, and its messages
+  name the data actually used.
+- This changelog: the 0.3.0 entries had been split by a misplaced heading.
+
+## [0.3.0] - 2026-10-19
 
 The autonomous-ratiometric line of work: a reversible-arithmetic layer on
 NEQR intensity registers, three end-to-end operator pipelines built on it,
 a QAE oracle composed from them, and the IBM Heron r2 runtime used to put
 the smallest of them on real hardware. This is the library behind the
-`autonomous_qimp_paper` manuscript.
+`autonomous_qimp_paper` manuscript. The release also prepares the
+repository for the SoftwareX software paper.
+
+### Added — release preparation
+- `scripts/softwarex_figures.py`, which regenerates the figures and numbers
+  of the software paper from the bundled Laurdan frame on a simulator.
+- `CITATION.cff`.
+
+### Fixed — release preparation
+- README quick start: `FrqiEncoder.decode` takes the counts only (the
+  example passed an `n=` keyword that the method does not accept).
+- Lint, formatting and `mypy` errors that made the CI `lint` job fail.
 
 ### Added — processing / arithmetic
 - **Inverses and controlled variants** for every adder: `qc_add_1_inv`,

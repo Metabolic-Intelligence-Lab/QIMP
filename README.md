@@ -63,7 +63,7 @@ cd QIMP
 pip install -e ".[dev]"
 
 # Or install a pinned tag directly with pip (no clone needed)
-pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.0"
+pip install "git+https://github.com/Metabolic-Intelligence-Lab/QIMP.git@v0.3.1"
 ```
 
 ### Optional extras
